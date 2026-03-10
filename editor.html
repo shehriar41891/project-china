@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Network Builder — Neural Network Playground</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="editor.css">
+</head>
+<body>
+  <header class="editor-header">
+    <a href="index.html" class="back-link">← Home</a>
+    <h1>Network Builder</h1>
+    <p class="subtitle">Connect Dataset → Input Layer → Hidden Layer(s) → Output Layer. Each node type is separate.</p>
+    <div class="header-actions">
+      <button type="button" class="btn-guide" id="btn-guide" title="How to use">?</button>
+      <button type="button" class="btn btn-secondary" id="btn-clear">Clear</button>
+      <button type="button" class="btn btn-primary" id="btn-run">
+        <i class="material-icons" style="font-size:18px;vertical-align:middle;">play_arrow</i> Run training
+      </button>
+    </div>
+  </header>
+
+  <div class="editor-layout">
+    <aside class="node-palette">
+      <h3>Nodes</h3>
+      <p class="palette-hint">Drag onto canvas. Connect: Dataset → Input → Hidden → Output</p>
+      <div class="palette-group">
+        <span class="palette-label">Data</span>
+        <div class="palette-node palette-node--dataset" data-node-type="dataset" data-label="Dataset" draggable="true">
+          <span class="palette-node-icon" aria-hidden="true">D</span>
+          Dataset
+        </div>
+      </div>
+      <div class="palette-group">
+        <span class="palette-label">Layers</span>
+        <div class="palette-node palette-node--input" data-node-type="input" data-label="Input Layer" draggable="true">
+          <span class="palette-node-icon" aria-hidden="true">In</span>
+          Input Layer
+        </div>
+        <div class="palette-node palette-node--hidden" data-node-type="layer" data-label="Hidden Layer" draggable="true">
+          <span class="palette-node-icon" aria-hidden="true">H</span>
+          Hidden Layer
+        </div>
+        <div class="palette-node palette-node--output" data-node-type="output" data-label="Output Layer" draggable="true">
+          <span class="palette-node-icon" aria-hidden="true">Out</span>
+          Output Layer
+        </div>
+      </div>
+    </aside>
+
+    <main class="node-canvas-wrap">
+      <div class="node-canvas" id="node-canvas">
+        <svg class="edge-layer" id="edge-layer"></svg>
+        <div class="nodes-container" id="nodes-container"></div>
+        <div class="canvas-placeholder" id="canvas-placeholder">Drop nodes here · Dataset → Input Layer → Hidden → Output Layer</div>
+      </div>
+    </main>
+  </div>
+
+  <div class="run-result" id="run-result"></div>
+
+  <!-- User guide overlay -->
+  <div class="guide-overlay" id="guide-overlay">
+    <div class="guide-card">
+      <div class="guide-head">
+        <h2 id="guide-title">How to build your network</h2>
+        <p id="guide-subtitle">Follow these steps to design and run training.</p>
+        <div class="guide-step-dots" id="guide-dots"></div>
+      </div>
+      <div class="guide-body" id="guide-body"></div>
+      <div class="guide-foot">
+        <button type="button" class="btn btn-ghost" id="guide-close">Got it</button>
+        <button type="button" class="btn btn-next" id="guide-next">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="node-editor.js"></script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Neural Network Playground</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: linear-gradient(160deg, #f0f9fc 0%, #e8f4f8 50%, #f5f5f5 100%);
+      min-height: 100vh;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+    }
+    .site-header {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      background: rgba(255,255,255,0.6);
+    }
+    .site-header .logo { font-weight: 600; color: #0d7ea4; text-decoration: none; font-size: 1.1rem; }
+    .lang-switcher {
+      display: flex;
+      gap: 4px;
+    }
+    .lang-switcher button {
+      padding: 6px 12px;
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #666;
+    }
+    .lang-switcher button:hover { border-color: #0d7ea4; color: #0d7ea4; }
+    .lang-switcher button.active { background: #0d7ea4; color: #fff; border-color: #0d7ea4; }
+    main {
+      flex: 1;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px 64px;
+      width: 100%;
+    }
+    .intro h1 {
+      font-size: 1.85rem;
+      font-weight: 600;
+      color: #0d7ea4;
+      margin: 0 0 20px 0;
+    }
+    .intro .lead {
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: #444;
+      margin: 0 0 24px 0;
+    }
+    .intro .detail {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #555;
+      margin: 0 0 32px 0;
+    }
+    .cta-wrap {
+      margin-top: 32px;
+      margin-bottom: 48px;
+    }
+    .cta-wrap a {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #0d7ea4;
+      color: #fff;
+      border-radius: 10px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .cta-wrap a:hover { background: #095a75; }
+    .site-footer {
+      padding: 24px 24px 32px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      background: rgba(255,255,255,0.5);
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .site-footer nav {
+      margin-bottom: 12px;
+    }
+    .site-footer a {
+      color: #0d7ea4;
+      text-decoration: none;
+      margin: 0 12px;
+    }
+    .site-footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" class="logo" data-i18n="siteName">Neural Network Playground</a>
+    <div class="lang-switcher">
+      <button type="button" data-lang="en" class="active">English</button>
+      <button type="button" data-lang="zh">中文</button>
+      <button type="button" data-lang="ja">日本語</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h1 data-i18n="title">Neural Network Playground</h1>
+      <p class="lead" data-i18n="lead">
+        This project helps you understand how neural networks learn. You can build a small network with a visual editor, connect layers and activation functions, attach a dataset, and run training — all in the browser, with no code.
+      </p>
+      <p class="detail" data-i18n="detail">
+        Use the Network Builder to design your architecture: add a dataset node, add one or more hidden layers (each with a chosen number of neurons and activation function), connect them to an output node, then start training. The playground will show how the model learns to fit or classify the data.
+      </p>
+      <div class="cta-wrap">
+        <a href="editor.html" data-i18n="openBuilder">Open Network Builder →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <nav>
+      <a href="about.html" data-i18n="about">About</a>
+      <a href="editor.html" data-i18n="openBuilderShort">Network Builder</a>
+      <a href="playground.html" data-i18n="classicBuilder">Classic builder</a>
+      <a href="https://github.com/tensorflow/playground" target="_blank" rel="noopener">Source on GitHub</a>
+    </nav>
+    <span data-i18n="footerCredit">Learn and experiment with neural networks in your browser.</span>
+  </footer>
+
+  <script>
+    var i18n = {
+      en: {
+        siteName: 'Neural Network Playground',
+        title: 'Neural Network Playground',
+        lead: 'This project helps you understand how neural networks learn. You can build a small network with a visual editor, connect layers and activation functions, attach a dataset, and run training — all in the browser, with no code.',
+        detail: 'Use the Network Builder to design your architecture: add a dataset node, add one or more hidden layers (each with a chosen number of neurons and activation function), connect them to an output node, then start training. The playground will show how the model learns to fit or classify the data.',
+        openBuilder: 'Open Network Builder →',
+        openBuilderShort: 'Network Builder',
+        classicBuilder: 'Classic builder',
+        about: 'About',
+        footerCredit: 'Learn and experiment with neural networks in your browser.'
+      },
+      zh: {
+        siteName: '神经网络游乐场',
+        title: '神经网络游乐场',
+        lead: '本项目帮助您理解神经网络如何学习。您可以使用可视化编辑器构建小型网络、连接层与激活函数、选择数据集并运行训练，全部在浏览器中完成，无需编写代码。',
+        detail: '在「网络构建器」中设计结构：添加数据集节点，添加一个或多个隐藏层（每层可设置神经元数量和激活函数），连接到输出节点，然后开始训练。游乐场将展示模型如何学习拟合或分类数据。',
+        openBuilder: '打开网络构建器 →',
+        openBuilderShort: '网络构建器',
+        classicBuilder: '经典构建器',
+        about: '关于',
+        footerCredit: '在浏览器中学习与实验神经网络。'
+      },
+      ja: {
+        siteName: 'ニューラルネットワークプレイグラウンド',
+        title: 'ニューラルネットワークプレイグラウンド',
+        lead: 'このプロジェクトでは、ニューラルネットワークの学習の仕組みを学べます。ビジュアルエディタで小さなネットワークを組み、層と活性化関数を接続し、データセットを選んでトレーニングを実行できます。すべてブラウザ内で、コード不要です。',
+        detail: 'ネットワークビルダーでアーキテクチャを設計します：データセットノードを置き、1つ以上の隠れ層（各層でニューロン数と活性化関数を選択）を追加し、出力ノードに接続してトレーニングを開始します。プレイグラウンドでモデルがデータにどう適合・分類するかが確認できます。',
+        openBuilder: 'ネットワークビルダーを開く →',
+        openBuilderShort: 'ネットワークビルダー',
+        classicBuilder: 'クラシックビルダー',
+        about: 'このサイトについて',
+        footerCredit: 'ブラウザでニューラルネットワークを学び、実験できます。'
+      }
+    };
+    var lang = localStorage.getItem('nnp-lang') || 'en';
+    function setLang(l) {
+      lang = l;
+      localStorage.setItem('nnp-lang', l);
+      document.querySelectorAll('.lang-switcher button').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.lang === l);
+      });
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (i18n[l] && i18n[l][key]) el.textContent = i18n[l][key];
+      });
+    }
+    document.querySelectorAll('.lang-switcher button').forEach(function(btn) {
+      btn.addEventListener('click', function() { setLang(btn.dataset.lang); });
+    });
+    setLang(lang);
+  </script>
+</body>
+</html>

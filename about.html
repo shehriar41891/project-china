@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="pageTitle">About — Neural Network Playground</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: linear-gradient(160deg, #f0f9fc 0%, #e8f4f8 50%, #f5f5f5 100%);
+      min-height: 100vh;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+    }
+    .site-header {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      background: rgba(255,255,255,0.6);
+    }
+    .site-header .logo { font-weight: 600; color: #0d7ea4; text-decoration: none; font-size: 1.1rem; }
+    .lang-switcher { display: flex; gap: 4px; }
+    .lang-switcher button {
+      padding: 6px 12px;
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #666;
+    }
+    .lang-switcher button:hover { border-color: #0d7ea4; color: #0d7ea4; }
+    .lang-switcher button.active { background: #0d7ea4; color: #fff; border-color: #0d7ea4; }
+    main {
+      flex: 1;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 48px 24px 64px;
+      width: 100%;
+    }
+    main h1 { font-size: 1.5rem; color: #0d7ea4; margin: 0 0 24px 0; }
+    main p { line-height: 1.75; color: #444; margin: 0 0 16px 0; }
+    main a { color: #0d7ea4; text-decoration: none; }
+    main a:hover { text-decoration: underline; }
+    .site-footer {
+      padding: 24px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      background: rgba(255,255,255,0.5);
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .site-footer a { color: #0d7ea4; text-decoration: none; margin: 0 12px; }
+    .site-footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" class="logo" data-i18n="siteName">Neural Network Playground</a>
+    <div class="lang-switcher">
+      <button type="button" data-lang="en" class="active">English</button>
+      <button type="button" data-lang="zh">中文</button>
+      <button type="button" data-lang="ja">日本語</button>
+    </div>
+  </header>
+
+  <main>
+    <h1 data-i18n="aboutTitle">About</h1>
+    <p data-i18n="about1">
+      This Neural Network Playground is an educational tool to explore how neural networks learn. You can design a small feedforward network using a node-graph editor: add a dataset, add hidden layers with a chosen number of neurons and activation function, connect them to an output, and run training. Results are shown in the classic playground view (loss curves and decision boundary).
+    </p>
+    <p data-i18n="about2">
+      The project is based on the TensorFlow Playground by Daniel Smilkov and Shan Carter. This version adds a visual node-graph builder, multi-language support (English, Chinese, Japanese), and a clearer flow from building the network to running training.
+    </p>
+    <p>
+      <a href="index.html" data-i18n="backHome">← Back to home</a> ·
+      <a href="editor.html" data-i18n="openBuilder">Open Network Builder</a> ·
+      <a href="https://github.com/tensorflow/playground" target="_blank" rel="noopener">Source on GitHub</a>
+    </p>
+  </main>
+
+  <footer class="site-footer">
+    <a href="index.html" data-i18n="home">Home</a>
+    <a href="about.html" data-i18n="about">About</a>
+    <a href="editor.html" data-i18n="openBuilderShort">Network Builder</a>
+  </footer>
+
+  <script>
+    var i18n = {
+      en: {
+        siteName: 'Neural Network Playground',
+        pageTitle: 'About — Neural Network Playground',
+        aboutTitle: 'About',
+        about1: 'This Neural Network Playground is an educational tool to explore how neural networks learn. You can design a small feedforward network using a node-graph editor: add a dataset, add hidden layers with a chosen number of neurons and activation function, connect them to an output, and run training. Results are shown in the classic playground view (loss curves and decision boundary).',
+        about2: 'The project is based on the TensorFlow Playground by Daniel Smilkov and Shan Carter. This version adds a visual node-graph builder, multi-language support (English, Chinese, Japanese), and a clearer flow from building the network to running training.',
+        backHome: '← Back to home',
+        openBuilder: 'Open Network Builder',
+        openBuilderShort: 'Network Builder',
+        about: 'About',
+        home: 'Home'
+      },
+      zh: {
+        siteName: '神经网络游乐场',
+        pageTitle: '关于 — 神经网络游乐场',
+        aboutTitle: '关于',
+        about1: '本神经网络游乐场是一个教学工具，用于探索神经网络如何学习。您可以使用节点图编辑器设计小型前馈网络：添加数据集、添加具有选定神经元数量和激活函数的隐藏层、连接到输出并运行训练。结果在经典游乐场视图中显示（损失曲线与决策边界）。',
+        about2: '本项目基于 Daniel Smilkov 与 Shan Carter 的 TensorFlow Playground。此版本增加了可视化节点图构建器、多语言支持（英语、中文、日语）以及从构建网络到运行训练的更清晰流程。',
+        backHome: '← 返回首页',
+        openBuilder: '打开网络构建器',
+        openBuilderShort: '网络构建器',
+        about: '关于',
+        home: '首页'
+      },
+      ja: {
+        siteName: 'ニューラルネットワークプレイグラウンド',
+        pageTitle: 'このサイトについて — ニューラルネットワークプレイグラウンド',
+        aboutTitle: 'このサイトについて',
+        about1: 'このニューラルネットワークプレイグラウンドは、ニューラルネットワークの学習を理解するための教育ツールです。ノードグラフエディタで小さな順伝播ネットワークを設計できます：データセットを追加し、ニューロン数と活性化関数を選んだ隠れ層を追加し、出力に接続してトレーニングを実行します。結果は従来のプレイグラウンド画面（損失曲線と決定境界）で表示されます。',
+        about2: '本プロジェクトは、Daniel Smilkov と Shan Carter による TensorFlow Playground を基にしています。この版では、ビジュアルなノードグラフビルダー、多言語対応（英語・中国語・日本語）、ネットワーク構築からトレーニング実行までの分かりやすい流れを追加しています。',
+        backHome: '← ホームへ',
+        openBuilder: 'ネットワークビルダーを開く',
+        openBuilderShort: 'ネットワークビルダー',
+        about: 'このサイトについて',
+        home: 'ホーム'
+      }
+    };
+    var lang = localStorage.getItem('nnp-lang') || 'en';
+    function setLang(l) {
+      lang = l;
+      localStorage.setItem('nnp-lang', l);
+      document.querySelectorAll('.lang-switcher button').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.lang === l);
+      });
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (i18n[l] && i18n[l][key]) el.textContent = i18n[l][key];
+      });
+      var t = document.querySelector('title');
+      if (t && t.hasAttribute('data-i18n') && i18n[l] && i18n[l].pageTitle) t.textContent = i18n[l].pageTitle;
+    }
+    document.querySelectorAll('.lang-switcher button').forEach(function(btn) {
+      btn.addEventListener('click', function() { setLang(btn.dataset.lang); });
+    });
+    setLang(lang);
+  </script>
+</body>
+</html>
