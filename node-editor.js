@@ -4,6 +4,7 @@
   var nodeIdCounter = 0;
   var nodes = {};
   var edges = [];
+  var restoring = false;
   var canvas = document.getElementById('node-canvas');
   var nodesContainer = document.getElementById('nodes-container');
   var edgeLayer = document.getElementById('edge-layer');
@@ -34,17 +35,6 @@
           '</select></label>' +
         '</div>' +
         '<div class="node-ports"><div class="inputs"></div><div class="outputs"><span class="port output" data-port="out"></span></div></div>';
-    } else if (type === 'input') {
-      el.innerHTML =
-        '<button type="button" class="node-delete" aria-label="Remove">×</button>' +
-        '<div class="node-title">Input Layer</div>' +
-        '<div class="node-body">' +
-          '<label class="node-field"><span>Input size</span><select class="node-select input-size">' +
-            '<option value="2">2</option>' +
-          '</select></label>' +
-          '<p class="node-hint">Receives data from Dataset</p>' +
-        '</div>' +
-        '<div class="node-ports"><div class="inputs"><span class="port input" data-port="in"></span></div><div class="outputs"><span class="port output" data-port="out"></span></div></div>';
     } else if (type === 'layer') {
       el.innerHTML =
         '<button type="button" class="node-delete" aria-label="Remove">×</button>' +
@@ -89,7 +79,81 @@
     portListeners(el);
     dragNode(el, nid);
     updatePlaceholder();
+    if (!restoring) saveGraph();
     return nid;
+  }
+
+  function getNodeState(nid) {
+    var n = nodes[nid];
+    if (!n) return null;
+    var el = n.el;
+    var left = parseInt(el.style.left, 10) || 80;
+    var top = parseInt(el.style.top, 10) || 80;
+    var state = { id: nid, type: n.type, x: left, y: top };
+    if (n.type === 'dataset') {
+      var ds = el.querySelector('.node-select.dataset-select');
+      state.dataset = ds ? ds.value : 'circle';
+    } else if (n.type === 'layer') {
+      var neur = el.querySelector('.node-select.layer-neurons');
+      var act = el.querySelector('.node-select.layer-activation');
+      state.neurons = neur ? neur.value : '2';
+      state.activation = act ? act.value : 'relu';
+    } else if (n.type === 'output') {
+      var outAct = el.querySelector('.node-select.output-activation');
+      state.outputActivation = outAct ? outAct.value : 'sigmoid';
+    }
+    return state;
+  }
+
+  function saveGraph() {
+    var nodeList = [];
+    for (var nid in nodes) nodeList.push(getNodeState(nid));
+    var edgeList = edges.map(function(e) { return { fromNode: e.fromNode, toNode: e.toNode }; });
+    try {
+      localStorage.setItem('nnp-editor-graph', JSON.stringify({ nodes: nodeList, edges: edgeList }));
+    } catch (err) {}
+  }
+
+  function restoreGraph() {
+    var raw;
+    try {
+      raw = localStorage.getItem('nnp-editor-graph');
+    } catch (err) { return; }
+    if (!raw) return;
+    var data;
+    try {
+      data = JSON.parse(raw);
+    } catch (err) { return; }
+    if (!data.nodes || !data.nodes.length) return;
+    restoring = true;
+    var idMap = {};
+    data.nodes.forEach(function(state) {
+      var nid = createCanvasNode(state.type, state.label || null, state.value, state.x, state.y);
+      idMap[state.id] = nid;
+      var n = nodes[nid];
+      if (!n || !n.el) return;
+      if (state.type === 'dataset' && state.dataset) {
+        var ds = n.el.querySelector('.node-select.dataset-select');
+        if (ds) ds.value = state.dataset;
+      } else if (state.type === 'layer') {
+        var neur = n.el.querySelector('.node-select.layer-neurons');
+        var act = n.el.querySelector('.node-select.layer-activation');
+        if (neur) neur.value = state.neurons || '2';
+        if (act) act.value = state.activation || 'relu';
+      } else if (state.type === 'output' && state.outputActivation) {
+        var outAct = n.el.querySelector('.node-select.output-activation');
+        if (outAct) outAct.value = state.outputActivation;
+      }
+    });
+    (data.edges || []).forEach(function(e) {
+      var from = idMap[e.fromNode];
+      var to = idMap[e.toNode];
+      if (from && to) edges.push({ fromNode: from, fromPort: 'out', toNode: to, toPort: 'in' });
+    });
+    redrawEdges();
+    updatePlaceholder();
+    restoring = false;
+    saveGraph();
   }
 
   function removeNode(nid) {
@@ -139,6 +203,7 @@
     });
     redrawEdges();
     cancelConnection();
+    saveGraph();
   }
 
   function onConnectMove(e) {
@@ -216,7 +281,10 @@
       el.style.top = Math.max(0, y) + 'px';
       redrawEdges();
     });
-    document.addEventListener('mouseup', function() { dragging = false; });
+    document.addEventListener('mouseup', function() {
+      dragging = false;
+      saveGraph();
+    });
   }
 
   function updatePlaceholder() {
@@ -253,20 +321,19 @@
   document.getElementById('btn-clear').addEventListener('click', function() {
     Object.keys(nodes).forEach(function(nid) { removeNode(nid); });
     runResult.classList.remove('visible');
+    try { localStorage.removeItem('nnp-editor-graph'); } catch (e) {}
   });
 
   document.getElementById('btn-run').addEventListener('click', function() {
     var datasetNode = null;
-    var inputNode = null;
     var outputNode = null;
     for (var nid in nodes) {
       if (nodes[nid].type === 'dataset') datasetNode = nid;
-      if (nodes[nid].type === 'input') inputNode = nid;
       if (nodes[nid].type === 'output') outputNode = nid;
     }
-    if (!datasetNode || !inputNode || !outputNode) {
+    if (!datasetNode || !outputNode) {
       runResult.className = 'run-result visible error';
-      runResult.innerHTML = 'Add <strong>Dataset</strong>, <strong>Input Layer</strong>, and <strong>Output Layer</strong>. Connect: Dataset → Input Layer → Hidden Layer(s) → Output Layer.';
+      runResult.innerHTML = 'Add <strong>Dataset</strong> and <strong>Output Layer</strong>. Connect: Dataset → Hidden Layer(s) → Output Layer.';
       return;
     }
 
@@ -289,13 +356,7 @@
     path.reverse();
     if (path[0] !== datasetNode) {
       runResult.className = 'run-result visible error';
-      runResult.innerHTML = 'Connect a single path: <strong>Dataset</strong> → <strong>Input Layer</strong> → <strong>Hidden Layer(s)</strong> → <strong>Output Layer</strong>.';
-      return;
-    }
-    var hasInput = path.some(function(nid) { return nodes[nid].type === 'input'; });
-    if (!hasInput) {
-      runResult.className = 'run-result visible error';
-      runResult.innerHTML = 'Path must include <strong>Input Layer</strong>: Dataset → Input Layer → … → Output Layer.';
+      runResult.innerHTML = 'Connect a single path: <strong>Dataset</strong> → <strong>Hidden Layer(s)</strong> → <strong>Output Layer</strong>.';
       return;
     }
 
@@ -327,17 +388,20 @@
 
   window.addEventListener('resize', redrawEdges);
 
+  // Restore saved graph when returning to the editor
+  restoreGraph();
+
   // ——— User guide ———
   var guideSteps = [
     {
       title: 'Step 1: Add nodes',
-      subtitle: 'Four distinct types. Drag each onto the canvas.',
-      body: '<ol><li><strong>Dataset</strong> — choose training data (Circle, XOR, Gaussian, Spiral).</li><li><strong>Input Layer</strong> — the network input (receives data from Dataset).</li><li><strong>Hidden Layer</strong> — one or more, with neurons (2–8) and activation.</li><li><strong>Output Layer</strong> — the end, with output activation.</li></ol>'
+      subtitle: 'Three types. Drag onto the canvas.',
+      body: '<ol><li><strong>Dataset</strong> — choose data (Circle, XOR, Gaussian, Spiral).</li><li><strong>Hidden Layer</strong> — one or more, with neurons (2–8) and activation.</li><li><strong>Output Layer</strong> — the end, with output activation.</li></ol>'
     },
     {
       title: 'Step 2: Connect them',
-      subtitle: 'Draw connections in order.',
-      body: '<p>Connect: <strong>Dataset</strong> (out) → <strong>Input Layer</strong> (in), then <strong>Input Layer</strong> (out) → <strong>Hidden Layer</strong> (in), then Hidden → … → <strong>Output Layer</strong> (in).</p><p>One path: Dataset → Input Layer → Hidden(s) → Output Layer.</p>'
+      subtitle: 'Dataset → Hidden(s) → Output.',
+      body: '<p>Connect <strong>Dataset</strong> (out) → <strong>Hidden Layer</strong> (in), then Hidden (out) → next Hidden or <strong>Output Layer</strong> (in). One path: Dataset → Hidden(s) → Output Layer.</p>'
     },
     {
       title: 'Step 3: Configure',

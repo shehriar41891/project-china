@@ -12,7 +12,7 @@
   <header class="editor-header">
     <a href="index.html" class="back-link">← Home</a>
     <h1>Network Builder</h1>
-    <p class="subtitle">Connect Dataset → Input Layer → Hidden Layer(s) → Output Layer. Each node type is separate.</p>
+    <p class="subtitle">Connect Dataset → Hidden Layer(s) → Output Layer. Your graph is saved when you leave.</p>
     <div class="header-actions">
       <button type="button" class="btn-guide" id="btn-guide" title="How to use">?</button>
       <button type="button" class="btn btn-secondary" id="btn-clear">Clear</button>
@@ -25,7 +25,7 @@
   <div class="editor-layout">
     <aside class="node-palette">
       <h3>Nodes</h3>
-      <p class="palette-hint">Drag onto canvas. Connect: Dataset → Input → Hidden → Output</p>
+      <p class="palette-hint">Drag onto canvas. Connect: Dataset → Hidden → Output</p>
       <div class="palette-group">
         <span class="palette-label">Data</span>
         <div class="palette-node palette-node--dataset" data-node-type="dataset" data-label="Dataset" draggable="true">
@@ -35,10 +35,6 @@
       </div>
       <div class="palette-group">
         <span class="palette-label">Layers</span>
-        <div class="palette-node palette-node--input" data-node-type="input" data-label="Input Layer" draggable="true">
-          <span class="palette-node-icon" aria-hidden="true">In</span>
-          Input Layer
-        </div>
         <div class="palette-node palette-node--hidden" data-node-type="layer" data-label="Hidden Layer" draggable="true">
           <span class="palette-node-icon" aria-hidden="true">H</span>
           Hidden Layer
@@ -54,7 +50,7 @@
       <div class="node-canvas" id="node-canvas">
         <svg class="edge-layer" id="edge-layer"></svg>
         <div class="nodes-container" id="nodes-container"></div>
-        <div class="canvas-placeholder" id="canvas-placeholder">Drop nodes here · Dataset → Input Layer → Hidden → Output Layer</div>
+        <div class="canvas-placeholder" id="canvas-placeholder">Drop nodes here · Dataset → Hidden → Output Layer</div>
       </div>
     </main>
   </div>

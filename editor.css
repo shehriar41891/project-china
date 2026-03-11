@@ -172,12 +172,6 @@ body {
 }
 .palette-node--dataset .palette-node-icon { background: rgba(163, 113, 247, 0.25); color: #a371f7; }
 .palette-node--dataset:hover { border-color: #8957e5; box-shadow: 0 0 0 1px #8957e5; }
-.palette-node--input {
-  background: rgba(35, 134, 54, 0.12);
-  color: #3fb950;
-}
-.palette-node--input .palette-node-icon { background: rgba(35, 134, 54, 0.25); color: #3fb950; }
-.palette-node--input:hover { border-color: #238636; box-shadow: 0 0 0 1px #238636; }
 .palette-node--hidden {
   background: rgba(88, 166, 255, 0.1);
   color: #58a6ff;
@@ -254,9 +248,6 @@ body {
 }
 .canvas-node.dataset {
   border-left: 3px solid #a371f7;
-}
-.canvas-node.input {
-  border-left: 3px solid #3fb950;
 }
 .canvas-node.layer {
   border-left: 3px solid #58a6ff;
