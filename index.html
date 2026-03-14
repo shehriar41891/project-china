@@ -5,508 +5,448 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Neural Network Playground</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: "DM Sans", system-ui, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      transition: background 0.3s, color 0.3s;
-    }
-    body.light {
-      background: linear-gradient(160deg, #f0f9fc 0%, #e8f4f8 50%, #f5f5f5 100%);
-      color: #333;
-    }
-    body.dark {
-      background: linear-gradient(160deg, #0d1117 0%, #161b22 50%, #21262d 100%);
-      color: #e6edf3;
-    }
-    .site-header {
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      transition: background 0.3s, border-color 0.3s;
-    }
-    body.light .site-header {
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      background: rgba(255,255,255,0.8);
-    }
-    body.dark .site-header {
-      border-bottom: 1px solid #30363d;
-      background: rgba(22, 27, 34, 0.9);
-    }
-    .site-header .logo {
-      font-weight: 600;
-      text-decoration: none;
-      font-size: 1.1rem;
-    }
-    body.light .site-header .logo { color: #0d7ea4; }
-    body.dark .site-header .logo { color: #58a6ff; }
-    .header-controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .lang-dropdown {
-      position: relative;
-    }
-    .lang-dropdown .lang-trigger {
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: 1px solid;
-      cursor: pointer;
-      font-size: 13px;
-      font-family: inherit;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      min-width: 120px;
-      justify-content: space-between;
-      transition: background 0.2s;
-    }
-    body.light .lang-dropdown .lang-trigger {
-      background: #fff;
-      border-color: #e0e0e0;
-      color: #333;
-    }
-    body.dark .lang-dropdown .lang-trigger {
-      background: #21262d;
-      border-color: #30363d;
-      color: #e6edf3;
-    }
-    .lang-dropdown .lang-trigger:hover { opacity: 0.9; }
-    .lang-dropdown .lang-menu {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      margin-top: 4px;
-      min-width: 100%;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-      display: none;
-      z-index: 100;
-    }
-    .lang-dropdown.open .lang-menu { display: block; }
-    body.light .lang-dropdown .lang-menu { background: #fff; border: 1px solid #e0e0e0; }
-    body.dark .lang-dropdown .lang-menu { background: #21262d; border: 1px solid #30363d; }
-    .lang-dropdown .lang-option {
-      display: block;
-      width: 100%;
-      padding: 10px 14px;
-      border: none;
-      background: none;
-      cursor: pointer;
-      font-size: 13px;
-      font-family: inherit;
-      text-align: left;
-      transition: background 0.15s;
-    }
-    body.light .lang-dropdown .lang-option:hover { background: #f0f9fc; }
-    body.dark .lang-dropdown .lang-option:hover { background: #30363d; }
-    body.light .lang-dropdown .lang-option { color: #333; }
-    body.dark .lang-dropdown .lang-option { color: #e6edf3; }
-    .theme-toggle {
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid;
-      cursor: pointer;
-      font-size: 13px;
-      background: none;
-      font-family: inherit;
-      transition: background 0.2s;
-    }
-    body.light .theme-toggle { border-color: #e0e0e0; color: #333; }
-    body.dark .theme-toggle { border-color: #30363d; color: #e6edf3; }
-    .theme-toggle:hover { opacity: 0.9; }
-    .chat-btn {
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: transform 0.2s;
-    }
-    body.light .chat-btn { background: #0d7ea4; color: #fff; }
-    body.dark .chat-btn { background: #238636; color: #fff; }
-    .chat-btn:hover { transform: scale(1.02); }
-    main {
-      flex: 1;
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 48px 24px 64px;
-      width: 100%;
-    }
-    .intro h1 {
-      font-size: 1.85rem;
-      font-weight: 600;
-      margin: 0 0 20px 0;
-      transition: color 0.3s;
-    }
-    body.light .intro h1 { color: #0d7ea4; }
-    body.dark .intro h1 { color: #58a6ff; }
-    .intro .lead, .intro .detail {
-      line-height: 1.75;
-      margin: 0 0 24px 0;
-      transition: color 0.3s;
-    }
-    body.light .intro .lead, body.light .intro .detail { color: #444; }
-    body.dark .intro .lead, body.dark .intro .detail { color: #8b949e; }
-    .intro .detail { margin-bottom: 32px; }
-    .cta-wrap { margin-top: 32px; margin-bottom: 48px; }
-    .cta-wrap a {
-      display: inline-block;
-      padding: 12px 24px;
-      border-radius: 10px;
-      font-weight: 500;
-      text-decoration: none;
-      transition: background 0.2s, transform 0.2s;
-    }
-    body.light .cta-wrap a { background: #0d7ea4; color: #fff; }
-    body.dark .cta-wrap a { background: #238636; color: #fff; }
-    .cta-wrap a:hover { transform: translateY(-2px); }
-    body.light .cta-wrap a:hover { background: #095a75; }
-    body.dark .cta-wrap a:hover { background: #2ea043; }
-    .site-footer {
-      padding: 24px 24px 32px;
-      text-align: center;
-      font-size: 0.9rem;
-      transition: background 0.3s, color 0.3s, border-color 0.3s;
-    }
-    body.light .site-footer {
-      border-top: 1px solid rgba(0,0,0,0.06);
-      background: rgba(255,255,255,0.5);
-      color: #666;
-    }
-    body.dark .site-footer {
-      border-top: 1px solid #30363d;
-      background: rgba(22, 27, 34, 0.6);
-      color: #8b949e;
-    }
-    .site-footer nav { margin-bottom: 12px; }
-    .site-footer a {
-      text-decoration: none;
-      margin: 0 12px;
-      transition: color 0.2s;
-    }
-    body.light .site-footer a { color: #0d7ea4; }
-    body.dark .site-footer a { color: #58a6ff; }
-    .site-footer a:hover { text-decoration: underline; }
-
-    /* Chatbot modal */
-    .chat-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .chat-overlay.visible { display: flex; }
-    .chat-modal {
-      width: 100%;
-      max-width: 420px;
-      max-height: 85vh;
-      border-radius: 16px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 24px 48px rgba(0,0,0,0.25);
-      animation: chatModalIn 0.3s ease;
-    }
-    @keyframes chatModalIn {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    body.light .chat-modal { background: #fff; border: 1px solid #e0e0e0; }
-    body.dark .chat-modal { background: #21262d; border: 1px solid #30363d; }
-    .chat-modal-head {
-      padding: 16px 20px;
-      border-bottom: 1px solid;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    body.light .chat-modal-head { border-color: #e0e0e0; background: #fafbfc; }
-    body.dark .chat-modal-head { border-color: #30363d; background: #161b22; }
-    .chat-modal-head h2 {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 600;
-    }
-    .chat-close {
-      width: 32px;
-      height: 32px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 18px;
-      line-height: 1;
-      background: transparent;
-      transition: background 0.2s;
-    }
-    body.light .chat-close { color: #666; }
-    body.dark .chat-close { color: #8b949e; }
-    body.light .chat-close:hover { background: #f0f0f0; }
-    body.dark .chat-close:hover { background: #30363d; }
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      min-height: 200px;
-      max-height: 320px;
-    }
-    body.light .chat-messages { background: #fafbfc; }
-    body.dark .chat-messages { background: #0d1117; }
-    .chat-msg {
-      margin-bottom: 12px;
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 14px;
-      line-height: 1.5;
-      max-width: 90%;
-    }
-    .chat-msg.bot {
-      background: rgba(13, 126, 164, 0.1);
-      border: 1px solid rgba(13, 126, 164, 0.2);
-      margin-right: auto;
-    }
-    body.dark .chat-msg.bot {
-      background: rgba(88, 166, 255, 0.12);
-      border-color: rgba(88, 166, 255, 0.2);
-    }
-    .chat-msg.user {
-      margin-left: auto;
-      margin-right: 0;
-    }
-    body.light .chat-msg.user { background: #0d7ea4; color: #fff; }
-    body.dark .chat-msg.user { background: #238636; color: #fff; }
-    .chat-form {
-      padding: 12px 16px 16px;
-      border-top: 1px solid;
-    }
-    body.light .chat-form { border-color: #e0e0e0; background: #fff; }
-    body.dark .chat-form { border-color: #30363d; background: #21262d; }
-    .chat-form form {
-      display: flex;
-      gap: 8px;
-    }
-    .chat-form input {
-      flex: 1;
-      padding: 10px 14px;
-      border-radius: 10px;
-      border: 1px solid;
-      font-size: 14px;
-      font-family: inherit;
-      outline: none;
-    }
-    body.light .chat-form input { border-color: #e0e0e0; background: #fff; color: #333; }
-    body.dark .chat-form input { border-color: #30363d; background: #161b22; color: #e6edf3; }
-    .chat-form button {
-      padding: 10px 18px;
-      border-radius: 10px;
-      border: none;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    body.light .chat-form button { background: #0d7ea4; color: #fff; }
-    body.dark .chat-form button { background: #238636; color: #fff; }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
 </head>
-<body class="light">
-  <header class="site-header">
-    <a href="index.html" class="logo" data-i18n="siteName">Neural Network Playground</a>
-    <div class="header-controls">
-      <div class="lang-dropdown" id="lang-dropdown">
-        <button type="button" class="lang-trigger" id="lang-trigger">
-          <span id="lang-label">English</span>
-          <span aria-hidden="true">▼</span>
+<body class="theme-dark">
+  <div class="page">
+    <!-- Background layer -->
+    <div class="bg">
+      <div class="bg-shape bg-shape-1"></div>
+      <div class="bg-shape bg-shape-2"></div>
+      <div class="bg-shape bg-shape-3"></div>
+      <div class="bg-lines"></div>
+      <!-- Floating cartoon dots -->
+      <div class="bg-dots">
+        <span class="bg-dot bg-dot--1"></span>
+        <span class="bg-dot bg-dot--2"></span>
+        <span class="bg-dot bg-dot--3"></span>
+        <span class="bg-dot bg-dot--4"></span>
+        <span class="bg-dot bg-dot--5"></span>
+        <span class="bg-dot bg-dot--6"></span>
+        <span class="bg-dot bg-dot--7"></span>
+        <span class="bg-dot bg-dot--8"></span>
+      </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="nav">
+      <a href="index.html" class="nav-brand" data-i18n="siteName">Neural Network Playground</a>
+      <div class="nav-right">
+        <span class="nav-auth" id="nav-auth">
+          <a href="login.html" class="nav-link nav-link--cta">Sign in</a>
+        </span>
+        <span class="nav-user" id="nav-user" style="display: none;">
+          <a href="learn.html" class="nav-link">Learn</a>
+          <a href="profile.html" class="nav-link">Profile</a>
+          <a href="editor.html" class="nav-link">Network Builder</a>
+          <button type="button" class="nav-link nav-link--logout" id="nav-logout">Logout</button>
+        </span>
+        <a href="about.html" class="nav-link" data-i18n="about">About</a>
+        <a href="editor.html" class="nav-link nav-link--cta" id="nav-builder-cta" data-i18n="openBuilderShort">Network Builder</a>
+        <div class="nav-dropdown" id="lang-dropdown">
+          <button type="button" class="nav-dropdown-btn" id="lang-trigger">
+            <span id="lang-label">English</span>
+            <svg class="nav-dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <button type="button" class="nav-dropdown-item" data-lang="en">English</button>
+            <button type="button" class="nav-dropdown-item" data-lang="zh">中文</button>
+            <button type="button" class="nav-dropdown-item" data-lang="ja">日本語</button>
+          </div>
+        </div>
+        <button type="button" class="nav-theme" id="theme-toggle" aria-label="Toggle theme">
+          <span class="nav-theme-icon" aria-hidden="true"></span>
         </button>
-        <div class="lang-menu">
-          <button type="button" class="lang-option" data-lang="en">English</button>
-          <button type="button" class="lang-option" data-lang="zh">中文</button>
-          <button type="button" class="lang-option" data-lang="ja">日本語</button>
+      </div>
+    </nav>
+
+    <!-- Main content — full width -->
+    <main class="main">
+      <section class="hero">
+        <div class="hero-content">
+          <h1 class="hero-headline" data-i18n="heroTitle">Build & train neural networks visually</h1>
+          <p class="hero-text" data-i18n="heroLead">No code. Drag nodes, connect layers, run training, and watch your model learn — all in the browser.</p>
+          <a href="editor.html" class="hero-btn" data-i18n="openBuilder">Open Network Builder</a>
+        </div>
+        <div class="hero-media">
+          <div class="hero-illus-wrap">
+            <img src="https://illustrations.popsy.co/teal/artificial-intelligence.svg" alt="Learn AI visually" class="hero-img hero-illus" width="500" height="400" loading="eager" data-fallback="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80">
+            <span class="hero-float hero-float--1" aria-hidden="true"></span>
+            <span class="hero-float hero-float--2" aria-hidden="true"></span>
+            <span class="hero-float hero-float--3" aria-hidden="true"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="features" id="features">
+        <div class="features-header">
+          <h2 class="features-heading" data-i18n="sectionTitle">What you get</h2>
+          <p class="features-sub" data-i18n="sectionDesc">Built for learning. Everything in one place.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card feature-card--1">
+            <div class="feature-card-img-wrap">
+              <img src="https://illustrations.popsy.co/teal/coding.svg" alt="Visual builder" class="feature-card-img feature-card-illus" width="280" height="160" loading="lazy" data-fallback="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=400&q=80">
+            </div>
+            <div class="feature-card-marker"></div>
+            <h3 class="feature-card-title" data-i18n="card1Title">Visual Network Builder</h3>
+            <p class="feature-card-desc" data-i18n="card1Text">Drag dataset, hidden layers, and output. Connect them and see your architecture before training.</p>
+          </article>
+          <article class="feature-card feature-card--2">
+            <div class="feature-card-img-wrap">
+              <img src="https://illustrations.popsy.co/teal/developer-activity.svg" alt="Live training" class="feature-card-img feature-card-illus" width="280" height="160" loading="lazy" data-fallback="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&q=80">
+            </div>
+            <div class="feature-card-marker"></div>
+            <h3 class="feature-card-title" data-i18n="card2Title">Live Training</h3>
+            <p class="feature-card-desc" data-i18n="card2Text">Run training and watch loss curves and decision boundaries update in real time.</p>
+          </article>
+          <article class="feature-card feature-card--3">
+            <div class="feature-card-img-wrap">
+              <img src="https://illustrations.popsy.co/teal/faq.svg" alt="Guides and help" class="feature-card-img feature-card-illus" width="280" height="160" loading="lazy" data-fallback="https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&q=80">
+            </div>
+            <div class="feature-card-marker"></div>
+            <h3 class="feature-card-title" data-i18n="card3Title">Guides & help</h3>
+            <p class="feature-card-desc" data-i18n="card3Text">In-app guides and tooltips. Use the chat icon when you need help.</p>
+          </article>
+          <article class="feature-card feature-card--4">
+            <div class="feature-card-img-wrap">
+              <img src="https://illustrations.popsy.co/teal/designer.svg" alt="No code" class="feature-card-img feature-card-illus" width="280" height="160" loading="lazy" data-fallback="https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&q=80">
+            </div>
+            <div class="feature-card-marker"></div>
+            <h3 class="feature-card-title" data-i18n="card4Title">No code</h3>
+            <p class="feature-card-desc" data-i18n="card4Text">Focus on concepts. Build and train without writing code.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="guide" id="guide">
+        <div class="guide-media">
+          <img src="https://illustrations.popsy.co/teal/idea.svg" alt="How it works" class="guide-img guide-illus" width="500" height="400" loading="lazy" data-fallback="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&q=80">
+          <span class="guide-float guide-float--1" aria-hidden="true"></span>
+          <span class="guide-float guide-float--2" aria-hidden="true"></span>
+        </div>
+        <div class="guide-content-wrap">
+          <h2 class="guide-heading" data-i18n="stepsTitle">How it works</h2>
+          <p class="guide-sub" data-i18n="stepsDesc">Three steps to your first trained network.</p>
+          <ol class="guide-list">
+            <li class="guide-item">
+              <span class="guide-num">1</span>
+              <div class="guide-content">
+                <h3 class="guide-title" data-i18n="step1Title">Build</h3>
+                <p class="guide-desc" data-i18n="step1Text">Open Network Builder. Add Dataset, Hidden layers, and Output. Connect them.</p>
+              </div>
+            </li>
+            <li class="guide-item">
+              <span class="guide-num">2</span>
+              <div class="guide-content">
+                <h3 class="guide-title" data-i18n="step2Title">Run training</h3>
+                <p class="guide-desc" data-i18n="step2Text">Click Run training. The training view opens. Press Play to start.</p>
+              </div>
+            </li>
+            <li class="guide-item">
+              <span class="guide-num">3</span>
+              <div class="guide-content">
+                <h3 class="guide-title" data-i18n="step3Title">Experiment</h3>
+                <p class="guide-desc" data-i18n="step3Text">Change layers or data, run again. See how choices affect learning.</p>
+              </div>
+            </li>
+          </ol>
+          <a href="editor.html" class="guide-cta" data-i18n="openBuilder">Open Network Builder</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <div class="foot-links">
+        <a href="about.html" data-i18n="about">About</a>
+        <a href="editor.html" data-i18n="openBuilderShort">Network Builder</a>
+        <a href="playground.html" data-i18n="classicBuilder">Classic builder</a>
+        <a href="https://github.com/tensorflow/playground" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <p class="foot-note" data-i18n="footerCredit">Learn neural networks in your browser.</p>
+    </footer>
+  </div>
+
+  <!-- Floating chat icon -->
+  <button type="button" class="chat-fab" id="chat-fab" aria-label="Open chat">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+  </button>
+
+  <!-- Chat overlay: blurred background + modal; fullscreen option -->
+  <div class="chat-overlay" id="chat-overlay" aria-hidden="true">
+    <div class="chat-backdrop" id="chat-backdrop"></div>
+    <div class="chat-window" id="chat-window">
+      <div class="chat-window-head">
+        <h2 data-i18n="chatTitle">Chat</h2>
+        <div class="chat-window-actions">
+          <button type="button" class="chat-window-fullscreen" id="chat-fullscreen" aria-label="Full screen">⛶</button>
+          <button type="button" class="chat-window-close" id="chat-close" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
         </div>
       </div>
-      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">Dark</button>
-      <button type="button" class="chat-btn" id="chat-btn">💬 Chatbot</button>
-    </div>
-  </header>
-
-  <main>
-    <section class="intro">
-      <h1 data-i18n="title">Neural Network Playground</h1>
-      <p class="lead" data-i18n="lead">
-        This project helps you understand how neural networks learn. You can build a small network with a visual editor, connect layers and activation functions, attach a dataset, and run training — all in the browser, with no code.
-      </p>
-      <p class="detail" data-i18n="detail">
-        Use the Network Builder to design your architecture: add a dataset node, add one or more hidden layers (each with a chosen number of neurons and activation function), connect them to an output node, then start training. The playground will show how the model learns to fit or classify the data.
-      </p>
-      <div class="cta-wrap">
-        <a href="editor.html" data-i18n="openBuilder">Open Network Builder →</a>
+      <div class="chat-window-messages" id="chat-messages">
+        <div class="chat-bubble chat-bubble--bot" data-i18n="chatWelcome">Hi! Ask me about the playground, chapters, or how to get started. I'm powered by AI.</div>
       </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <nav>
-      <a href="about.html" data-i18n="about">About</a>
-      <a href="editor.html" data-i18n="openBuilderShort">Network Builder</a>
-      <a href="playground.html" data-i18n="classicBuilder">Classic builder</a>
-      <a href="https://github.com/tensorflow/playground" target="_blank" rel="noopener">Source on GitHub</a>
-    </nav>
-    <span data-i18n="footerCredit">Learn and experiment with neural networks in your browser.</span>
-  </footer>
-
-  <!-- Chatbot modal -->
-  <div class="chat-overlay" id="chat-overlay">
-    <div class="chat-modal">
-      <div class="chat-modal-head">
-        <h2 data-i18n="chatTitle">Chatbot</h2>
-        <button type="button" class="chat-close" id="chat-close" aria-label="Close">×</button>
-      </div>
-      <div class="chat-messages" id="chat-messages">
-        <div class="chat-msg bot" data-i18n="chatWelcome">Hi! Ask me about the Neural Network Playground or how to get started.</div>
-      </div>
-      <div class="chat-form">
-        <form id="chat-form">
-          <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
-          <button type="submit">Send</button>
-        </form>
-      </div>
+      <form class="chat-window-form" id="chat-form">
+        <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
+        <button type="submit">Send</button>
+      </form>
     </div>
   </div>
 
   <script>
-    var i18n = {
-      en: {
-        siteName: 'Neural Network Playground',
-        title: 'Neural Network Playground',
-        lead: 'This project helps you understand how neural networks learn. You can build a small network with a visual editor, connect layers and activation functions, attach a dataset, and run training — all in the browser, with no code.',
-        detail: 'Use the Network Builder to design your architecture: add a dataset node, add one or more hidden layers (each with a chosen number of neurons and activation function), connect them to an output node, then start training. The playground will show how the model learns to fit or classify the data.',
-        openBuilder: 'Open Network Builder →',
-        openBuilderShort: 'Network Builder',
-        classicBuilder: 'Classic builder',
-        about: 'About',
-        footerCredit: 'Learn and experiment with neural networks in your browser.',
-        chatTitle: 'Chatbot',
-        chatWelcome: 'Hi! Ask me about the Neural Network Playground or how to get started.'
-      },
-      zh: {
-        siteName: '神经网络游乐场',
-        title: '神经网络游乐场',
-        lead: '本项目帮助您理解神经网络如何学习。您可以使用可视化编辑器构建小型网络、连接层与激活函数、选择数据集并运行训练，全部在浏览器中完成，无需编写代码。',
-        detail: '在「网络构建器」中设计结构：添加数据集节点，添加一个或多个隐藏层（每层可设置神经元数量和激活函数），连接到输出节点，然后开始训练。游乐场将展示模型如何学习拟合或分类数据。',
-        openBuilder: '打开网络构建器 →',
-        openBuilderShort: '网络构建器',
-        classicBuilder: '经典构建器',
-        about: '关于',
-        footerCredit: '在浏览器中学习与实验神经网络。',
-        chatTitle: '聊天助手',
-        chatWelcome: '你好！可以问我关于神经网络游乐场或如何入门。'
-      },
-      ja: {
-        siteName: 'ニューラルネットワークプレイグラウンド',
-        title: 'ニューラルネットワークプレイグラウンド',
-        lead: 'このプロジェクトでは、ニューラルネットワークの学習の仕組みを学べます。ビジュアルエディタで小さなネットワークを組み、層と活性化関数を接続し、データセットを選んでトレーニングを実行できます。すべてブラウザ内で、コード不要です。',
-        detail: 'ネットワークビルダーでアーキテクチャを設計します：データセットノードを置き、1つ以上の隠れ層（各層でニューロン数と活性化関数を選択）を追加し、出力ノードに接続してトレーニングを開始します。プレイグラウンドでモデルがデータにどう適合・分類するかが確認できます。',
-        openBuilder: 'ネットワークビルダーを開く →',
-        openBuilderShort: 'ネットワークビルダー',
-        classicBuilder: 'クラシックビルダー',
-        about: 'このサイトについて',
-        footerCredit: 'ブラウザでニューラルネットワークを学び、実験できます。',
-        chatTitle: 'チャットボット',
-        chatWelcome: 'こんにちは！ニューラルネットワークプレイグラウンドや始め方について質問してください。'
-      }
-    };
-    var langNames = { en: 'English', zh: '中文', ja: '日本語' };
-    var lang = localStorage.getItem('nnp-lang') || 'en';
-    var theme = localStorage.getItem('nnp-theme') || 'light';
-
-    function setLang(l) {
-      lang = l;
-      localStorage.setItem('nnp-lang', l);
-      document.getElementById('lang-label').textContent = langNames[l];
-      document.querySelectorAll('[data-i18n]').forEach(function(el) {
-        var key = el.getAttribute('data-i18n');
-        if (i18n[l] && i18n[l][key]) el.textContent = i18n[l][key];
+    (function() {
+      // Fallback images if illustration CDN fails
+      document.querySelectorAll('img[data-fallback]').forEach(function(img) {
+        img.addEventListener('error', function() {
+          var fallback = this.getAttribute('data-fallback');
+          if (fallback) { this.src = fallback; }
+        });
       });
-      document.getElementById('lang-dropdown').classList.remove('open');
-    }
-    function setTheme(t) {
-      theme = t;
-      localStorage.setItem('nnp-theme', t);
-      document.body.classList.remove('light', 'dark');
-      document.body.classList.add(t);
-      document.getElementById('theme-toggle').textContent = t === 'light' ? 'Dark' : 'Light';
-    }
 
-    document.getElementById('lang-trigger').addEventListener('click', function() {
-      document.getElementById('lang-dropdown').classList.toggle('open');
-    });
-    document.querySelectorAll('.lang-option').forEach(function(btn) {
-      btn.addEventListener('click', function() { setLang(btn.dataset.lang); });
-    });
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.lang-dropdown')) document.getElementById('lang-dropdown').classList.remove('open');
-    });
-    document.getElementById('theme-toggle').addEventListener('click', function() {
-      setTheme(theme === 'light' ? 'dark' : 'light');
-    });
+      // Auth: show Sign in/Sign up or Profile, Quiz, Logout
+      (function() {
+        var navAuth = document.getElementById('nav-auth');
+        var navUser = document.getElementById('nav-user');
+        var navBuilderCta = document.getElementById('nav-builder-cta');
+        var navLogout = document.getElementById('nav-logout');
+        if (!navAuth || !navUser) return;
+        fetch('/api/auth/me', { credentials: 'include' }).then(function(r) {
+          if (r.ok) return r.json();
+          throw new Error('not logged in');
+        }).then(function(data) {
+          if (data.user) {
+            navAuth.style.display = 'none';
+            if (navBuilderCta) navBuilderCta.style.display = 'none';
+            navUser.style.display = 'flex';
+            navUser.style.alignItems = 'center';
+            navUser.style.gap = '0.75rem';
+          }
+        }).catch(function() {
+          navUser.style.display = 'none';
+          navAuth.style.display = 'flex';
+          navAuth.style.alignItems = 'center';
+          navAuth.style.gap = '0.5rem';
+        });
+        if (navLogout) navLogout.addEventListener('click', function() {
+          fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).then(function() { window.location.reload(); });
+        });
+      })();
 
-    setLang(lang);
-    setTheme(theme);
+      var i18n = {
+        en: {
+          siteName: 'Neural Network Playground',
+          heroTitle: 'Build & train neural networks visually',
+          heroLead: 'No code. Drag nodes, connect layers, run training, and watch your model learn — all in the browser.',
+          openBuilder: 'Open Network Builder',
+          openBuilderShort: 'Network Builder',
+          sectionTitle: 'What you get',
+          sectionDesc: 'Built for learning. Everything in one place.',
+          card1Title: 'Visual Network Builder',
+          card1Text: 'Drag dataset, hidden layers, and output. Connect them and see your architecture before training.',
+          card2Title: 'Live Training',
+          card2Text: 'Run training and watch loss curves and decision boundaries update in real time.',
+          card3Title: 'Guides & help',
+          card3Text: 'In-app guides and tooltips. Use the chat icon when you need help.',
+          card4Title: 'No code',
+          card4Text: 'Focus on concepts. Build and train without writing code.',
+          stepsTitle: 'How it works',
+          stepsDesc: 'Three steps to your first trained network.',
+          step1Title: 'Build',
+          step1Text: 'Open Network Builder. Add Dataset, Hidden layers, and Output. Connect them.',
+          step2Title: 'Run training',
+          step2Text: 'Click Run training. The training view opens. Press Play to start.',
+          step3Title: 'Experiment',
+          step3Text: 'Change layers or data, run again. See how choices affect learning.',
+          about: 'About',
+          classicBuilder: 'Classic builder',
+          footerCredit: 'Learn neural networks in your browser.',
+          chatTitle: 'Chat',
+          chatWelcome: 'Hi! Ask me about the playground or how to get started.'
+        },
+        zh: {
+          siteName: '神经网络游乐场',
+          heroTitle: '可视化构建与训练神经网络',
+          heroLead: '无需代码。拖拽节点、连接层、运行训练，在浏览器中直观看到模型如何学习。',
+          openBuilder: '打开网络构建器',
+          openBuilderShort: '网络构建器',
+          sectionTitle: '你能做什么',
+          sectionDesc: '为学习而设计，一站式体验。',
+          card1Title: '可视化网络构建器',
+          card1Text: '拖拽数据集、隐藏层与输出层并连接，在训练前查看你的网络结构。',
+          card2Title: '实时训练',
+          card2Text: '运行训练，实时查看损失曲线与决策边界的变化。',
+          card3Title: '指南与帮助',
+          card3Text: '应用内指南与提示。需要帮助时点击聊天图标。',
+          card4Title: '无需编程',
+          card4Text: '专注概念。不写代码即可构建与训练。',
+          stepsTitle: '使用方式',
+          stepsDesc: '三步完成你的第一个训练好的网络。',
+          step1Title: '构建',
+          step1Text: '打开网络构建器，添加数据集、隐藏层与输出层并连接。',
+          step2Title: '运行训练',
+          step2Text: '点击运行训练，训练视图会打开，点击播放即可开始。',
+          step3Title: '实验',
+          step3Text: '修改层或数据后再次运行，观察选择如何影响学习。',
+          about: '关于',
+          classicBuilder: '经典构建器',
+          footerCredit: '在浏览器中学习神经网络。',
+          chatTitle: '聊天',
+          chatWelcome: '你好！可以问我关于游乐场或如何入门。'
+        },
+        ja: {
+          siteName: 'ニューラルネットワークプレイグラウンド',
+          heroTitle: 'ビジュアルでネットワークを構築・訓練',
+          heroLead: 'コード不要。ノードをドラッグし、層を接続し、訓練を実行。ブラウザでモデルの学習をその場で確認。',
+          openBuilder: 'ネットワークビルダーを開く',
+          openBuilderShort: 'ネットワークビルダー',
+          sectionTitle: 'できること',
+          sectionDesc: '学習のための設計。すべてが一箇所に。',
+          card1Title: 'ビジュアルネットワークビルダー',
+          card1Text: 'データセット・隠れ層・出力をドラッグして接続。訓練前にアーキテクチャを確認。',
+          card2Title: 'ライブ訓練',
+          card2Text: '訓練を実行し、損失曲線と決定境界がリアルタイムで更新される様子を見られます。',
+          card3Title: 'ガイドとヘルプ',
+          card3Text: 'アプリ内ガイドとツールチップ。困ったらチャットアイコンをクリック。',
+          card4Title: 'コード不要',
+          card4Text: '概念に集中。コードを書かずに構築と訓練ができます。',
+          stepsTitle: '使い方',
+          stepsDesc: '3ステップで最初のネットワークを訓練。',
+          step1Title: '構築',
+          step1Text: 'ネットワークビルダーを開き、データセット・隠れ層・出力を追加して接続。',
+          step2Title: '訓練を実行',
+          step2Text: '「訓練を実行」をクリックすると訓練ビューが開きます。再生で開始。',
+          step3Title: '実験',
+          step3Text: '層やデータを変えて再実行し、選択が学習に与える影響を確認。',
+          about: 'このサイトについて',
+          classicBuilder: 'クラシックビルダー',
+          footerCredit: 'ブラウザでニューラルネットワークを学ぶ。',
+          chatTitle: 'チャット',
+          chatWelcome: 'こんにちは！プレイグラウンドや始め方について質問してください。'
+        }
+      };
+      var langNames = { en: 'English', zh: '中文', ja: '日本語' };
+      var lang = localStorage.getItem('nnp-lang') || 'en';
+      var theme = localStorage.getItem('nnp-theme') || 'dark';
 
-    // Chatbot
-    var chatOpen = document.getElementById('chat-btn');
-    var chatOverlay = document.getElementById('chat-overlay');
-    var chatClose = document.getElementById('chat-close');
-    var chatForm = document.getElementById('chat-form');
-    var chatInput = document.getElementById('chat-input');
-    var chatMessages = document.getElementById('chat-messages');
+      function savePreferences() {
+        try { localStorage.setItem('nnp-lang', lang); localStorage.setItem('nnp-theme', theme); } catch (e) {}
+        try {
+          fetch('/api/preferences', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lang: lang, theme: theme })
+          }).catch(function() {});
+        } catch (e) {}
+      }
+      function setLang(l) {
+        lang = l;
+        localStorage.setItem('nnp-lang', l);
+        savePreferences();
+        var label = document.getElementById('lang-label');
+        if (label) label.textContent = langNames[l];
+        document.querySelectorAll('[data-i18n]').forEach(function(el) {
+          var key = el.getAttribute('data-i18n');
+          if (i18n[l] && i18n[l][key]) el.textContent = i18n[l][key];
+        });
+        document.getElementById('lang-dropdown').classList.remove('is-open');
+      }
+      function setTheme(t) {
+        theme = t;
+        localStorage.setItem('nnp-theme', t);
+        savePreferences();
+        document.body.classList.remove('theme-light', 'theme-dark');
+        document.body.classList.add('theme-' + t);
+        document.getElementById('theme-toggle').setAttribute('aria-label', t === 'light' ? 'Switch to dark' : 'Switch to light');
+      }
 
-    chatOpen.addEventListener('click', function() {
-      chatOverlay.classList.add('visible');
-      chatInput.focus();
-    });
-    chatClose.addEventListener('click', function() { chatOverlay.classList.remove('visible'); });
-    chatOverlay.addEventListener('click', function(e) {
-      if (e.target === chatOverlay) chatOverlay.classList.remove('visible');
-    });
-    chatForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      var text = (chatInput.value || '').trim();
-      if (!text) return;
-      var userMsg = document.createElement('div');
-      userMsg.className = 'chat-msg user';
-      userMsg.textContent = text;
-      chatMessages.appendChild(userMsg);
-      chatInput.value = '';
-      var botMsg = document.createElement('div');
-      botMsg.className = 'chat-msg bot';
-      botMsg.textContent = 'Thanks for your message! This is a demo chatbot. In a full version, you could connect this to an AI model to get answers about neural networks and the playground.';
-      if (lang === 'zh') botMsg.textContent = '感谢您的消息！这是演示聊天机器人。完整版可连接 AI 模型来解答关于神经网络和游乐场的问题。';
-      if (lang === 'ja') botMsg.textContent = 'メッセージありがとうございます！これはデモ用チャットボットです。正式版ではAIモデルと連携し、ニューラルネットやプレイグラウンドについて回答できます。';
-      chatMessages.appendChild(botMsg);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    });
+      setLang(lang);
+      setTheme(theme);
+      fetch('/api/preferences').then(function(r) { return r.ok ? r.json() : null; }).then(function(pref) {
+        if (pref && (pref.lang || pref.theme)) {
+          if (pref.lang) { lang = pref.lang; localStorage.setItem('nnp-lang', lang); }
+          if (pref.theme) { theme = pref.theme; localStorage.setItem('nnp-theme', theme); }
+          setLang(lang);
+          setTheme(theme);
+        }
+      }).catch(function() {});
+
+      document.getElementById('lang-trigger').addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.getElementById('lang-dropdown').classList.toggle('is-open');
+      });
+      document.querySelectorAll('.nav-dropdown-item').forEach(function(btn) {
+        btn.addEventListener('click', function() { setLang(btn.dataset.lang); });
+      });
+      document.addEventListener('click', function() {
+        document.getElementById('lang-dropdown').classList.remove('is-open');
+      });
+      document.getElementById('theme-toggle').addEventListener('click', function() {
+        setTheme(theme === 'light' ? 'dark' : 'light');
+      });
+
+      var chatFab = document.getElementById('chat-fab');
+      var chatOverlay = document.getElementById('chat-overlay');
+      var chatBackdrop = document.getElementById('chat-backdrop');
+      var chatClose = document.getElementById('chat-close');
+      var chatForm = document.getElementById('chat-form');
+      var chatInput = document.getElementById('chat-input');
+      var chatMessages = document.getElementById('chat-messages');
+
+      function openChat() {
+        chatOverlay.classList.add('is-open');
+        chatOverlay.setAttribute('aria-hidden', 'false');
+        chatInput.focus();
+      }
+      function closeChat() {
+        chatOverlay.classList.remove('is-open');
+        chatOverlay.setAttribute('aria-hidden', 'true');
+      }
+      var chatHistory = [];
+      var chatFullscreen = document.getElementById('chat-fullscreen');
+      var chatWindow = document.getElementById('chat-window');
+      if (chatFullscreen) chatFullscreen.addEventListener('click', function() {
+        chatWindow.classList.toggle('chat-window--fullscreen');
+        chatFullscreen.setAttribute('aria-label', chatWindow.classList.contains('chat-window--fullscreen') ? 'Exit full screen' : 'Full screen');
+      });
+      chatFab.addEventListener('click', openChat);
+      chatClose.addEventListener('click', closeChat);
+      chatBackdrop.addEventListener('click', closeChat);
+      chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var text = (chatInput.value || '').trim();
+        if (!text) return;
+        var userBubble = document.createElement('div');
+        userBubble.className = 'chat-bubble chat-bubble--user';
+        userBubble.textContent = text;
+        chatMessages.appendChild(userBubble);
+        chatInput.value = '';
+        chatInput.disabled = true;
+        chatHistory.push({ role: 'user', content: text });
+        var botBubble = document.createElement('div');
+        botBubble.className = 'chat-bubble chat-bubble--bot';
+        botBubble.textContent = '…';
+        chatMessages.appendChild(botBubble);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, history: chatHistory.slice(-10) })
+        }).then(function(r) { return r.json(); }).then(function(data) {
+          botBubble.textContent = (data.reply || data.error || 'Sorry, I couldn\'t respond.').trim();
+          chatHistory.push({ role: 'assistant', content: botBubble.textContent });
+        }).catch(function() {
+          botBubble.textContent = 'Connection error. Please try again.';
+        }).then(function() {
+          chatInput.disabled = false;
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+      });
+    })();
   </script>
 </body>
 </html>

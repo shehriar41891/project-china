@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quiz — Neural Network Playground</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+  <style>
+    /* Override auth.css: full-width block layout */
+    body.quiz-body { display: block; margin: 0; min-height: 100vh; font-family: 'Space Grotesk', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 0; }
+    body.quiz-body.theme-light { --bg: #f5f5f4; --bg-card: #fff; --text: #1c1917; --text-muted: #57534e; --accent: #0d9488; --accent-soft: rgba(13,148,136,0.12); --border: #e7e5e4; }
+    body.quiz-body.theme-dark { --bg: #0c0a09; --bg-card: #1c1917; --text: #fafaf9; --text-muted: #a8a29e; --accent: #2dd4bf; --accent-soft: rgba(45,212,191,0.12); --border: #292524; }
+    .quiz-nav { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 1rem min(2rem, 4vw); background: var(--bg-card); border-bottom: 1px solid var(--border); box-sizing: border-box; }
+    .quiz-nav a { color: var(--text); text-decoration: none; font-weight: 500; }
+    .quiz-nav a:hover { color: var(--accent); }
+    .quiz-main { width: 100%; max-width: 100%; padding: 2rem min(2.5rem, 4vw); box-sizing: border-box; display: block; }
+    .quiz-page { max-width: 640px; margin: 0 auto; }
+    .quiz-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+    body.quiz-body.theme-dark .quiz-card { box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+    .quiz-progress { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; }
+    .quiz-progress strong { color: var(--text); }
+    .quiz-q { font-size: 1.15rem; font-weight: 600; margin-bottom: 1.25rem; line-height: 1.5; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.6rem; }
+    .quiz-opt { display: block; width: 100%; text-align: left; padding: 0.85rem 1rem; font-size: 1rem; font-family: inherit; background: var(--bg); border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: border-color 0.2s, background 0.2s; color: var(--text); }
+    .quiz-opt:hover { border-color: var(--accent); }
+    .quiz-opt.selected { border-color: var(--accent); background: var(--accent-soft, rgba(13,148,136,0.12)); }
+    .quiz-opt:disabled { cursor: not-allowed; opacity: 0.8; }
+    .quiz-opt.correct { border-color: #22c55e; background: rgba(34,197,94,0.1); }
+    .quiz-opt.wrong { border-color: #ef4444; background: rgba(239,68,68,0.1); }
+    .quiz-actions { margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end; }
+    .quiz-actions button { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; font-family: inherit; border-radius: 10px; cursor: pointer; border: none; }
+    .quiz-next { background: var(--accent); color: #fff; }
+    .quiz-next:hover:not(:disabled) { opacity: 0.92; }
+    .quiz-next:disabled { opacity: 0.6; cursor: not-allowed; }
+    .quiz-start { background: var(--accent); color: #fff; padding: 0.85rem 2rem; font-size: 1.1rem; }
+    .quiz-start:hover { opacity: 0.92; }
+    .quiz-done { text-align: center; padding: 2rem; }
+    .quiz-done h2 { margin: 0 0 0.5rem; font-size: 1.5rem; }
+    .quiz-done .score { font-size: 1.25rem; color: var(--accent); font-weight: 700; margin: 1rem 0; }
+    .quiz-done a { display: inline-block; margin-top: 1rem; color: var(--accent); font-weight: 600; }
+    #quiz-done-retake a { display: inline-block; margin-top: 0.5rem; }
+    .quiz-loading { text-align: center; padding: 2rem; color: var(--text-muted); }
+    body.theme-dark .quiz-opt.correct { background: rgba(34,197,94,0.2); }
+    body.theme-dark .quiz-opt.wrong { background: rgba(239,68,68,0.2); }
+  </style>
+</head>
+<body class="quiz-body theme-dark">
+  <nav class="quiz-nav">
+    <a href="index.html">← Neural Network Playground</a>
+    <a href="learn.html">Learn</a>
+    <a href="profile.html">Profile</a>
+  </nav>
+  <main class="quiz-main">
+    <div class="quiz-page">
+      <div id="quiz-start-screen" class="quiz-card">
+        <h1 class="auth-title">Deep Learning Quiz</h1>
+        <p class="auth-sub">Adaptive questions on neural networks and deep learning. You'll get 6 questions per attempt. Retakes adapt to your weak areas.</p>
+        <button type="button" class="quiz-start" id="btn-start">Start quiz</button>
+        <button type="button" class="quiz-start" id="btn-retake" style="margin-top: 0.5rem; background: transparent; color: var(--accent); border: 2px solid var(--accent); display: none;">Retake (adapted to your last results)</button>
+        <p class="auth-footer" style="margin-top: 1rem;">Or <a href="profile.html">view your profile</a></p>
+      </div>
+      <div id="quiz-question-screen" class="quiz-card" style="display: none;">
+        <div class="quiz-progress">Question <strong id="q-num">1</strong> of <strong id="q-total">6</strong></div>
+        <div class="quiz-q" id="q-text"></div>
+        <div class="quiz-options" id="q-options"></div>
+        <div class="quiz-actions">
+          <button type="button" class="quiz-next" id="btn-next" style="display: none;">Next</button>
+        </div>
+      </div>
+      <div id="quiz-loading" class="quiz-card quiz-loading" style="display: none;">Generating question…</div>
+      <div id="quiz-done-screen" class="quiz-card quiz-done" style="display: none;">
+        <h2>Quiz complete</h2>
+        <p class="score" id="quiz-score"></p>
+        <p id="quiz-done-retake" style="display: none; margin-top: 0.5rem;"></p>
+        <a href="profile.html">View profile &amp; recommendations</a>
+        <br>
+        <a href="quiz.html">Take another quiz</a>
+      </div>
+    </div>
+  </main>
+  <script>
+    (function() {
+      var startScreen = document.getElementById('quiz-start-screen');
+      var questionScreen = document.getElementById('quiz-question-screen');
+      var loadingScreen = document.getElementById('quiz-loading');
+      var doneScreen = document.getElementById('quiz-done-screen');
+      var qNum = document.getElementById('q-num');
+      var qTotal = document.getElementById('q-total');
+      var qText = document.getElementById('q-text');
+      var qOptions = document.getElementById('q-options');
+      var btnNext = document.getElementById('btn-next');
+      var quizScore = document.getElementById('quiz-score');
+      var attemptId = null;
+      var attemptChapterId = null;
+      var currentQuestion = null;
+      var answeredCount = 0;
+      var totalQuestions = 6;
+
+      function show(el) { el.style.display = 'block'; }
+      function hide(el) { el.style.display = 'none'; }
+
+      function checkAuth() {
+        return fetch('/api/auth/me', { credentials: 'include' }).then(function(r) {
+          if (!r.ok) { window.location.href = 'login.html'; throw new Error('not logged in'); }
+          return r.json();
+        });
+      }
+
+      var chapterIdFromUrl = parseInt((window.location.search.match(/chapterId=(\d+)/) || [])[1], 10) || null;
+      function startQuiz(contextForRetake, chapterId) {
+        attemptChapterId = chapterId || null;
+        hide(startScreen);
+        show(loadingScreen);
+        var body = {};
+        if (contextForRetake) body.contextForRetake = contextForRetake;
+        if (chapterId) body.chapterId = chapterId;
+        fetch('/api/quiz/start', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+              attemptId = data.attemptId;
+              answeredCount = 0;
+              hide(loadingScreen);
+              fetchNextQuestion();
+            }).catch(function() {
+              hide(loadingScreen);
+              show(startScreen);
+              alert('Could not start quiz. Sign in and try again.');
+            });
+      }
+      document.getElementById('btn-start').addEventListener('click', function() {
+        checkAuth().then(function() { startQuiz(null, chapterIdFromUrl); });
+      });
+      if (chapterIdFromUrl) {
+        document.querySelector('.auth-sub').textContent = 'Chapter quiz: 6 questions on this chapter\'s topic. Retakes give new questions on the same concepts.';
+        document.getElementById('btn-start').textContent = 'Start chapter quiz';
+      }
+      var btnRetake = document.getElementById('btn-retake');
+      function showRetakeButton(contextForRetake, cid) {
+        btnRetake.style.display = 'block';
+        btnRetake.onclick = function() { startQuiz(contextForRetake || null, cid || chapterIdFromUrl); };
+      }
+      if (chapterIdFromUrl) {
+        checkAuth().then(function() {
+          return fetch('/api/quiz/retake-context?chapterId=' + chapterIdFromUrl, { credentials: 'include' }).then(function(r) { return r.json(); });
+        }).then(function(d) {
+          if (d.contextForRetake) showRetakeButton(d.contextForRetake, chapterIdFromUrl);
+        }).catch(function() {});
+      } else {
+        checkAuth().then(function() {
+          return fetch('/api/quiz/attempts', { credentials: 'include' }).then(function(r) { return r.json(); });
+        }).then(function(d) {
+          var lastCompleted = (d.attempts || []).find(function(a) { return a.completed_at && a.context_for_retake; });
+          if (lastCompleted && lastCompleted.context_for_retake) showRetakeButton(lastCompleted.context_for_retake, lastCompleted.chapter_id || null);
+        }).catch(function() {});
+      }
+
+      function fetchNextQuestion() {
+        show(loadingScreen);
+        hide(questionScreen);
+        var body = { attemptId: attemptId };
+        if (currentQuestion) {
+          body.previousQuestion = currentQuestion.question;
+          body.userAnswerIndex = currentQuestion.userAnswerIndex;
+          body.correctIndex = currentQuestion.correctIndex;
+          body.topic = currentQuestion.topic;
+        }
+        fetch('/api/quiz/question', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        }).then(function(r) { return r.json(); }).then(function(data) {
+          hide(loadingScreen);
+          if (data.done) {
+            fetch('/api/quiz/complete', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ attemptId: attemptId }) }).then(function() {});
+            var total = data.totalQuestions || totalQuestions;
+            var correct = data.correctCount !== undefined ? data.correctCount : answeredCount;
+            show(doneScreen);
+            quizScore.textContent = 'You got ' + correct + ' out of ' + total + ' correct.';
+            var retakeWrap = document.getElementById('quiz-done-retake');
+            if (retakeWrap && attemptChapterId && correct < total) {
+              retakeWrap.style.display = 'block';
+              retakeWrap.innerHTML = '<a href="quiz.html?chapterId=' + attemptChapterId + '">Retake this chapter (new questions, same concepts)</a>';
+            }
+            return;
+          }
+          currentQuestion = { question: data.question, options: data.options, correctIndex: data.correctIndex, topic: data.topic };
+          qNum.textContent = answeredCount + 1;
+          qTotal.textContent = totalQuestions;
+          qText.textContent = data.question;
+          qOptions.innerHTML = '';
+          (data.options || []).forEach(function(opt, i) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'quiz-opt';
+            btn.textContent = opt;
+            btn.dataset.index = i;
+            btn.addEventListener('click', function() {
+              if (currentQuestion.answered) return;
+              currentQuestion.answered = true;
+              currentQuestion.userAnswerIndex = i;
+              qOptions.querySelectorAll('.quiz-opt').forEach(function(b) { b.disabled = true; });
+              btn.classList.add('selected');
+              fetch('/api/quiz/answer', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  attemptId: attemptId,
+                  questionText: currentQuestion.question,
+                  topic: currentQuestion.topic,
+                  options: currentQuestion.options,
+                  userAnswerIndex: i,
+                  correctIndex: currentQuestion.correctIndex
+                })
+              }).then(function(r) { return r.json(); }).then(function(result) {
+                qOptions.querySelectorAll('.quiz-opt').forEach(function(b) {
+                  if (Number(b.dataset.index) === currentQuestion.correctIndex) b.classList.add('correct');
+                  else if (Number(b.dataset.index) === i && !result.correct) b.classList.add('wrong');
+                });
+                answeredCount++;
+                btnNext.style.display = 'block';
+                btnNext.textContent = answeredCount >= totalQuestions ? 'Finish' : 'Next question';
+              });
+            });
+            qOptions.appendChild(btn);
+          });
+          btnNext.style.display = 'none';
+          btnNext.onclick = function() {
+            if (answeredCount >= totalQuestions) {
+              hide(questionScreen);
+              show(loadingScreen);
+              fetch('/api/quiz/complete', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ attemptId: attemptId }) })
+                .then(function(r) { return r.json(); })
+                .then(function(completeData) {
+                  hide(loadingScreen);
+                  var total = (completeData.totalQuestions !== undefined && completeData.totalQuestions !== null) ? completeData.totalQuestions : totalQuestions;
+                  var correct = (completeData.correctCount !== undefined && completeData.correctCount !== null) ? completeData.correctCount : answeredCount;
+                  show(doneScreen);
+                  quizScore.textContent = 'You got ' + correct + ' out of ' + total + ' correct.';
+                  var retakeWrap = document.getElementById('quiz-done-retake');
+                  if (retakeWrap && attemptChapterId && correct < total) {
+                    retakeWrap.style.display = 'block';
+                    retakeWrap.innerHTML = '<a href="quiz.html?chapterId=' + attemptChapterId + '">Retake this chapter (new questions, same concepts)</a>';
+                  }
+                })
+                .catch(function() {
+                  hide(loadingScreen);
+                  show(doneScreen);
+                  quizScore.textContent = 'You got ' + answeredCount + ' out of ' + totalQuestions + ' correct.';
+                });
+              return;
+            }
+            currentQuestion = null;
+            fetchNextQuestion();
+          };
+          show(questionScreen);
+        }).catch(function() {
+          hide(loadingScreen);
+          show(startScreen);
+          alert('Failed to load question.');
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

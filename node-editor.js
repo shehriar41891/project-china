@@ -105,26 +105,29 @@
     return state;
   }
 
-  function saveGraph() {
+  var graphPayload = function() {
     var nodeList = [];
     for (var nid in nodes) nodeList.push(getNodeState(nid));
     var edgeList = edges.map(function(e) { return { fromNode: e.fromNode, toNode: e.toNode }; });
+    return { nodes: nodeList, edges: edgeList };
+  };
+
+  function saveGraph() {
+    var payload = graphPayload();
     try {
-      localStorage.setItem('nnp-editor-graph', JSON.stringify({ nodes: nodeList, edges: edgeList }));
+      localStorage.setItem('nnp-editor-graph', JSON.stringify(payload));
+    } catch (err) {}
+    try {
+      fetch('/api/graph', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(function() {});
     } catch (err) {}
   }
 
-  function restoreGraph() {
-    var raw;
-    try {
-      raw = localStorage.getItem('nnp-editor-graph');
-    } catch (err) { return; }
-    if (!raw) return;
-    var data;
-    try {
-      data = JSON.parse(raw);
-    } catch (err) { return; }
-    if (!data.nodes || !data.nodes.length) return;
+  function applyGraphData(data) {
+    if (!data || !data.nodes || !data.nodes.length) return;
     restoring = true;
     var idMap = {};
     data.nodes.forEach(function(state) {
@@ -154,6 +157,19 @@
     updatePlaceholder();
     restoring = false;
     saveGraph();
+  }
+
+  function restoreGraph() {
+    function fromLocal() {
+      var raw;
+      try { raw = localStorage.getItem('nnp-editor-graph'); } catch (err) { return; }
+      if (!raw) return;
+      try { applyGraphData(JSON.parse(raw)); } catch (err) {}
+    }
+    fetch('/api/graph').then(function(r) { return r.ok ? r.json() : null; }).then(function(data) {
+      if (data && (data.nodes && data.nodes.length)) applyGraphData(data);
+      else fromLocal();
+    }).catch(function() { fromLocal(); });
   }
 
   function removeNode(nid) {
@@ -322,6 +338,13 @@
     Object.keys(nodes).forEach(function(nid) { removeNode(nid); });
     runResult.classList.remove('visible');
     try { localStorage.removeItem('nnp-editor-graph'); } catch (e) {}
+    try {
+      fetch('/api/graph', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nodes: [], edges: [] })
+      }).catch(function() {});
+    } catch (e) {}
   });
 
   document.getElementById('btn-run').addEventListener('click', function() {
