@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d9488" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#0d9488" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+  <rect width="500" height="400" fill="url(#bg)" rx="16"/>
+  <circle cx="250" cy="160" r="60" stroke="#0d9488" stroke-width="3" fill="none"/>
+  <path d="M180 260h140M210 290h80M230 320h40" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/>
+  <text x="250" y="380" text-anchor="middle" fill="#0d9488" font-family="system-ui,sans-serif" font-size="14">Neural Network Playground</text>
+</svg>

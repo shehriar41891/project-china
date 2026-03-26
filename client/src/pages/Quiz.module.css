@@ -1,0 +1,121 @@
+.main {
+  width: 100%;
+  padding: 2rem min(2.5rem, 4vw);
+  box-sizing: border-box;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+.sub {
+  color: var(--text-muted);
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+}
+.btnStart, .btnRetake {
+  padding: 0.85rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.btnStart:hover, .btnRetake:hover {
+  opacity: 0.92;
+}
+.btnRetake {
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+}
+.footer {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+}
+.progress {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+.progress strong {
+  color: var(--text);
+}
+.qText {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.opt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  color: var(--text);
+}
+.opt:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.opt:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+.feedbackTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: var(--text);
+}
+.feedbackDetail {
+  margin: 0 0 1rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.topicTag {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 1rem;
+}
+.score {
+  font-size: 1.25rem;
+  color: var(--accent);
+  font-weight: 700;
+  margin: 1rem 0;
+}
+.card a {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--accent);
+  font-weight: 600;
+}

@@ -1,0 +1,187 @@
+.main {
+  width: 100%;
+  padding: 1.5rem min(2rem, 3vw);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 260px 1fr 280px;
+  gap: 1rem;
+  align-items: start;
+}
+.left,
+.center,
+.right {
+  min-width: 0;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  margin-bottom: 1rem;
+}
+.center .card {
+  padding: 1.4rem;
+}
+.card h1 {
+  font-size: 1.5rem;
+  margin: 0 0 0.7rem;
+}
+.objective {
+  margin: 0 0 1rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+.content {
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 0.5rem;
+}
+.section {
+  margin-top: 1.1rem;
+}
+.section h3 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+  color: var(--text-muted);
+}
+.tryItDesc {
+  margin: 0.35rem 0;
+  line-height: 1.5;
+  font-size: 0.92rem;
+}
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.45rem;
+}
+.links a {
+  display: inline-block;
+  padding: 0.45rem 0.8rem;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+.links a:hover {
+  opacity: 0.9;
+}
+.btnQuiz {
+  display: inline-block;
+  padding: 0.7rem 1.2rem;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 10px;
+  text-decoration: none;
+}
+.btnQuiz:hover {
+  opacity: 0.92;
+  color: #fff;
+}
+.btnBack {
+  display: inline-block;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  font-weight: 600;
+  border-radius: 10px;
+  text-decoration: none;
+}
+.btnBack:hover {
+  color: var(--text);
+}
+.bottomNav {
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.lessonList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lessonList li {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+}
+.lessonList li a {
+  display: block;
+  padding: 0.55rem 0.7rem;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.activeLesson {
+  border-color: var(--accent) !important;
+  background: var(--accent-soft);
+}
+.termWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.termChip {
+  font-size: 0.78rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.22rem 0.5rem;
+  color: var(--text-muted);
+  background: var(--bg);
+}
+.lessonProgress {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+.lessonProgress span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.askBox {
+  width: 100%;
+  min-height: 80px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  padding: 0.6rem;
+  resize: vertical;
+}
+.askBtn {
+  margin-top: 0.45rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.55rem 0.9rem;
+}
+.tutorReply {
+  margin: 0.55rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.checkline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+@media (max-width: 1100px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+}

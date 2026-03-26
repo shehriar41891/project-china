@@ -1,0 +1,84 @@
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bgShape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.5;
+  animation: bgFloat 25s ease-in-out infinite;
+  background: var(--accent);
+}
+body.theme-dark .bgShape {
+  opacity: 0.2;
+}
+.bgShape1 {
+  width: 50vmax;
+  height: 50vmax;
+  top: -15vmax;
+  right: -10vmax;
+  animation-delay: 0s;
+}
+.bgShape2 {
+  width: 35vmax;
+  height: 35vmax;
+  bottom: -10vmax;
+  left: -10vmax;
+  animation-delay: -7s;
+}
+.bgShape3 {
+  width: 28vmax;
+  height: 28vmax;
+  top: 45%;
+  left: 55%;
+  animation-delay: -14s;
+}
+@keyframes bgFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(4%, -6%) scale(1.06); }
+  66% { transform: translate(-4%, 5%) scale(0.97); }
+}
+
+.bgLines {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.15;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 70%);
+}
+
+.bgDots {
+  position: absolute;
+  inset: 0;
+}
+
+.bgDot {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.3;
+  animation: bgDot 12s ease-in-out infinite;
+}
+body.theme-dark .bgDot {
+  opacity: 0.2;
+}
+.bgDot1 { width: 10px; height: 10px; top: 15%; left: 10%; animation-delay: 0s; }
+.bgDot2 { width: 8px; height: 8px; top: 70%; right: 15%; animation-delay: -2s; }
+.bgDot3 { width: 12px; height: 12px; bottom: 25%; left: 20%; animation-delay: -4s; }
+.bgDot4 { width: 6px; height: 6px; top: 40%; right: 25%; animation-delay: -6s; }
+.bgDot5 { width: 10px; height: 10px; top: 80%; left: 50%; animation-delay: -8s; }
+.bgDot6 { width: 8px; height: 8px; top: 20%; right: 30%; animation-delay: -3s; }
+.bgDot7 { width: 12px; height: 12px; bottom: 40%; right: 10%; animation-delay: -5s; }
+.bgDot8 { width: 6px; height: 6px; top: 60%; left: 15%; animation-delay: -7s; }
+@keyframes bgDot {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(6px, -8px); }
+}

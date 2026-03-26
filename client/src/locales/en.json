@@ -1,0 +1,45 @@
+{
+  "nav": {
+    "brand": "Neural Network Playground",
+    "learn": "Learn",
+    "profile": "Profile",
+    "quiz": "Quiz",
+    "about": "About",
+    "builder": "Network Builder",
+    "signIn": "Sign in",
+    "logout": "Logout",
+    "toggleTheme": "Toggle theme"
+  },
+  "footer": {
+    "tagline": "Learn neural networks in your browser."
+  },
+  "a11y": {
+    "skipToContent": "Skip to main content"
+  },
+  "tutor": {
+    "title": "Learning assistant",
+    "subtitle": "Ask about concepts, get hints, or where to go next. Not for exam answers.",
+    "placeholder": "Type a question…",
+    "send": "Send",
+    "close": "Close",
+    "open": "Open learning assistant",
+    "notConfigured": "Tutor is not configured on this server (missing API key).",
+    "error": "Something went wrong. Try again.",
+    "explain": "Explain simply",
+    "hint": "Give a hint",
+    "navigate": "Where to go",
+    "glossary": "Glossary term"
+  },
+  "quiz": {
+    "correct": "Correct.",
+    "incorrect": "Not quite.",
+    "correctWas": "The correct answer is:",
+    "next": "Next question",
+    "topic": "Topic"
+  },
+  "chapter": {
+    "tryIt": "Try it hands-on",
+    "tryBuilder": "Open Network Builder — drag layers and train a small model.",
+    "tryPlayground": "Open Classic Playground — 2D dataset and decision boundary."
+  }
+}

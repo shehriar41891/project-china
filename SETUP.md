@@ -33,11 +33,12 @@ Then open **http://localhost:3000**
 - **Profile** → progress by topic, recent attempts, LLM recommendations.
 - **Retake** → on the quiz page, "Retake (adapted to your last results)" uses previous weak areas.
 
-## 4. Database
+## 4. Database and persistence
 
-- **Location:** `playground/data/playground.db` (SQLite).
-- **Tables:** `users`, `quiz_attempts`, `quiz_answers`, `store` (graph/preferences).
-- No external database; everything is local in the project directory.
+- **SQLite:** `playground/data/playground.db` — users, quiz attempts/answers, chapter progress, chapters, `store` (graph/preferences).
+- **Sessions:** `playground/data/sessions/` — login cookies are backed by **file storage** (not RAM), so **restarting the server keeps you logged in** as long as the cookie is valid and this folder is not deleted.
+- Set a stable **`SESSION_SECRET`** in `.env` in production; changing it invalidates existing session cookies.
+- Do **not** delete `data/` if you want to keep accounts and progress (both files are gitignored).
 
 ## 5. Without the server
 

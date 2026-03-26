@@ -19,21 +19,30 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
+const FileStore = require('session-file-store')(session);
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 
 const PORT = process.env.PORT || 3000;
 const DIST = path.join(__dirname, 'dist');
 const DATA_DIR = path.join(__dirname, 'data');
+const SESSION_DIR = path.join(DATA_DIR, 'sessions');
 const DB_PATH = path.join(DATA_DIR, 'playground.db');
 const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY || '';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret-change-in-production';
+const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const SESSION_TTL_SEC = Math.floor(SESSION_MAX_AGE_MS / 1000);
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+if (!fs.existsSync(SESSION_DIR)) fs.mkdirSync(SESSION_DIR, { recursive: true });
 
 // ----- SQLite -----
 const Database = require('better-sqlite3');
 const db = new Database(DB_PATH);
+db.pragma('journal_mode = WAL');
+db.pragma('synchronous = NORMAL');
+db.pragma('foreign_keys = ON');
+db.pragma('busy_timeout = 8000');
 db.exec(`
   CREATE TABLE IF NOT EXISTS store ( key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT DEFAULT (datetime('now')) );
   CREATE TABLE IF NOT EXISTS users (
@@ -87,6 +96,7 @@ db.exec(`
 `);
 try { db.exec('ALTER TABLE quiz_attempts ADD COLUMN chapter_id INTEGER'); } catch (e) {}
 console.log('SQLite DB:', DB_PATH);
+console.log('Session store (file):', SESSION_DIR);
 
 // Seed chapters if empty
 const chapterCount = db.prepare('SELECT COUNT(*) as c FROM chapters').get().c;
@@ -119,10 +129,23 @@ app.use(cookieParser());
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
+  store: new FileStore({
+    path: SESSION_DIR,
+    ttl: SESSION_TTL_SEC,
+    retries: 1,
+    logFn: function () {}
+  }),
+  name: 'connect.sid',
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }
+  rolling: false,
+  cookie: {
+    httpOnly: true,
+    maxAge: SESSION_MAX_AGE_MS,
+    sameSite: 'lax',
+    path: '/'
+  }
 }));
 
 function requireAuth(req, res, next) {
@@ -479,13 +502,23 @@ app.get('/api/profile', requireAuth, async (req, res) => {
   });
 });
 
-// ----- Chat (LLM) -----
+// ----- Chat (LLM) — scoped tutor intents (reduces off-topic / quiz-spoil answers) -----
+const TUTOR_INTENTS = {
+  explain: 'The user wants a simpler explanation. Use short sentences and plain language. No code unless asked.',
+  hint: 'Give a learning hint or direction only—do NOT reveal answers to quiz or homework questions. Nudge toward the concept.',
+  navigate: 'Help them use this app: routes are /learn (chapters), /quiz, /profile (progress), /editor (Network Builder), /playground (classic 2D visualization). One or two sentences.',
+  glossary: 'Define ML/DL terms clearly. If they ask for another language, give the English term and a short equivalent or transliteration when helpful.',
+  general: 'Help with neural networks, deep learning, and this learning platform. Be brief and friendly.'
+};
+
 app.post('/api/chat', async (req, res) => {
-  const { message, history = [] } = req.body || {};
+  const { message, history = [], intent } = req.body || {};
   if (!message || typeof message !== 'string') return res.status(400).json({ error: 'Message required' });
   if (!MISTRAL_API_KEY) return res.status(503).json({ error: 'Chat not configured' });
+  const intentKey = typeof intent === 'string' && TUTOR_INTENTS[intent] ? intent : 'general';
+  const intentLine = TUTOR_INTENTS[intentKey];
   const messages = [
-    { role: 'system', content: 'You are a helpful tutor for the Neural Network Playground, a learning platform for neural networks and deep learning. Answer briefly and clearly. Help with concepts, quizzes, the network builder, and learning path. Be friendly and concise.' },
+    { role: 'system', content: `You are a scoped tutor for the Neural Network Playground (browser-based NN learning). Stay on-topic: concepts, training intuition, builder/playground help, study tips. Do not fabricate features the app may not have. Current mode: ${intentKey}. ${intentLine}` },
     ...history.slice(-10).map(m => ({ role: m.role, content: m.content })),
     { role: 'user', content: message.trim().slice(0, 2000) }
   ];
@@ -498,16 +531,30 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-// ----- Static -----
+// ----- Static (SPA: serve index.html for non-API routes that are not files) -----
 app.use(express.static(DIST));
-app.get('*', (req, res) => {
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) return next();
   const p = path.join(DIST, req.path === '/' ? 'index.html' : req.path);
   if (fs.existsSync(p) && fs.statSync(p).isFile()) return res.sendFile(p);
   res.sendFile(path.join(DIST, 'index.html'));
 });
 
+function shutdownDb() {
+  try {
+    db.close();
+  } catch (_) {}
+}
+process.once('SIGINT', () => {
+  shutdownDb();
+  process.exit(0);
+});
+process.once('SIGTERM', () => {
+  shutdownDb();
+  process.exit(0);
+});
+
 app.listen(PORT, () => {
   console.log('Server http://localhost:' + PORT);
-  console.log('DB:', DB_PATH);
   if (!MISTRAL_API_KEY) console.warn('MISTRAL_API_KEY not set — quiz generation will fall back to defaults');
 });
