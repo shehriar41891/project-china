@@ -130,21 +130,19 @@ export default function Quiz() {
       <div className={styles.card}>
         {screen === 'start' && (
           <>
-            <h1 className={styles.title}>Deep Learning Quiz</h1>
+            <h1 className={styles.title}>{t('quiz.title')}</h1>
             <p className={styles.sub}>
-              {chapterId
-                ? "Chapter quiz: 6 questions on this chapter's topic. Retakes give new questions on the same concepts."
-                : "Adaptive questions on neural networks and deep learning. You'll get 6 questions per attempt."}
+              {chapterId ? t('quiz.chapterIntro') : t('quiz.generalIntro')}
             </p>
-            <button type="button" className={styles.btnStart} onClick={() => startQuiz(null)}>Start quiz</button>
+            <button type="button" className={styles.btnStart} onClick={() => startQuiz(null)}>{t('quiz.startQuiz')}</button>
             {contextForRetake && (
-              <button type="button" className={styles.btnRetake} onClick={() => startQuiz(contextForRetake)}>Retake (adapted to your last results)</button>
+              <button type="button" className={styles.btnRetake} onClick={() => startQuiz(contextForRetake)}>{t('quiz.retakeAdapted')}</button>
             )}
-            <p className={styles.footer}><Link to="/profile">View your profile</Link></p>
+            <p className={styles.footer}><Link to="/profile">{t('quiz.viewProfile')}</Link></p>
           </>
         )}
 
-        {screen === 'loading' && <div className={styles.loading}>Loading…</div>}
+        {screen === 'loading' && <div className={styles.loading}>{t('quiz.loading')}</div>}
 
         {screen === 'feedback' && feedback && (
           <>
@@ -170,7 +168,7 @@ export default function Quiz() {
 
         {screen === 'question' && currentQuestion && (
           <>
-            <p className={styles.progress}>Question <strong>{answeredCount + 1}</strong> of <strong>{TOTAL_QUESTIONS}</strong></p>
+            <p className={styles.progress}>{t('quiz.questionOf').replace('{n}', String(answeredCount + 1)).replace('{total}', String(TOTAL_QUESTIONS))}</p>
             <p className={styles.qText}>{currentQuestion.question}</p>
             <div className={styles.options}>
               {(currentQuestion.options || []).map((opt, i) => (
@@ -190,13 +188,13 @@ export default function Quiz() {
 
         {screen === 'done' && (
           <>
-            <h2>Quiz complete</h2>
-            <p className={styles.score}>You got {score.correct} out of {score.total} correct.</p>
+            <h2>{t('quiz.completeTitle')}</h2>
+            <p className={styles.score}>{t('quiz.scoreOutOf').replace('{correct}', String(score.correct)).replace('{total}', String(score.total))}</p>
             {attemptChapterId && score.correct < score.total && (
-              <p><Link to={'/quiz?chapterId=' + attemptChapterId}>Retake this chapter (new questions, same concepts)</Link></p>
+              <p><Link to={`/quiz?chapterId=${attemptChapterId}`}>{t('quiz.retakeChapter')}</Link></p>
             )}
-            <p><Link to="/profile">View profile & recommendations</Link></p>
-            <p><Link to="/quiz">Take another quiz</Link></p>
+            <p><Link to="/profile">{t('quiz.profileRec')}</Link></p>
+            <p><Link to="/quiz">{t('quiz.anotherQuiz')}</Link></p>
           </>
         )}
       </div>

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLocale } from '../context/LocaleContext';
 import { api } from '../api/client';
 import styles from './Chapter.module.css';
 
 export default function Chapter() {
+  const { t } = useLocale();
   const { id, slug } = useParams();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -36,7 +38,7 @@ export default function Chapter() {
         setChapter(data);
         fetch('/api/chapters/' + data.id + '/start', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: '{}' }).catch(() => {});
       })
-      .catch(() => setErr('Could not load lesson.'))
+      .catch(() => setErr('chapter.loadError'))
       .finally(() => setLoading(false));
   }, [id, slug, user, authLoading, navigate]);
 
@@ -45,7 +47,7 @@ export default function Chapter() {
   if (loading || err || !chapter) {
     return (
       <div className={styles.main}>
-        <div className={styles.card}>{err || 'Loading lesson…'}</div>
+        <div className={styles.card}>{err ? t(err) : t('chapter.loading')}</div>
       </div>
     );
   }
@@ -55,7 +57,7 @@ export default function Chapter() {
   const currentIndex = chapters.findIndex((c) => c.id === chapter.id);
   const prev = currentIndex > 0 ? chapters[currentIndex - 1] : null;
   const next = currentIndex >= 0 && currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
-  const objective = `By the end of this lesson, you should confidently explain and apply: ${chapter.title}.`;
+  const objective = `${t('chapter.objectiveText')} ${chapter.title}`;
   const quizProgress = Math.round((chapter.sort_order / 10) * 100);
   const keyTerms = (chapter.content_text || '')
     .toLowerCase()
@@ -69,20 +71,20 @@ export default function Chapter() {
     if (!chatInput.trim()) return;
     try {
       const res = await api('/api/chat', { method: 'POST', body: { message: chatInput } });
-      setChatReply(res.reply || 'No response.');
+      setChatReply(res.reply || t('chapter.noTutorReply'));
     } catch (_) {
-      setChatReply('Tutor is unavailable right now.');
+      setChatReply(t('chapter.tutorNoReply'));
     }
   }
 
   return (
     <div className={styles.main}>
       <aside className={styles.left}>
-        <h3>Lesson list</h3>
+        <h3>{t('chapter.lessonList')}</h3>
         <ul className={styles.lessonList}>
           {chapters.map((c) => (
             <li key={c.id} className={c.id === chapter.id ? styles.activeLesson : ''}>
-              <Link to={'/learn/' + c.slug}>{c.sort_order}. {c.title}</Link>
+              <Link to={`/learn/${c.slug}`}>{c.sort_order}. {c.title}</Link>
             </li>
           ))}
         </ul>
@@ -90,80 +92,81 @@ export default function Chapter() {
 
       <section className={styles.center}>
         <article className={styles.card}>
-          <h1>{chapter.title || 'Lesson'}</h1>
-          <p className={styles.objective}><strong>Learning objective:</strong> {objective}</p>
+          <h1>{chapter.title || t('chapter.lessonFallback')}</h1>
+          <p className={styles.objective}><strong>{t('chapter.objectivePrefix')}</strong> {objective}</p>
 
           <div className={styles.section}>
-            <h3>Concept explanation</h3>
-            <div className={styles.content}>{chapter.content_text || 'No content.'}</div>
+            <h3>{t('chapter.conceptTitle')}</h3>
+            <div className={styles.content}>{chapter.content_text || t('chapter.noContent')}</div>
           </div>
 
           <div className={styles.section}>
-            <h3>Guided visualization</h3>
-            <p className={styles.tryItDesc}>Open visual tools and map this concept with your own network setup.</p>
+            <h3>{t('chapter.vizTitle')}</h3>
+            <p className={styles.tryItDesc}>{t('chapter.vizDesc')}</p>
             <div className={styles.links}>
-              <Link to="/editor">Open Network Builder</Link>
-              <Link to="/playground">Open Classic Playground</Link>
+              <Link to="/editor">{t('chapter.openBuilder')}</Link>
+              <Link to="/playground">{t('chapter.openPlayground')}</Link>
             </div>
           </div>
 
           <div className={styles.section}>
-            <h3>Micro-exploration task</h3>
-            <p className={styles.tryItDesc}>Change one parameter, run again, and compare the behavior.</p>
+            <h3>{t('chapter.microTitle')}</h3>
+            <p className={styles.tryItDesc}>{t('chapter.microDesc')}</p>
             <label className={styles.checkline}>
-              <input type="checkbox" checked={taskDone} onChange={(e) => setTaskDone(e.target.checked)} /> Task completed
+              <input type="checkbox" checked={taskDone} onChange={(e) => setTaskDone(e.target.checked)} /> {t('chapter.taskDone')}
             </label>
           </div>
 
           <div className={styles.section}>
-            <h3>Quiz checkpoint</h3>
-            <Link to={'/quiz?chapterId=' + chapter.id} className={styles.btnQuiz}>Take checkpoint quiz</Link>
+            <h3>{t('chapter.quizCheckpoint')}</h3>
+            <Link to={`/quiz?chapterId=${chapter.id}`} className={styles.btnQuiz}>{t('chapter.takeCheckpoint')}</Link>
           </div>
 
           <div className={styles.section}>
-            <h3>Summary + next recommendation</h3>
+            <h3>{t('chapter.summaryTitle')}</h3>
             <p className={styles.tryItDesc}>
-              You finished the core ideas for <strong>{chapter.title}</strong>. {next ? `Next lesson: ${next.title}.` : 'You completed all lessons.'}
+              {t('chapter.summaryIntro')} <strong>{chapter.title}</strong>.{' '}
+              {next ? `${t('chapter.summaryNext')} ${next.title}.` : t('chapter.summaryAllDone')}
             </p>
           </div>
 
           <div className={styles.bottomNav}>
-            {prev ? <Link to={'/learn/' + prev.slug} className={styles.btnBack}>← Previous lesson</Link> : <span />}
-            {next ? <Link to={'/learn/' + next.slug} className={styles.btnBack}>Next lesson →</Link> : <Link to="/profile" className={styles.btnBack}>Go to profile →</Link>}
+            {prev ? <Link to={`/learn/${prev.slug}`} className={styles.btnBack}>{t('chapter.prevLesson')}</Link> : <span />}
+            {next ? <Link to={`/learn/${next.slug}`} className={styles.btnBack}>{t('chapter.nextLesson')}</Link> : <Link to="/profile" className={styles.btnBack}>{t('chapter.goProfile')}</Link>}
           </div>
         </article>
       </section>
 
       <aside className={styles.right}>
         <div className={styles.card}>
-          <h3>Key terms</h3>
+          <h3>{t('chapter.keyTerms')}</h3>
           <div className={styles.termWrap}>
             {keyTerms.length ? keyTerms.map((term) => <span key={term} className={styles.termChip}>{term}</span>) : <span className={styles.termChip}>neural</span>}
           </div>
         </div>
 
         <div className={styles.card}>
-          <h3>Progress in this lesson</h3>
-          <div className={styles.lessonProgress}><span style={{ width: quizProgress + '%' }} /></div>
-          <p className={styles.tryItDesc}>{quizProgress}% through this module track.</p>
+          <h3>{t('chapter.progressTitle')}</h3>
+          <div className={styles.lessonProgress}><span style={{ width: `${quizProgress}%` }} /></div>
+          <p className={styles.tryItDesc}>{t('chapter.progressThrough').replace('{n}', String(quizProgress))}</p>
         </div>
 
         <div className={styles.card}>
-          <h3>Ask tutor</h3>
-          <textarea className={styles.askBox} value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder="Ask anything about this lesson..." />
-          <button type="button" className={styles.askBtn} onClick={askTutor}>Ask</button>
+          <h3>{t('chapter.askTutor')}</h3>
+          <textarea className={styles.askBox} value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder={t('chapter.askPlaceholder')} />
+          <button type="button" className={styles.askBtn} onClick={askTutor}>{t('chapter.ask')}</button>
           {chatReply ? <p className={styles.tutorReply}>{chatReply}</p> : null}
         </div>
 
         <div className={styles.card}>
-          <h3>Related glossary terms</h3>
+          <h3>{t('chapter.glossary')}</h3>
           <div className={styles.termWrap}>
             {(keyTerms.slice(0, 4)).map((term) => <span key={term} className={styles.termChip}>{term}</span>)}
           </div>
           {(videos.length || docs.length) ? (
             <div className={styles.links}>
-              {videos.map((url, i) => <a key={'v' + i} href={url} target="_blank" rel="noopener noreferrer">Video</a>)}
-              {docs.map((url, i) => <a key={'d' + i} href={url} target="_blank" rel="noopener noreferrer">Doc</a>)}
+              {videos.map((url, i) => <a key={`v${i}`} href={url} target="_blank" rel="noopener noreferrer">{t('chapter.video')}</a>)}
+              {docs.map((url, i) => <a key={`d${i}`} href={url} target="_blank" rel="noopener noreferrer">{t('chapter.doc')}</a>)}
             </div>
           ) : null}
         </div>

@@ -26,23 +26,6 @@
   border: 0;
 }
 
-.langLabel {
-  display: inline-flex;
-  align-items: center;
-}
-.langSelect {
-  font-size: 0.85rem;
-  padding: 0.35rem 0.5rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  cursor: pointer;
-}
-.langSelect:hover {
-  border-color: var(--accent);
-}
-
 .page {
   min-height: 100vh;
   display: flex;
@@ -53,7 +36,9 @@
 .nav {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
   padding: 0.85rem min(2rem, 4vw);
   background: color-mix(in srgb, var(--bg-card) 92%, transparent);
   border-bottom: 1px solid var(--border);
@@ -141,6 +126,19 @@
 .navLinkCta:hover {
   opacity: 0.92;
   color: #fff;
+}
+.navLinkMuted {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.45rem 0.7rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+}
+.navLinkMuted:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+  text-decoration: none;
 }
 
 .navSearch {
@@ -280,6 +278,7 @@
     max-width: 100%;
     min-width: 100%;
     width: 100%;
+    flex: none;
   }
   .navRight {
     display: none;

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLocale } from '../context/LocaleContext';
 import styles from './Auth.module.css';
 
 export default function Signup() {
+  const { t } = useLocale();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -16,7 +18,7 @@ export default function Signup() {
     e.preventDefault();
     setError('');
     if (!email.trim() || !password || !name.trim()) {
-      setError('Please enter email, password and name.');
+      setError(t('auth.errSignup'));
       return;
     }
     setLoading(true);
@@ -24,7 +26,7 @@ export default function Signup() {
       await signup(email.trim(), password, name.trim());
       navigate('/');
     } catch (err) {
-      setError(err.message || 'Sign up failed.');
+      setError(err.message || t('auth.signUpFailed'));
     } finally {
       setLoading(false);
     }
@@ -32,13 +34,13 @@ export default function Signup() {
 
   return (
     <div className={styles.wrap}>
-      <Link to="/" className={styles.back}>← Back to home</Link>
+      <Link to="/" className={styles.back}>{t('auth.backHome')}</Link>
       <div className={styles.card}>
-        <h1 className={styles.title}>Register</h1>
-        <p className={styles.sub}>Create an account to save progress and take quizzes.</p>
+        <h1 className={styles.title}>{t('auth.registerTitle')}</h1>
+        <p className={styles.sub}>{t('auth.registerSub')}</p>
         {error && <div className={styles.error} role="alert">{error}</div>}
         <form className={styles.form} onSubmit={handleSubmit}>
-          <label htmlFor="name">Name</label>
+          <label htmlFor="name">{t('auth.name')}</label>
           <input
             id="name"
             type="text"
@@ -46,9 +48,9 @@ export default function Signup() {
             onChange={(e) => setName(e.target.value)}
             required
             autoComplete="name"
-            placeholder="Your name"
+            placeholder={t('auth.namePlaceholder')}
           />
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">{t('auth.email')}</label>
           <input
             id="email"
             type="email"
@@ -58,7 +60,7 @@ export default function Signup() {
             autoComplete="email"
             placeholder="you@example.com"
           />
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">{t('auth.password')}</label>
           <input
             id="password"
             type="password"
@@ -68,9 +70,9 @@ export default function Signup() {
             autoComplete="new-password"
             placeholder="••••••••"
           />
-          <button type="submit" disabled={loading}>{loading ? 'Creating account…' : 'Register'}</button>
+          <button type="submit" disabled={loading}>{loading ? t('auth.creating') : t('auth.registerBtn')}</button>
         </form>
-        <p className={styles.footer}>Already have an account? <Link to="/login">Sign in</Link></p>
+        <p className={styles.footer}>{t('auth.haveAccount')} <Link to="/login">{t('nav.signIn')}</Link></p>
       </div>
     </div>
   );

@@ -1,9 +1,9 @@
 .main {
   width: 100%;
-  padding: 2rem min(2.5rem, 4vw);
+  padding: 1.25rem min(1.25rem, 3vw) 2.5rem;
   box-sizing: border-box;
-  max-width: 720px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
 }
 .card {
   background: var(--bg-card);

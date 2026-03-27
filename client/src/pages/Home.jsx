@@ -2,10 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Background from '../components/Background';
 import { useAuth } from '../context/AuthContext';
+import { useLocale } from '../context/LocaleContext';
 import { api } from '../api/client';
 import styles from './Home.module.css';
 
-// Real AI/tech images: Popsy illustrations (primary) + Unsplash fallbacks
 const IMAGES = {
   hero: {
     primary: 'https://illustrations.popsy.co/teal/artificial-intelligence.svg',
@@ -47,6 +47,7 @@ function ImgWithFallback({ primary, fallback, alt, className, ...props }) {
 }
 
 export default function Home() {
+  const { t, locale } = useLocale();
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
 
@@ -74,22 +75,34 @@ export default function Home() {
     return profile.chapterProgress.find((c) => !c.completed_at) || null;
   }, [profile]);
 
-  const quickAccess = [
-    { title: 'Start Learning', desc: 'Open course modules and begin your path.', to: '/learn' },
-    { title: 'Build a Neural Network', desc: 'Use drag-and-drop to build architecture.', to: '/editor' },
-    { title: 'Visualize Training', desc: 'Run and watch training behavior live.', to: '/playground' },
-    { title: 'Take a Quiz', desc: 'Checkpoint your understanding with adaptive quiz.', to: '/quiz' },
-    { title: 'Talk to Tutor AI', desc: 'Ask concepts and get guided support.', to: '/tutor' },
-    { title: 'Learning Path', desc: 'Follow structured beginner-to-advanced flow.', to: '/learn' },
-  ];
+  const quickAccess = useMemo(
+    () => [
+      { title: t('home.qa1Title'), desc: t('home.qa1Desc'), to: '/learn' },
+      { title: t('home.qa2Title'), desc: t('home.qa2Desc'), to: '/editor' },
+      { title: t('home.qa3Title'), desc: t('home.qa3Desc'), to: '/playground' },
+      { title: t('home.qa4Title'), desc: t('home.qa4Desc'), to: '/quiz' },
+      { title: t('home.qa5Title'), desc: t('home.qa5Desc'), to: '/tutor' },
+      { title: t('home.qa6Title'), desc: t('home.qa6Desc'), to: '/learn' },
+    ],
+    [t, locale]
+  );
 
-  const modulePreview = ['Neuron & Perceptron', 'Activation Functions', 'Loss Functions', 'Gradient Descent', 'Backpropagation', 'Overfitting & Generalization'];
-  const popularCourses = [
-    { title: 'Neural Networks 101', level: 'Beginner', students: '12.4k students', to: '/learn' },
-    { title: 'Optimization in Deep Learning', level: 'Intermediate', students: '8.9k students', to: '/learn' },
-    { title: 'CNNs for Vision', level: 'Intermediate', students: '10.2k students', to: '/learn' },
-    { title: 'Debugging Model Training', level: 'Advanced', students: '6.3k students', to: '/learn' },
-  ];
+  const modulePreview = useMemo(
+    () => [t('home.m1'), t('home.m2'), t('home.m3'), t('home.m4'), t('home.m5'), t('home.m6')],
+    [t, locale]
+  );
+
+  const popularCourses = useMemo(
+    () => [
+      { title: t('home.course1'), meta: `${t('home.levelBeginner')} • 12.4k ${t('home.studentsK')}`, to: '/learn' },
+      { title: t('home.course2'), meta: `${t('home.levelIntermediate')} • 8.9k ${t('home.studentsK')}`, to: '/learn' },
+      { title: t('home.course3'), meta: `${t('home.levelIntermediate')} • 10.2k ${t('home.studentsK')}`, to: '/learn' },
+      { title: t('home.course4'), meta: `${t('home.levelAdvanced')} • 6.3k ${t('home.studentsK')}`, to: '/learn' },
+    ],
+    [t, locale]
+  );
+
+  const loopSteps = useMemo(() => [t('home.step1'), t('home.step2'), t('home.step3'), t('home.step4'), t('home.step5')], [t, locale]);
 
   return (
     <>
@@ -97,19 +110,17 @@ export default function Home() {
       <div className={styles.landing}>
         <section className={styles.hero}>
           <div className={styles.heroContent}>
-            <p className={styles.heroKicker}>Interactive AI Learning Platform</p>
-            <h1 className={styles.heroHeadline}>Learn deep learning like a pro, not from static slides.</h1>
-            <p className={styles.heroText}>
-              Explore concepts, build neural networks, track progress, and get AI-guided feedback in one modern workflow.
-            </p>
+            <p className={styles.heroKicker}>{t('home.heroKicker')}</p>
+            <h1 className={styles.heroHeadline}>{t('home.heroTitle')}</h1>
+            <p className={styles.heroText}>{t('home.heroText')}</p>
             <div className={styles.heroActions}>
-              <Link to="/learn" className={styles.heroBtnPrimary}>Start Learning</Link>
-              <Link to="/editor" className={styles.heroBtnSecondary}>Open Builder</Link>
+              <Link to="/learn" className={styles.heroBtnPrimary}>{t('home.startLearning')}</Link>
+              <Link to="/editor" className={styles.heroBtnSecondary}>{t('home.openBuilder')}</Link>
             </div>
           </div>
           <div className={styles.heroMedia}>
             <div className={styles.heroIllusWrap}>
-              <ImgWithFallback primary={IMAGES.hero.primary} fallback={IMAGES.hero.fallback} alt="Learn AI visually" width={500} height={400} loading="eager" />
+              <ImgWithFallback primary={IMAGES.hero.primary} fallback={IMAGES.hero.fallback} alt={t('home.heroAlt')} width={500} height={400} loading="eager" />
               <span className={styles.heroFloat1} aria-hidden="true" />
               <span className={styles.heroFloat2} aria-hidden="true" />
               <span className={styles.heroFloat3} aria-hidden="true" />
@@ -119,12 +130,12 @@ export default function Home() {
 
         <section className={styles.surfaceSection}>
           <div className={styles.sectionHead}>
-            <h2>Quick Access</h2>
-            <p>Everything important, one click away.</p>
+            <h2>{t('home.quickAccessTitle')}</h2>
+            <p>{t('home.quickAccessSub')}</p>
           </div>
           <div className={styles.featureGridSix}>
             {quickAccess.map((card, idx) => (
-              <article className={styles.featureCard} key={card.title}>
+              <article className={styles.featureCard} key={card.to + idx}>
                 <div className={styles.featureCardImgWrap}>
                   <ImgWithFallback
                     primary={[IMAGES.builder.primary, IMAGES.learn.primary, IMAGES.hero.primary, IMAGES.quiz.primary, IMAGES.guide.primary, IMAGES.progress.primary][idx]}
@@ -138,7 +149,7 @@ export default function Home() {
                 </div>
                 <h3>{card.title}</h3>
                 <p>{card.desc}</p>
-                <Link to={card.to} className={styles.featureLink}>Open module</Link>
+                <Link to={card.to} className={styles.featureLink}>{t('home.openModule')}</Link>
               </article>
             ))}
           </div>
@@ -146,11 +157,11 @@ export default function Home() {
 
         <section className={styles.loopSection}>
           <div className={styles.sectionHead}>
-            <h2>How It Works</h2>
-            <p>A complete learning loop from concept to recommendation.</p>
+            <h2>{t('home.howTitle')}</h2>
+            <p>{t('home.howSub')}</p>
           </div>
           <div className={styles.loopSteps}>
-            {['Learn concept', 'Build model', 'Visualize behavior', 'Take quiz', 'Get recommendation'].map((step, index) => (
+            {loopSteps.map((step, index) => (
               <article key={step} className={styles.loopStep}>
                 <span>{index + 1}</span>
                 <p>{step}</p>
@@ -161,14 +172,14 @@ export default function Home() {
 
         <section className={styles.surfaceSection}>
           <div className={styles.sectionHead}>
-            <h2>Learning Modules</h2>
-            <p>Structured lessons from fundamentals to advanced debugging.</p>
+            <h2>{t('home.modulesTitle')}</h2>
+            <p>{t('home.modulesSub')}</p>
           </div>
           <div className={styles.moduleGrid}>
             {modulePreview.map((m) => (
               <article key={m} className={styles.moduleCard}>
                 <h3>{m}</h3>
-                <p>Concept explanation, guided visualization, micro task, quiz checkpoint.</p>
+                <p>{t('home.moduleCardDesc')}</p>
               </article>
             ))}
           </div>
@@ -176,15 +187,15 @@ export default function Home() {
 
         <section className={styles.surfaceSection}>
           <div className={styles.sectionHead}>
-            <h2>Popular Courses</h2>
-            <p>Most visited paths from learners this week.</p>
+            <h2>{t('home.popularTitle')}</h2>
+            <p>{t('home.popularSub')}</p>
           </div>
           <div className={styles.popularGrid}>
             {popularCourses.map((c) => (
               <article key={c.title} className={styles.popularCard}>
                 <h3>{c.title}</h3>
-                <p>{c.level} • {c.students}</p>
-                <Link to={c.to}>View course</Link>
+                <p>{c.meta}</p>
+                <Link to={c.to}>{t('home.viewCourse')}</Link>
               </article>
             ))}
           </div>
@@ -192,32 +203,32 @@ export default function Home() {
 
         <section className={styles.progressSection}>
           <div className={styles.progressPanel}>
-            <h2>Continue Learning</h2>
+            <h2>{t('home.continueTitle')}</h2>
             {user && profile ? (
               <>
-                <p><strong>Completed modules:</strong> {profile.chapterProgress ? profile.chapterProgress.filter((c) => c.completed_at).length : 0}</p>
-                <p><strong>Weak topics:</strong> {weakTopics.length ? weakTopics.join(', ') : 'No weak topics yet'}</p>
-                <p><strong>Recommended next lesson:</strong> {nextLesson ? nextLesson.title : 'You completed all modules'}</p>
-                {nextLesson ? <Link to={'/learn/' + nextLesson.slug} className={styles.ctaPrimary}>Continue next lesson</Link> : <Link to="/profile" className={styles.ctaPrimary}>Go to profile</Link>}
+                <p><strong>{t('home.completedStrong')}</strong> {profile.chapterProgress ? profile.chapterProgress.filter((c) => c.completed_at).length : 0}</p>
+                <p><strong>{t('home.weakStrong')}</strong> {weakTopics.length ? weakTopics.join(', ') : t('home.noWeak')}</p>
+                <p><strong>{t('home.nextStrong')}</strong> {nextLesson ? nextLesson.title : t('home.allDone')}</p>
+                {nextLesson ? <Link to={`/learn/${nextLesson.slug}`} className={styles.ctaPrimary}>{t('home.continueNext')}</Link> : <Link to="/profile" className={styles.ctaPrimary}>{t('home.goProfile')}</Link>}
               </>
             ) : (
               <>
-                <p>New learner? Start with a diagnostic and follow the beginner path.</p>
+                <p>{t('home.newLearner')}</p>
                 <div className={styles.ctaRow}>
-                  <Link to="/quiz" className={styles.ctaPrimary}>Take Diagnostic Quiz</Link>
-                  <Link to="/learn" className={styles.ctaSecondary}>Start Beginner Path</Link>
+                  <Link to="/quiz" className={styles.ctaPrimary}>{t('home.diagnosticQuiz')}</Link>
+                  <Link to="/learn" className={styles.ctaSecondary}>{t('home.beginnerPath')}</Link>
                 </div>
               </>
             )}
           </div>
           <div className={styles.tutorPanel}>
-            <h3>Need help right now?</h3>
-            <p>Ask Tutor AI about any concept, quiz answer, or training issue.</p>
-            <Link to="/tutor" className={styles.ctaPrimary}>Open Tutor AI</Link>
+            <h3>{t('home.tutorHelpTitle')}</h3>
+            <p>{t('home.tutorHelpText')}</p>
+            <Link to="/tutor" className={styles.ctaPrimary}>{t('home.openTutor')}</Link>
           </div>
         </section>
 
-        <Link to="/tutor" className={styles.tutorFab} aria-label="Open AI Tutor">🤖</Link>
+        <Link to="/tutor" className={styles.tutorFab} aria-label={t('home.fabTutor')}>🤖</Link>
       </div>
     </>
   );

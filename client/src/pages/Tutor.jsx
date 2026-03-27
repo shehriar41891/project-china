@@ -1,21 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useLocale } from '../context/LocaleContext';
 import { api } from '../api/client';
 import styles from './Tutor.module.css';
 
-const QUICK_PROMPTS = [
-  'Explain backpropagation in simple words.',
-  'What is the difference between loss and accuracy?',
-  'How do I reduce overfitting in this model?',
-  'Give me a mini quiz on activation functions.',
-];
-
 export default function Tutor() {
+  const { t, locale } = useLocale();
+  const quickPrompts = useMemo(
+    () => [t('tutorPage.prompt1'), t('tutorPage.prompt2'), t('tutorPage.prompt3'), t('tutorPage.prompt4')],
+    [t, locale]
+  );
+
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'Hi! I am your AI Tutor. Ask anything about concepts, quizzes, or model building.' },
+    {
+      role: 'assistant',
+      content: t('tutorPage.welcome'),
+    },
   ]);
+
+  useEffect(() => {
+    setMessages([{ role: 'assistant', content: t('tutorPage.welcome') }]);
+  }, [locale, t]);
+
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, loading]);
 
   async function send(text) {
     const prompt = (text || input).trim();
@@ -25,11 +38,11 @@ export default function Tutor() {
     const userMsg = { role: 'user', content: prompt };
     setMessages((prev) => [...prev, userMsg]);
     try {
-      const history = messages.map((m) => ({ role: m.role, content: m.content }));
+      const history = [...messages, userMsg].map((m) => ({ role: m.role, content: m.content }));
       const data = await api('/api/chat', { method: 'POST', body: { message: prompt, history } });
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply || 'No response.' }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply || t('tutorPage.noResponse') }]);
     } catch (_) {
-      setMessages((prev) => [...prev, { role: 'assistant', content: 'Tutor is currently unavailable.', isError: true }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: t('tutorPage.unavailable'), isError: true }]);
     } finally {
       setLoading(false);
     }
@@ -41,44 +54,64 @@ export default function Tutor() {
   }
 
   return (
-    <div className={styles.main}>
-      <div className={styles.headerCard}>
-        <h1>AI Tutor</h1>
-        <p>Ask concepts, clear confusion, and get guided next steps tailored to your learning journey.</p>
-        <div className={styles.headerActions}>
-          <Link to="/learn">Go to Learning Path</Link>
-          <Link to="/quiz">Take Quiz</Link>
+    <div className={styles.page}>
+      <header className={styles.hero}>
+        <div className={styles.heroText}>
+          <p className={styles.eyebrow}>{t('tutorPage.eyebrow')}</p>
+          <h1>{t('tutorPage.title')}</h1>
+          <p className={styles.lead}>{t('tutorPage.lead')}</p>
         </div>
-      </div>
+        <div className={styles.heroLinks}>
+          <Link to="/learn" className={styles.heroLink}>{t('tutorPage.learningPath')}</Link>
+          <Link to="/quiz" className={styles.heroLinkMuted}>{t('tutorPage.quizzes')}</Link>
+        </div>
+      </header>
 
-      <div className={styles.layout}>
-        <aside className={styles.side}>
-          <h3>Quick prompts</h3>
-          <div className={styles.promptList}>
-            {QUICK_PROMPTS.map((p) => (
-              <button key={p} type="button" onClick={() => send(p)}>{p}</button>
+      <div className={styles.shell}>
+        <aside className={styles.sidebar} aria-label={t('tutorPage.promptsAria')}>
+          <h2 className={styles.sidebarTitle}>{t('tutorPage.quickPrompts')}</h2>
+          <ul className={styles.promptList}>
+            {quickPrompts.map((p) => (
+              <li key={p}>
+                <button type="button" className={styles.promptBtn} onClick={() => send(p)} disabled={loading}>
+                  {p}
+                </button>
+              </li>
             ))}
-          </div>
+          </ul>
         </aside>
 
-        <section className={styles.chatCard}>
-          <div className={styles.messages}>
+        <section className={styles.chat} aria-label={t('tutorPage.chatAria')}>
+          <div className={styles.thread}>
             {messages.map((m, i) => (
-              <div key={i} className={`${styles.bubble} ${m.role === 'user' ? styles.user : styles.assistant} ${m.isError ? styles.err : ''}`}>
-                {m.content}
+              <div
+                key={i}
+                className={`${styles.row} ${m.role === 'user' ? styles.rowUser : styles.rowAssistant}`}
+              >
+                <span className={styles.badge}>{m.role === 'user' ? t('tutorPage.you') : t('tutorPage.tutor')}</span>
+                <div className={`${styles.bubble} ${m.isError ? styles.bubbleErr : ''}`}>{m.content}</div>
               </div>
             ))}
-            {loading ? <div className={`${styles.bubble} ${styles.assistant}`}>Thinking…</div> : null}
+            {loading ? (
+              <div className={`${styles.row} ${styles.rowAssistant}`}>
+                <span className={styles.badge}>{t('tutorPage.tutor')}</span>
+                <div className={`${styles.bubble} ${styles.thinking}`}>{t('tutorPage.thinking')}</div>
+              </div>
+            ) : null}
+            <div ref={bottomRef} />
           </div>
-          <form className={styles.form} onSubmit={onSubmit}>
+          <form className={styles.composer} onSubmit={onSubmit}>
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask your question..."
+              placeholder={t('tutorPage.placeholder')}
               maxLength={2000}
               disabled={loading}
+              aria-label={t('tutorPage.messageAria')}
             />
-            <button type="submit" disabled={!input.trim() || loading}>Send</button>
+            <button type="submit" disabled={!input.trim() || loading}>
+              {t('tutorPage.send')}
+            </button>
           </form>
         </section>
       </div>
