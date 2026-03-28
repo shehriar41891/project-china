@@ -125,16 +125,24 @@ function storeSet(key, val) { setStore.run(key, typeof val === 'string' ? val : 
 
 // ----- Express -----
 const app = express();
+const isProduction = process.env.NODE_ENV === 'production';
+// Behind Render / other reverse proxies, required for secure cookies and correct client IP
+if (isProduction) {
+  app.set('trust proxy', 1);
+}
+
+const sessionStore = new FileStore({
+  path: SESSION_DIR,
+  ttl: SESSION_TTL_SEC,
+  retries: 1,
+  logFn: function () {}
+});
+
 app.use(cookieParser());
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
-  store: new FileStore({
-    path: SESSION_DIR,
-    ttl: SESSION_TTL_SEC,
-    retries: 1,
-    logFn: function () {}
-  }),
+  store: sessionStore,
   name: 'connect.sid',
   secret: SESSION_SECRET,
   resave: false,
@@ -144,6 +152,7 @@ app.use(session({
     httpOnly: true,
     maxAge: SESSION_MAX_AGE_MS,
     sameSite: 'lax',
+    secure: isProduction,
     path: '/'
   }
 }));
@@ -555,6 +564,7 @@ process.once('SIGTERM', () => {
 });
 
 app.listen(PORT, () => {
-  console.log('Server http://localhost:' + PORT);
+  const url = 'http://localhost:' + PORT;
+  console.log('Server listening on port', PORT, '(' + url + ' on local dev)');
   if (!MISTRAL_API_KEY) console.warn('MISTRAL_API_KEY not set — quiz generation will fall back to defaults');
 });

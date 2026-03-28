@@ -46,3 +46,29 @@ If you run only `npx serve dist/` (no Node server), the app still works but:
 
 - Login/signup and quiz/profile are unavailable (redirect to login will fail; use Network Builder and home as before).
 - To use auth and quiz, run `npm run server` and open the app through it.
+
+## 6. Deploying on Render (or similar)
+
+**What you see in the logs is usually not an error:**
+
+| Log | Meaning |
+|-----|--------|
+| `copyfiles … dist && concat …` | Normal output from `npm run prep` / `npm start` (static assets + `lib.js` bundle). |
+| `SQLite DB: /opt/render/...` | Normal — the app uses SQLite under `data/playground.db`. |
+| `Seeded 10 chapters` | First run only — empty DB was populated with default chapters. |
+| `Server listening on port …` | Server started successfully. |
+
+**`Warning: connect.session() MemoryStore is not designed for a production environment`**
+
+That warning appears only when Express is using the **default in-memory** session store (no `store:` option). The current `server.js` uses **`session-file-store`** under `data/sessions/`, so you should **not** see this if you deploy the latest code. If you still do, your Render service is probably running an **old `server.js`** — redeploy after pulling the repo, or confirm the **Root Directory** is `playground` and **Start Command** runs this project’s `server.js`.
+
+**Recommended Render settings**
+
+- **Root Directory:** `playground` (if the repo root is above it).
+- **Build Command:** `npm install && npm run prep` (or `npm ci && npm run prep`).
+- **Start Command:** `node server.js` (or `npm start` if that only runs the server; avoid double `prep` on every restart if builds are slow — use a build step + `node server.js` for start).
+- **Environment:** set `SESSION_SECRET` to a long random string, `MISTRAL_API_KEY` if you use AI features, and optionally `NODE_ENV=production` (Render often sets this automatically).
+
+**Note:** Ephemeral disk on free tiers means `data/` is wiped if the instance is moved; for durable SQLite + sessions, use a [persistent disk](https://render.com/docs/disks) or an external database.
+
+Cookies use `secure: true` in production so sessions work over HTTPS behind Render’s proxy (`trust proxy` is enabled).
