@@ -3,11 +3,15 @@
   "version": "2016.3.10",
   "description": "",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "clean": "rimraf dist",
     "build:client": "cd client && npm run build",
     "dev": "npm run prep && concurrently \"--kill-others=false\" \"node server.js\" \"npm run watch\"",
     "start": "npm run prep && node server.js",
+    "start:prod": "node server.js",
     "prep": "npm run build:client && copyfiles -f client/public/* dist && copyfiles editor.html playground.html analytics.js guide-and-drag.js editor.css node-editor.js dist && concat node_modules/material-design-lite/material.min.js node_modules/seedrandom/seedrandom.min.js > dist/lib.js",
     "build-css": "concat node_modules/material-design-lite/material.min.css styles.css > dist/bundle.css",
     "watch-css": "concat node_modules/material-design-lite/material.min.css styles.css -o dist/bundle.css",
