@@ -8,7 +8,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:client": "cd client && npm run build",
+    "build:client": "npm install --prefix client && npm run build --prefix client",
     "dev": "npm run prep && concurrently \"--kill-others=false\" \"node server.js\" \"npm run watch\"",
     "start": "npm run prep && node server.js",
     "start:prod": "node server.js",
