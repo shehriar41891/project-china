@@ -13,21 +13,31 @@ const IMAGES = {
   },
   builder: {
     primary: 'https://illustrations.popsy.co/blue/coding.svg',
-    fallback: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=400&q=80',
+    fallback: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&q=80',
   },
   learn: {
     primary: 'https://illustrations.popsy.co/blue/developer-activity.svg',
-    fallback: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&q=80',
+    fallback: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&q=80',
+  },
+  /** Training / metrics — fits “visualize training” playground */
+  playground: {
+    primary: 'https://illustrations.popsy.co/blue/data-report.svg',
+    fallback: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80',
   },
   quiz: {
     primary: 'https://illustrations.popsy.co/blue/online-learning.svg',
-    fallback: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=400&q=80',
+    fallback: 'https://images.unsplash.com/photo-1434030216411-0b793f4ed417?w=600&q=80',
   },
-  progress: {
-    primary: 'https://illustrations.popsy.co/blue/data-report.svg',
-    fallback: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80',
+  /** Quick Access “Take a Quiz” — checkpoint / exam vibe (distinct from generic “quiz” module art) */
+  quizCard: {
+    primary: 'https://images.unsplash.com/photo-1434030216411-0b793f4ed417?w=640&q=80',
+    fallback: 'https://illustrations.popsy.co/blue/online-learning.svg',
   },
-  guide: {
+  tutor: {
+    primary: 'https://illustrations.popsy.co/blue/artificial-intelligence.svg',
+    fallback: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&q=80',
+  },
+  learningPath: {
     primary: 'https://illustrations.popsy.co/blue/rocket-launch.svg',
     fallback: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80',
   },
@@ -35,6 +45,9 @@ const IMAGES = {
 
 function ImgWithFallback({ primary, fallback, alt, className, ...props }) {
   const [src, setSrc] = useState(primary);
+  useEffect(() => {
+    setSrc(primary);
+  }, [primary]);
   return (
     <img
       src={src}
@@ -79,27 +92,34 @@ export default function Home() {
 
   const quickAccess = useMemo(
     () => [
-      { title: t('home.qa1Title'), desc: t('home.qa1Desc'), to: '/learn' },
-      { title: t('home.qa2Title'), desc: t('home.qa2Desc'), to: '/editor' },
-      { title: t('home.qa3Title'), desc: t('home.qa3Desc'), to: '/playground' },
-      { title: t('home.qa4Title'), desc: t('home.qa4Desc'), to: '/quiz' },
-      { title: t('home.qa5Title'), desc: t('home.qa5Desc'), to: '/tutor' },
-      { title: t('home.qa6Title'), desc: t('home.qa6Desc'), to: '/learn' },
+      { title: t('home.qa1Title'), desc: t('home.qa1Desc'), to: '/learn', imageKey: 'learn' },
+      { title: t('home.qa2Title'), desc: t('home.qa2Desc'), to: '/editor', imageKey: 'builder' },
+      { title: t('home.qa3Title'), desc: t('home.qa3Desc'), to: '/playground', imageKey: 'playground' },
+      { title: t('home.qa4Title'), desc: t('home.qa4Desc'), to: '/quiz', imageKey: 'quizCard' },
+      { title: t('home.qa5Title'), desc: t('home.qa5Desc'), to: '/tutor', imageKey: 'tutor' },
+      { title: t('home.qa6Title'), desc: t('home.qa6Desc'), to: '/learn', imageKey: 'learningPath' },
     ],
     [t, locale]
   );
 
-  const modulePreview = useMemo(
-    () => [t('home.m1'), t('home.m2'), t('home.m3'), t('home.m4'), t('home.m5'), t('home.m6')],
-    [t, locale]
+  const moduleCards = useMemo(
+    () => [
+      { id: 'm1', imageKey: 'hero' },
+      { id: 'm2', imageKey: 'playground' },
+      { id: 'm3', imageKey: 'quiz' },
+      { id: 'm4', imageKey: 'learningPath' },
+      { id: 'm5', imageKey: 'builder' },
+      { id: 'm6', imageKey: 'tutor' },
+    ],
+    []
   );
 
   const popularCourses = useMemo(
     () => [
-      { title: t('home.course1'), meta: `${t('home.levelBeginner')} • 12.4k ${t('home.studentsK')}`, to: '/learn' },
-      { title: t('home.course2'), meta: `${t('home.levelIntermediate')} • 8.9k ${t('home.studentsK')}`, to: '/learn' },
-      { title: t('home.course3'), meta: `${t('home.levelIntermediate')} • 10.2k ${t('home.studentsK')}`, to: '/learn' },
-      { title: t('home.course4'), meta: `${t('home.levelAdvanced')} • 6.3k ${t('home.studentsK')}`, to: '/learn' },
+      { title: t('home.course1'), meta: `${t('home.levelBeginner')} • 12.4k ${t('home.studentsK')}`, to: '/learn', imageKey: 'learn' },
+      { title: t('home.course2'), meta: `${t('home.levelIntermediate')} • 8.9k ${t('home.studentsK')}`, to: '/learn', imageKey: 'playground' },
+      { title: t('home.course3'), meta: `${t('home.levelIntermediate')} • 10.2k ${t('home.studentsK')}`, to: '/learn', imageKey: 'hero' },
+      { title: t('home.course4'), meta: `${t('home.levelAdvanced')} • 6.3k ${t('home.studentsK')}`, to: '/learn', imageKey: 'builder' },
     ],
     [t, locale]
   );
@@ -163,24 +183,28 @@ export default function Home() {
             <p>{t('home.quickAccessSub')}</p>
           </div>
           <div className={styles.featureGridSix}>
-            {quickAccess.map((card, idx) => (
-              <article className={styles.featureCard} key={card.to + idx}>
-                <div className={styles.featureCardImgWrap}>
-                  <ImgWithFallback
-                    primary={[IMAGES.builder.primary, IMAGES.learn.primary, IMAGES.hero.primary, IMAGES.quiz.primary, IMAGES.guide.primary, IMAGES.progress.primary][idx]}
-                    fallback={[IMAGES.builder.fallback, IMAGES.learn.fallback, IMAGES.hero.fallback, IMAGES.quiz.fallback, IMAGES.guide.fallback, IMAGES.progress.fallback][idx]}
-                    alt={card.title}
-                    className={styles.featureCardImg}
-                    width={260}
-                    height={140}
-                    loading="lazy"
-                  />
-                </div>
-                <h3>{card.title}</h3>
-                <p>{card.desc}</p>
-                <Link to={card.to} className={styles.featureLink}>{t('home.openModule')}</Link>
-              </article>
-            ))}
+            {quickAccess.map((card, idx) => {
+              const img = IMAGES[card.imageKey];
+              return (
+                <article className={styles.featureCard} key={card.to + idx}>
+                  <div className={styles.cardMediaSlot}>
+                    <ImgWithFallback
+                      primary={img.primary}
+                      fallback={img.fallback}
+                      alt=""
+                      className={styles.cardMediaImg}
+                      width={320}
+                      height={180}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <h3>{card.title}</h3>
+                  <p>{card.desc}</p>
+                  <Link to={card.to} className={styles.featureLink}>{t('home.openModule')}</Link>
+                </article>
+              );
+            })}
           </div>
         </section>
 
@@ -205,12 +229,27 @@ export default function Home() {
             <p>{t('home.modulesSub')}</p>
           </div>
           <div className={styles.moduleGrid}>
-            {modulePreview.map((m) => (
-              <article key={m} className={styles.moduleCard}>
-                <h3>{m}</h3>
-                <p>{t('home.moduleCardDesc')}</p>
-              </article>
-            ))}
+            {moduleCards.map((row) => {
+              const img = IMAGES[row.imageKey];
+              return (
+                <article key={row.id} className={styles.moduleCard}>
+                  <div className={styles.cardMediaSlot}>
+                    <ImgWithFallback
+                      primary={img.primary}
+                      fallback={img.fallback}
+                      alt=""
+                      className={styles.cardMediaImg}
+                      width={320}
+                      height={180}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <h3>{t(`home.${row.id}`)}</h3>
+                  <p>{t('home.moduleCardDesc')}</p>
+                </article>
+              );
+            })}
           </div>
         </section>
 
@@ -220,13 +259,28 @@ export default function Home() {
             <p>{t('home.popularSub')}</p>
           </div>
           <div className={styles.popularGrid}>
-            {popularCourses.map((c) => (
-              <article key={c.title} className={styles.popularCard}>
-                <h3>{c.title}</h3>
-                <p>{c.meta}</p>
-                <Link to={c.to}>{t('home.viewCourse')}</Link>
-              </article>
-            ))}
+            {popularCourses.map((c) => {
+              const img = IMAGES[c.imageKey];
+              return (
+                <article key={c.title} className={styles.popularCard}>
+                  <div className={styles.cardMediaSlot}>
+                    <ImgWithFallback
+                      primary={img.primary}
+                      fallback={img.fallback}
+                      alt=""
+                      className={styles.cardMediaImg}
+                      width={320}
+                      height={180}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <h3>{c.title}</h3>
+                  <p>{c.meta}</p>
+                  <Link to={c.to}>{t('home.viewCourse')}</Link>
+                </article>
+              );
+            })}
           </div>
         </section>
 

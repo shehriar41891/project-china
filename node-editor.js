@@ -271,7 +271,7 @@
       var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       var mid = (p1.x + p2.x) / 2;
       path.setAttribute('d', 'M' + p1.x + ',' + p1.y + ' C' + (mid + 60) + ',' + p1.y + ' ' + (mid - 60) + ',' + p2.y + ' ' + p2.x + ',' + p2.y);
-      path.setAttribute('stroke', '#0d7ea4');
+      path.setAttribute('stroke', '#3b82f6');
       path.setAttribute('stroke-width', '2');
       path.setAttribute('fill', 'none');
       edgeLayer.appendChild(path);

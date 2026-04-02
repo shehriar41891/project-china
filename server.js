@@ -331,9 +331,17 @@ app.post('/api/quiz/question', requireAuth, async (req, res) => {
   }
 
   let chapterTopic = '';
+  let chapterMaterial = '';
   if (attempt.chapter_id) {
-    const ch = db.prepare('SELECT title FROM chapters WHERE id = ?').get(attempt.chapter_id);
-    if (ch) chapterTopic = ' Focus questions on this chapter: ' + ch.title + '.';
+    const ch = db.prepare('SELECT title, content_text FROM chapters WHERE id = ?').get(attempt.chapter_id);
+    if (ch) {
+      chapterTopic = ` The quiz is ONLY for this chapter: "${ch.title}". Every question must test understanding of this lesson—do not ask about unrelated topics (e.g. no CNN/RNN questions if this chapter is introductory).`;
+      const raw = (ch.content_text || '').trim();
+      if (raw) {
+        const snippet = raw.length > 4000 ? raw.slice(0, 4000) + '…' : raw;
+        chapterMaterial = `\n\nUse this chapter material to write accurate, grounded questions (paraphrase concepts; do not copy long excerpts):\n${snippet}`;
+      }
+    }
   }
 
   // Adaptive: fetch user's past attempts for this chapter (or all) to build weak-topics context
@@ -360,8 +368,12 @@ app.post('/api/quiz/question', requireAuth, async (req, res) => {
   const retakeInstruction = isRetake
     ? ' This is a RETAKE: ask about the SAME concepts/topics as before (e.g. activation functions, backpropagation) but with a NEW question—different wording, different scenario, different wrong options. Same underlying concept, different question.'
     : '';
-  let systemPrompt = `You are a teacher for an adaptive learning platform about neural networks and deep learning.${chapterTopic}${pastContext}
-Generate exactly ONE multiple-choice question (4 options, one correct). Topics: basics (neurons, layers, activation), backpropagation, CNNs, RNNs, optimization (SGD, Adam), regularization, loss functions, data preprocessing.
+  const topicScope = attempt.chapter_id
+    ? 'Question must align with the chapter title and material above only.'
+    : 'Topics may span basics (neurons, layers, activation), backpropagation, CNNs, RNNs, optimization (SGD, Adam), regularization, loss functions, data preprocessing.';
+  let systemPrompt = `You are a teacher for an adaptive learning platform about neural networks and deep learning.${chapterTopic}${chapterMaterial}${pastContext}
+${topicScope}
+Generate exactly ONE multiple-choice question (4 options, one correct).
 Output ONLY valid JSON with this exact structure (no markdown):
 {"question":"...","options":["A","B","C","D"],"correctIndex":0,"topic":"short topic name"}${retakeInstruction}`;
 
