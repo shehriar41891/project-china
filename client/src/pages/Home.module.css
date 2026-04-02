@@ -7,6 +7,41 @@
   padding-bottom: 2rem;
 }
 
+.landingBlue {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(165deg, rgba(6, 11, 25, 0.92) 0%, rgba(15, 52, 96, 0.88) 38%, rgba(26, 95, 180, 0.9) 68%, rgba(37, 99, 235, 0.95) 100%),
+    radial-gradient(ellipse 120% 80% at 50% -10%, rgba(125, 211, 252, 0.18) 0%, transparent 55%),
+    linear-gradient(165deg, #050a14 0%, #0c1e3d 32%, #153a72 62%, #1d4ed8 100%);
+  min-height: 100%;
+}
+
+.landingForeground {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.landingBlue .hero .heroKicker {
+  color: #93c5fd;
+}
+.landingBlue .hero .heroHeadline {
+  color: #f0f9ff;
+}
+.landingBlue .hero .heroText {
+  color: rgba(224, 242, 254, 0.92);
+}
+.landingBlue .hero .heroBtnSecondary {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #f0f9ff;
+}
+.landingBlue .hero .heroBtnSecondary:hover {
+  border-color: #93c5fd;
+  color: #fff;
+}
+
 .hero {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -44,8 +79,67 @@
 .heroText {
   font-size: 1.02rem;
   color: var(--text-muted);
-  margin: 0 0 1.5rem;
+  margin: 0 0 1.25rem;
   line-height: 1.5;
+}
+.heroSearch {
+  margin: 0 0 1.35rem;
+  max-width: 32rem;
+}
+@media (max-width: 768px) {
+  .heroSearch {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+.heroSearchRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+.heroSearchInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0.72rem 1rem;
+  font-size: 0.98rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(6, 11, 25, 0.45);
+  color: #f0f9ff;
+  box-sizing: border-box;
+}
+.heroSearchInput::placeholder {
+  color: rgba(224, 242, 254, 0.45);
+}
+.heroSearchInput:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.2);
+}
+.heroSearchBtn {
+  flex-shrink: 0;
+  padding: 0.72rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.14);
+  color: #f0f9ff;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+.heroSearchBtn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: #93c5fd;
+}
+.heroSearchHint {
+  margin: 0.45rem 0 0;
+  font-size: 0.8rem;
+  color: rgba(224, 242, 254, 0.65);
+  line-height: 1.35;
+}
+.landingBlue .hero .heroSearchHint {
+  color: rgba(224, 242, 254, 0.62);
 }
 .heroActions {
   display: flex;

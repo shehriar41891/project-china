@@ -1,0 +1,62 @@
+{
+  "intro-neural-nets": {
+    "title": "Introduction to Neural Networks",
+    "content": "Neural networks are computing systems inspired by biological brains. They consist of layers of nodes (neurons) that process inputs and produce outputs. Each connection has a weight that is adjusted during training. This chapter covers the basic structure: input layer, hidden layers, and output layer, and how data flows forward through the network.",
+    "videoTeaser": "Visual walkthrough of layers, neurons, and how signals move through a network.",
+    "rewards": "Explain the role of layers and weights in a simple network|Trace how one forward pass transforms inputs|Be ready to experiment in the Network Builder"
+  },
+  "neurons-activation": {
+    "title": "Neurons and Activation Functions",
+    "content": "A single neuron receives inputs, multiplies them by weights, sums the result, and applies an activation function. Common activations: ReLU (max(0,x)), Sigmoid (squashes to 0–1), Tanh (squashes to -1–1), and Linear. The choice of activation affects learning and the kinds of patterns the network can learn.",
+    "videoTeaser": "Why activations matter and how ReLU, sigmoid, and tanh shape outputs.",
+    "rewards": "Compare common activation functions|Choose sensible activations for hidden vs output layers|Interpret how nonlinearity enables complex patterns"
+  },
+  "layers-architecture": {
+    "title": "Layers and Network Architecture",
+    "content": "Layers are groups of neurons. The input layer holds your features; hidden layers transform them; the output layer produces predictions. Deeper networks can learn more complex patterns but need more data and care to train. Width (neurons per layer) and depth (number of layers) are key design choices.",
+    "videoTeaser": "Depth vs width trade-offs and how architecture choices affect capacity.",
+    "rewards": "Describe input, hidden, and output layers|Reason about depth and width trade-offs|Sketch a small architecture for a given task"
+  },
+  "loss-functions": {
+    "title": "Loss Functions",
+    "content": "A loss function measures how wrong the network's predictions are. For regression, Mean Squared Error (MSE) is common. For classification, Cross-Entropy is standard. The goal of training is to minimize the loss on the training data by adjusting weights.",
+    "videoTeaser": "Connecting predictions to MSE and cross-entropy in practice.",
+    "rewards": "Pick an appropriate loss for regression vs classification|Interpret loss as an error signal|Relate loss minimization to weight updates"
+  },
+  "gradient-backprop": {
+    "title": "Gradient Descent and Backpropagation",
+    "content": "Gradient descent updates weights in the direction that reduces the loss. Backpropagation is the algorithm that computes the gradient of the loss with respect to every weight using the chain rule. Learning rate controls how big each update step is.",
+    "videoTeaser": "Intuition for gradients, the chain rule, and step size (learning rate).",
+    "rewards": "Explain gradient descent in plain language|Describe what backpropagation computes|Tune learning rate at a high level"
+  },
+  "optimizers": {
+    "title": "Optimizers: SGD, Adam",
+    "content": "Optimizers decide how to update weights from gradients. Stochastic Gradient Descent (SGD) uses a fixed or decaying learning rate. Adam adapts the learning rate per parameter using momentum and scaling, and often converges faster. Other options include RMSprop and AdaGrad.",
+    "videoTeaser": "SGD vs adaptive methods like Adam and when each tends to work well.",
+    "rewards": "Contrast SGD with Adam|Name situations where adaptive optimizers help|Choose a starting optimizer for small experiments"
+  },
+  "regularization": {
+    "title": "Overfitting and Regularization",
+    "content": "Overfitting means the model memorizes training data and fails on new data. Regularization reduces overfitting: L2 (weight decay), Dropout (randomly disabling neurons), and early stopping. Validation data is used to monitor generalization.",
+    "videoTeaser": "Spotting overfitting and applying dropout, weight decay, and early stopping.",
+    "rewards": "Define overfitting vs generalization|List three regularization techniques|Use validation metrics to guide training"
+  },
+  "cnns": {
+    "title": "Convolutional Neural Networks (CNNs)",
+    "content": "CNNs are designed for grid-like data (images). Convolutional layers apply filters to detect local patterns (edges, textures). Pooling layers reduce spatial size. Stacking these layers builds up from low-level to high-level features, leading to state-of-the-art image recognition.",
+    "videoTeaser": "Convolutions, filters, pooling, and hierarchical features in images.",
+    "rewards": "Explain convolutions and pooling in simple terms|Describe the hierarchy from edges to objects|Connect CNN ideas to vision applications"
+  },
+  "rnns": {
+    "title": "Recurrent Networks and RNNs",
+    "content": "RNNs process sequences by maintaining a hidden state that carries information across time steps. They are used for text, speech, and time series. Long Short-Term Memory (LSTM) and Gated Recurrent Units (GRU) address the vanishing gradient problem in basic RNNs.",
+    "videoTeaser": "Sequence modeling, hidden state, and why LSTMs/GRUs help.",
+    "rewards": "Describe how an RNN unrolls over time|Explain vanishing gradients at a high level|Name two gated RNN variants and their role"
+  },
+  "data-training": {
+    "title": "Data and Training Practice",
+    "content": "Good data and training practice are essential. Topics: train/validation/test split, normalization and preprocessing, batch size and epochs, monitoring loss and metrics, and debugging (e.g., checking gradients and overfitting).",
+    "videoTeaser": "Splits, batches, epochs, and debugging training loops like a practitioner.",
+    "rewards": "Set up train/val/test splits responsibly|Monitor metrics during training|Apply a short checklist when training misbehaves"
+  }
+}

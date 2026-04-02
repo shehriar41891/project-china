@@ -1,0 +1,62 @@
+{
+  "intro-neural-nets": {
+    "title": "Introducción a las redes neuronales",
+    "content": "Las redes neuronales se inspiran en el cerebro: capas de nodos procesan entradas y producen salidas. Cada conexión tiene un peso que se ajusta en el entrenamiento. Este capítulo cubre la estructura básica — entrada, ocultas, salida — y el flujo hacia adelante de los datos.",
+    "videoTeaser": "Recorrido visual por capas, neuronas y cómo circulan las señales.",
+    "rewards": "Explicar capas y pesos en una red sencilla|Seguir un pase hacia adelante|Estar listo para practicar en el constructor"
+  },
+  "neurons-activation": {
+    "title": "Neuronas y funciones de activación",
+    "content": "Una neurona suma entradas ponderadas y aplica una activación. Comunes: ReLU, sigmoide (0–1), tanh (-1–1), lineal. La activación afecta qué patrones puede aprender la red.",
+    "videoTeaser": "Por qué importan las activaciones: ReLU, sigmoide y tanh.",
+    "rewards": "Comparar activaciones habituales|Elegir activaciones para ocultas vs salida|Entender el papel de la no linealidad"
+  },
+  "layers-architecture": {
+    "title": "Capas y arquitectura",
+    "content": "Las capas agrupan neuronas: entrada para rasgos, ocultas para transformar, salida para predicciones. Más profundidad permite patrones más complejos pero exige más datos. Anchura y profundidad son decisiones clave.",
+    "videoTeaser": "Profundidad frente a anchura y capacidad del modelo.",
+    "rewards": "Describir entrada, ocultas y salida|Razonar sobre profundidad y anchura|Bosquejar una arquitectura pequeña"
+  },
+  "loss-functions": {
+    "title": "Funciones de pérdida",
+    "content": "La pérdida mide el error de las predicciones. MSE en regresión, entropía cruzada en clasificación. El entrenamiento minimiza la pérdida ajustando pesos.",
+    "videoTeaser": "Conectar predicciones con MSE y entropía cruzada.",
+    "rewards": "Elegir pérdida para regresión o clasificación|Interpretar la pérdida como señal|Relacionar minimización con actualizaciones"
+  },
+  "gradient-backprop": {
+    "title": "Descenso por gradiente y retropropagación",
+    "content": "El descenso por gradiente actualiza pesos para reducir la pérdida. La retropropagación calcula el gradiente respecto a cada peso con la regla de la cadena. La tasa de aprendizaje fija el tamaño del paso.",
+    "videoTeaser": "Intuición de gradientes, regla de la cadena y paso (tasa).",
+    "rewards": "Explicar descenso por gradiente en palabras sencillas|Describir qué calcula la retropropagación|Ajustar la tasa de aprendizaje a alto nivel"
+  },
+  "optimizers": {
+    "title": "Optimizadores: SGD, Adam",
+    "content": "Los optimizadores deciden cómo aplicar los gradientes. SGD usa tasa fija o decreciente. Adam adapta la tasa por parámetro y suele converger más rápido. También RMSprop, AdaGrad.",
+    "videoTeaser": "SGD frente a métodos adaptativos como Adam.",
+    "rewards": "Contrastar SGD y Adam|Cuándo ayudan los optimizadores adaptativos|Elegir un optimizador para pruebas pequeñas"
+  },
+  "regularization": {
+    "title": "Sobreajuste y regularización",
+    "content": "El sobreajuste memoriza el entrenamiento y falla en datos nuevos. Regularización: L2, dropout, parada temprana. La validación monitorea la generalización.",
+    "videoTeaser": "Detectar sobreajuste: dropout, L2, parada temprana.",
+    "rewards": "Definir sobreajuste y generalización|Tres técnicas de regularización|Guiar el entrenamiento con validación"
+  },
+  "cnns": {
+    "title": "Redes convolucionales (CNN)",
+    "content": "Las CNN tratan datos en rejilla (imágenes). Las convoluciones detectan patrones locales; el pooling reduce tamaño. Apilar capas construye rasgos de bajo a alto nivel.",
+    "videoTeaser": "Convoluciones, filtros, pooling y jerarquía visual.",
+    "rewards": "Explicar convoluciones y pooling|Describir jerarquía de rasgos|Relacionar CNN con visión"
+  },
+  "rnns": {
+    "title": "Redes recurrentes (RNN)",
+    "content": "Las RNN procesan secuencias con un estado oculto en el tiempo. Texto, audio, series. LSTM y GRU mitigan el gradiente que desaparece en RNN básicas.",
+    "videoTeaser": "Secuencias, estado oculto, LSTM / GRU.",
+    "rewards": "Describir el despliegue temporal de una RNN|Explicar el gradiente que desaparece|Nombrar dos variantes con compuertas"
+  },
+  "data-training": {
+    "title": "Datos y buenas prácticas de entrenamiento",
+    "content": "Buenos datos y prácticas: divisiones train/val/test, normalización, tamaño de lote, épocas, métricas, depuración (gradientes, sobreajuste).",
+    "videoTeaser": "Divisiones, lotes, épocas y depuración de bucles.",
+    "rewards": "Definir divisiones responsables|Monitorear métricas|Usar una lista corta si el entrenamiento falla"
+  }
+}

@@ -27,7 +27,11 @@
   },
   "common": {
     "loading": "加载中…",
-    "errorGeneric": "出错了。"
+    "errorGeneric": "出错了。",
+    "backNav": "页面导航",
+    "back": "← 返回",
+    "home": "首页",
+    "allModules": "全部模块"
   },
   "home": {
     "heroKicker": "交互式 AI 学习平台",
@@ -92,7 +96,8 @@
     "tutorHelpText": "向 AI 导师提问概念、测验或训练问题。",
     "openTutor": "打开 AI 导师",
     "fabTutor": "打开 AI 导师",
-    "heroAlt": "可视化学习人工智能"
+    "heroAlt": "可视化学习人工智能",
+    "searchHint": "在学习页按课程标题查找模块。"
   },
   "learn": {
     "kicker": "课程目录",
@@ -139,7 +144,9 @@
     "nModules": "{n} 个模块",
     "previous": "上一页",
     "next": "下一页",
-    "pageOf": "第 {page} / {total} 页"
+    "pageOf": "第 {page} / {total} 页",
+    "videoPreviewTitle": "课时视频",
+    "watchPreview": "预览"
   },
   "profile": {
     "loadError": "无法加载个人资料。",
@@ -255,7 +262,20 @@
     "noTutorReply": "无回复。",
     "glossary": "相关术语",
     "video": "视频",
-    "doc": "文档"
+    "doc": "文档",
+    "introHeading": "章节概览",
+    "introSub": "在完整课程前先了解时长、收获与短视频预览。",
+    "courseAboutTitle": "关于完整课程",
+    "chaptersBoxTitle": "章节数",
+    "courseChaptersCount": "本路径共 {n} 章",
+    "courseTimeLabel": "完整课程（全部章节）",
+    "courseHours": "约 {h} 小时（共 {m} 分钟）",
+    "chapterTimeLabel": "本章",
+    "chapterMins": "约 {n} 分钟",
+    "rewardsTitle": "完成本章后你将获得",
+    "previewTitle": "章节预览",
+    "enterLesson": "进入完整课程",
+    "openOnYoutube": "在 YouTube 打开"
   },
   "auth": {
     "backHome": "← 返回首页",

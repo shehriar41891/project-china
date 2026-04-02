@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLocale } from '../context/LocaleContext';
 import { api } from '../api/client';
+import PageBackBar from '../components/PageBackBar';
 import styles from './Quiz.module.css';
 
 const TOTAL_QUESTIONS = 6;
@@ -127,6 +128,7 @@ export default function Quiz() {
 
   return (
     <div className={styles.main}>
+      <PageBackBar />
       <div className={styles.card}>
         {screen === 'start' && (
           <>

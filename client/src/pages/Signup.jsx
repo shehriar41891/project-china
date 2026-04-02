@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLocale } from '../context/LocaleContext';
+import PageBackBar from '../components/PageBackBar';
 import styles from './Auth.module.css';
 
 export default function Signup() {
@@ -34,7 +35,7 @@ export default function Signup() {
 
   return (
     <div className={styles.wrap}>
-      <Link to="/" className={styles.back}>{t('auth.backHome')}</Link>
+      <PageBackBar showModulesLink={false} />
       <div className={styles.card}>
         <h1 className={styles.title}>{t('auth.registerTitle')}</h1>
         <p className={styles.sub}>{t('auth.registerSub')}</p>

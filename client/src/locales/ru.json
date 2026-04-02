@@ -27,7 +27,11 @@
   },
   "common": {
     "loading": "Загрузка…",
-    "errorGeneric": "Что-то пошло не так."
+    "errorGeneric": "Что-то пошло не так.",
+    "backNav": "Навигация",
+    "back": "← Назад",
+    "home": "Главная",
+    "allModules": "Все модули"
   },
   "home": {
     "heroKicker": "Интерактивная платформа для изучения ИИ",
@@ -92,7 +96,8 @@
     "tutorHelpText": "Спросите ИИ-тьютора о концепции, ответе в тесте или проблеме обучения.",
     "openTutor": "Открыть ИИ-тьютора",
     "fabTutor": "Открыть ИИ-тьютора",
-    "heroAlt": "Визуальное изучение ИИ"
+    "heroAlt": "Визуальное изучение ИИ",
+    "searchHint": "Ищите модули по названию урока на странице «Обучение»."
   },
   "learn": {
     "kicker": "Каталог курса",
@@ -139,7 +144,9 @@
     "nModules": "{n} модулей",
     "previous": "Назад",
     "next": "Далее",
-    "pageOf": "Стр. {page} из {total}"
+    "pageOf": "Стр. {page} из {total}",
+    "videoPreviewTitle": "Видео урока",
+    "watchPreview": "Превью"
   },
   "profile": {
     "loadError": "Не удалось загрузить профиль.",
@@ -255,7 +262,20 @@
     "noTutorReply": "Нет ответа.",
     "glossary": "Связанные термины",
     "video": "Видео",
-    "doc": "Документ"
+    "doc": "Документ",
+    "introHeading": "Обзор главы",
+    "introSub": "Время, результаты и короткое видео перед полным уроком.",
+    "courseAboutTitle": "О полном курсе",
+    "chaptersBoxTitle": "Главы",
+    "courseChaptersCount": "В этом пути {n} глав",
+    "courseTimeLabel": "Весь курс (все главы)",
+    "courseHours": "Около {h} ч (всего {m} мин)",
+    "chapterTimeLabel": "Эта глава",
+    "chapterMins": "Около {n} минут",
+    "rewardsTitle": "После этой главы вы сможете",
+    "previewTitle": "Предпросмотр содержания",
+    "enterLesson": "Перейти к полному уроку",
+    "openOnYoutube": "Открыть на YouTube"
   },
   "auth": {
     "backHome": "← На главную",

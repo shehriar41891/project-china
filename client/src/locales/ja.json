@@ -27,7 +27,11 @@
   },
   "common": {
     "loading": "読み込み中…",
-    "errorGeneric": "エラーが発生しました。"
+    "errorGeneric": "エラーが発生しました。",
+    "backNav": "ページ移動",
+    "back": "← 戻る",
+    "home": "ホーム",
+    "allModules": "すべてのモジュール"
   },
   "home": {
     "heroKicker": "インタラクティブなAI学習プラットフォーム",
@@ -92,7 +96,8 @@
     "tutorHelpText": "概念・クイズ・学習のことはAIチューターにどうぞ。",
     "openTutor": "AIチューターを開く",
     "fabTutor": "AIチューターを開く",
-    "heroAlt": "視覚的にAIを学ぶ"
+    "heroAlt": "視覚的にAIを学ぶ",
+    "searchHint": "学習ページでレッスンタイトルからモジュールを検索します。"
   },
   "learn": {
     "kicker": "学習カタログ",
@@ -139,7 +144,9 @@
     "nModules": "{n}モジュール",
     "previous": "前へ",
     "next": "次へ",
-    "pageOf": "{page} / {total} ページ"
+    "pageOf": "{page} / {total} ページ",
+    "videoPreviewTitle": "レッスン動画",
+    "watchPreview": "プレビュー"
   },
   "profile": {
     "loadError": "プロフィールを読み込めませんでした。",
@@ -255,7 +262,20 @@
     "noTutorReply": "応答がありません。",
     "glossary": "関連用語",
     "video": "動画",
-    "doc": "ドキュメント"
+    "doc": "ドキュメント",
+    "introHeading": "章の概要",
+    "introSub": "全体の所要時間・成果・短い動画を確認してから本編へ。",
+    "courseAboutTitle": "全コースについて",
+    "chaptersBoxTitle": "章の数",
+    "courseChaptersCount": "このパスは全{n}章",
+    "courseTimeLabel": "全コース（全章）",
+    "courseHours": "約{h}時間（合計{m}分）",
+    "chapterTimeLabel": "この章",
+    "chapterMins": "約{n}分",
+    "rewardsTitle": "この章を終えるとできること",
+    "previewTitle": "章のプレビュー",
+    "enterLesson": "本編レッスンへ進む",
+    "openOnYoutube": "YouTubeで開く"
   },
   "auth": {
     "backHome": "← ホームに戻る",

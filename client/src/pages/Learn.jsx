@@ -3,20 +3,9 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLocale } from '../context/LocaleContext';
 import { api } from '../api/client';
+import { youtubeIdFromUrl, youtubeThumbUrl } from '../utils/youtube';
+import PageBackBar from '../components/PageBackBar';
 import styles from './Learn.module.css';
-
-const CHAPTER_IMAGES = {
-  1: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&q=80',
-  2: 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=1200&q=80',
-  3: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
-  4: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200&q=80',
-  5: 'https://images.unsplash.com/photo-1527474305487-b87b222841cc?w=1200&q=80',
-  6: 'https://images.unsplash.com/photo-1488229297570-58520851e868?w=1200&q=80',
-  7: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80',
-  8: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200&q=80',
-  9: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80',
-  10: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1200&q=80',
-};
 
 function getCategory(chapter) {
   if (chapter.sort_order <= 3) return 'basics';
@@ -25,7 +14,7 @@ function getCategory(chapter) {
 }
 
 export default function Learn() {
-  const { t, locale } = useLocale();
+  const { t, locale, chapterText } = useLocale();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -107,9 +96,14 @@ export default function Learn() {
 
   const filteredList = useMemo(() => {
     const catOk = (c) => categoryFilter === 'all' || getCategory(c) === categoryFilter;
-    const searchOk = (c) => !searchLower || (c.title || '').toLowerCase().includes(searchLower);
+    const searchOk = (c) => {
+      if (!searchLower) return true;
+      const apiTitle = (c.title || '').toLowerCase();
+      const locTitle = chapterText(c.slug, 'title', c.title).toLowerCase();
+      return apiTitle.includes(searchLower) || locTitle.includes(searchLower);
+    };
     return baseForView.filter((c) => catOk(c) && searchOk(c));
-  }, [baseForView, categoryFilter, searchLower]);
+  }, [baseForView, categoryFilter, searchLower, chapterText, locale]);
 
   const totalPages = Math.max(Math.ceil(filteredList.length / PAGE_SIZE), 1);
   const pagedList = useMemo(() => {
@@ -156,7 +150,11 @@ export default function Learn() {
     return (
       <ul className={styles.chapterList}>
         {list.map((c) => {
-          const image = CHAPTER_IMAGES[c.sort_order] || CHAPTER_IMAGES[1];
+          const displayTitle = chapterText(c.slug, 'title', c.title);
+          const vUrl = (c.video_links && c.video_links[0]) || '';
+          const ytId = youtubeIdFromUrl(vUrl);
+          const thumb = ytId ? youtubeThumbUrl(ytId) : null;
+          const teaser = chapterText(c.slug, 'videoTeaser', '');
           const statusText = c.completed_at
             ? t('learn.statusCompleted')
             : c.quiz_best
@@ -168,13 +166,26 @@ export default function Learn() {
           return (
             <li key={c.id}>
               <article className={styles.chapterItem}>
-                <img className={styles.thumb} src={image} alt={c.title || t('learn.chapterFallback')} loading="lazy" />
+                <div className={styles.mediaCol}>
+                  {ytId && thumb ? (
+                    <div className={styles.videoPreview}>
+                      <p className={styles.videoPreviewLabel}>{t('learn.videoPreviewTitle')}</p>
+                      {teaser ? <p className={styles.videoTeaserSmall}>{teaser}</p> : null}
+                      <a className={styles.videoThumbLink} href={vUrl} target="_blank" rel="noopener noreferrer">
+                        <img src={thumb} alt="" className={styles.ytThumb} />
+                        <span className={styles.playBadge}>{t('learn.watchPreview')}</span>
+                      </a>
+                    </div>
+                  ) : (
+                    <div className={styles.mediaPlaceholder} aria-hidden />
+                  )}
+                </div>
                 <div className={styles.chapterBody}>
                   <div className={styles.chapterHead}>
                     <span className={styles.chapterNum}>{t('learn.moduleN').replace('{n}', String(c.sort_order))}</span>
                     <span className={c.completed_at ? styles.done : styles.pending}>{statusText}</span>
                   </div>
-                  <h3>{c.title || t('learn.chapterFallback')}</h3>
+                  <h3>{displayTitle || t('learn.chapterFallback')}</h3>
                   <p className={styles.meta}>
                     {getDifficulty(c)} • {getEstTime(c)} {t('learn.min')} •{' '}
                     {c.quiz_best ? `${t('learn.quizLabel')} ${c.quiz_best}` : t('learn.quizNotTaken')}
@@ -200,6 +211,7 @@ export default function Learn() {
 
   return (
     <div className={styles.main}>
+      <PageBackBar showModulesLink={false} />
       <section className={styles.topBar}>
         <div>
           <p className={styles.kicker}>{t('learn.kicker')}</p>

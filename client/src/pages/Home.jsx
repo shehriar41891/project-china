@@ -1,34 +1,34 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Background from '../components/Background';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLocale } from '../context/LocaleContext';
 import { api } from '../api/client';
+import HomeParticlesBackground from '../components/HomeParticlesBackground';
 import styles from './Home.module.css';
 
 const IMAGES = {
   hero: {
-    primary: 'https://illustrations.popsy.co/teal/artificial-intelligence.svg',
+    primary: 'https://illustrations.popsy.co/blue/artificial-intelligence.svg',
     fallback: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
   },
   builder: {
-    primary: 'https://illustrations.popsy.co/teal/coding.svg',
+    primary: 'https://illustrations.popsy.co/blue/coding.svg',
     fallback: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=400&q=80',
   },
   learn: {
-    primary: 'https://illustrations.popsy.co/teal/developer-activity.svg',
+    primary: 'https://illustrations.popsy.co/blue/developer-activity.svg',
     fallback: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&q=80',
   },
   quiz: {
-    primary: 'https://illustrations.popsy.co/teal/online-learning.svg',
+    primary: 'https://illustrations.popsy.co/blue/online-learning.svg',
     fallback: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=400&q=80',
   },
   progress: {
-    primary: 'https://illustrations.popsy.co/teal/data-report.svg',
+    primary: 'https://illustrations.popsy.co/blue/data-report.svg',
     fallback: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80',
   },
   guide: {
-    primary: 'https://illustrations.popsy.co/teal/rocket-launch.svg',
+    primary: 'https://illustrations.popsy.co/blue/rocket-launch.svg',
     fallback: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80',
   },
 };
@@ -47,9 +47,11 @@ function ImgWithFallback({ primary, fallback, alt, className, ...props }) {
 }
 
 export default function Home() {
-  const { t, locale } = useLocale();
+  const { t, locale, chapterText } = useLocale();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
+  const [heroSearch, setHeroSearch] = useState('');
 
   useEffect(() => {
     if (!user) return;
@@ -104,15 +106,42 @@ export default function Home() {
 
   const loopSteps = useMemo(() => [t('home.step1'), t('home.step2'), t('home.step3'), t('home.step4'), t('home.step5')], [t, locale]);
 
+  const submitHeroSearch = (e) => {
+    e.preventDefault();
+    const q = heroSearch.trim();
+    const learnPath = q ? `/learn?q=${encodeURIComponent(q)}` : '/learn';
+    if (user) {
+      navigate(learnPath);
+      return;
+    }
+    navigate(`/login?next=${encodeURIComponent(learnPath)}`);
+  };
+
   return (
-    <>
-      <Background />
-      <div className={styles.landing}>
+    <div className={`${styles.landing} ${styles.landingBlue}`}>
+      <HomeParticlesBackground />
+      <div className={styles.landingForeground}>
         <section className={styles.hero}>
           <div className={styles.heroContent}>
             <p className={styles.heroKicker}>{t('home.heroKicker')}</p>
             <h1 className={styles.heroHeadline}>{t('home.heroTitle')}</h1>
             <p className={styles.heroText}>{t('home.heroText')}</p>
+            <form className={styles.heroSearch} onSubmit={submitHeroSearch} role="search" aria-label={t('layout.searchAria')}>
+              <div className={styles.heroSearchRow}>
+                <input
+                  type="search"
+                  name="q"
+                  value={heroSearch}
+                  onChange={(e) => setHeroSearch(e.target.value)}
+                  placeholder={t('layout.searchPlaceholder')}
+                  className={styles.heroSearchInput}
+                  aria-label={t('layout.searchAria')}
+                  autoComplete="off"
+                />
+                <button type="submit" className={styles.heroSearchBtn}>{t('layout.searchButton')}</button>
+              </div>
+              <p className={styles.heroSearchHint}>{t('home.searchHint')}</p>
+            </form>
             <div className={styles.heroActions}>
               <Link to="/learn" className={styles.heroBtnPrimary}>{t('home.startLearning')}</Link>
               <Link to="/editor" className={styles.heroBtnSecondary}>{t('home.openBuilder')}</Link>
@@ -208,8 +237,24 @@ export default function Home() {
               <>
                 <p><strong>{t('home.completedStrong')}</strong> {profile.chapterProgress ? profile.chapterProgress.filter((c) => c.completed_at).length : 0}</p>
                 <p><strong>{t('home.weakStrong')}</strong> {weakTopics.length ? weakTopics.join(', ') : t('home.noWeak')}</p>
-                <p><strong>{t('home.nextStrong')}</strong> {nextLesson ? nextLesson.title : t('home.allDone')}</p>
-                {nextLesson ? <Link to={`/learn/${nextLesson.slug}`} className={styles.ctaPrimary}>{t('home.continueNext')}</Link> : <Link to="/profile" className={styles.ctaPrimary}>{t('home.goProfile')}</Link>}
+                <p>
+                  <strong>{t('home.nextStrong')}</strong>{' '}
+                  {nextLesson
+                    ? chapterText(nextLesson.slug, 'title', nextLesson.title)
+                    : t('home.allDone')}
+                </p>
+                {nextLesson ? (
+                  <Link
+                    to={nextLesson.slug ? `/learn/${nextLesson.slug}` : '/learn'}
+                    className={styles.ctaPrimary}
+                  >
+                    {t('home.continueNext')}
+                  </Link>
+                ) : (
+                  <Link to="/profile" className={styles.ctaPrimary}>
+                    {t('home.goProfile')}
+                  </Link>
+                )}
               </>
             ) : (
               <>
@@ -230,6 +275,6 @@ export default function Home() {
 
         <Link to="/tutor" className={styles.tutorFab} aria-label={t('home.fabTutor')}>🤖</Link>
       </div>
-    </>
+    </div>
   );
 }

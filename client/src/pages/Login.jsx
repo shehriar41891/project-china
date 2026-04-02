@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLocale } from '../context/LocaleContext';
+import PageBackBar from '../components/PageBackBar';
 import styles from './Auth.module.css';
 
 export default function Login() {
@@ -12,6 +13,15 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const safeNextPath = () => {
+    const raw = searchParams.get('next');
+    if (!raw || typeof raw !== 'string') return null;
+    const path = raw.trim();
+    if (!path.startsWith('/') || path.startsWith('//')) return null;
+    return path;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +33,8 @@ export default function Login() {
     setLoading(true);
     try {
       await login(email.trim(), password);
-      navigate('/');
+      const next = safeNextPath();
+      navigate(next || '/', { replace: true });
     } catch (err) {
       setError(err.message || t('auth.signInFailed'));
     } finally {
@@ -33,7 +44,7 @@ export default function Login() {
 
   return (
     <div className={styles.wrap}>
-      <Link to="/" className={styles.back}>{t('auth.backHome')}</Link>
+      <PageBackBar showModulesLink={false} />
       <div className={styles.card}>
         <h1 className={styles.title}>{t('auth.signInTitle')}</h1>
         <p className={styles.sub}>{t('auth.signInSub')}</p>

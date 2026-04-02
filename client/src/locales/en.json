@@ -27,7 +27,11 @@
   },
   "common": {
     "loading": "Loading…",
-    "errorGeneric": "Something went wrong."
+    "errorGeneric": "Something went wrong.",
+    "backNav": "Page navigation",
+    "back": "← Back",
+    "home": "Home",
+    "allModules": "All modules"
   },
   "home": {
     "heroKicker": "Interactive AI Learning Platform",
@@ -92,7 +96,8 @@
     "tutorHelpText": "Ask Tutor AI about any concept, quiz answer, or training issue.",
     "openTutor": "Open Tutor AI",
     "fabTutor": "Open AI Tutor",
-    "heroAlt": "Learn AI visually"
+    "heroAlt": "Learn AI visually",
+    "searchHint": "Find modules by lesson title on Learn."
   },
   "learn": {
     "kicker": "Learning catalog",
@@ -139,7 +144,9 @@
     "nModules": "{n} modules",
     "previous": "Previous",
     "next": "Next",
-    "pageOf": "Page {page} / {total}"
+    "pageOf": "Page {page} / {total}",
+    "videoPreviewTitle": "Lesson video",
+    "watchPreview": "Preview"
   },
   "profile": {
     "loadError": "Could not load profile.",
@@ -255,7 +262,20 @@
     "noTutorReply": "No response.",
     "glossary": "Related glossary terms",
     "video": "Video",
-    "doc": "Doc"
+    "doc": "Doc",
+    "introHeading": "Chapter overview",
+    "introSub": "Review time, outcomes, and a short video before the full lesson.",
+    "courseAboutTitle": "About the full course",
+    "chaptersBoxTitle": "Chapters",
+    "courseChaptersCount": "{n} chapters in this path",
+    "courseTimeLabel": "Full course (all chapters)",
+    "courseHours": "About {h} hours ({m} minutes total)",
+    "chapterTimeLabel": "This chapter",
+    "chapterMins": "About {n} minutes",
+    "rewardsTitle": "What you’ll gain after this chapter",
+    "previewTitle": "Chapter preview",
+    "enterLesson": "Continue to full lesson",
+    "openOnYoutube": "Open on YouTube"
   },
   "auth": {
     "backHome": "← Back to home",

@@ -1,0 +1,62 @@
+{
+  "intro-neural-nets": {
+    "title": "Introduction aux réseaux de neurones",
+    "content": "Les réseaux de neurones s'inspirent du cerveau : des couches de nœuds traitent les entrées et produisent des sorties. Chaque connexion a un poids ajusté à l'entraînement. Ce chapitre présente la structure de base — entrée, couches cachées, sortie — et le flux avant des données.",
+    "videoTeaser": "Parcours visuel des couches, neurones et propagation des signaux.",
+    "rewards": "Expliquer rôles des couches et des poids|Suivre une passe avant sur les entrées|Être prêt à expérimenter dans le constructeur"
+  },
+  "neurons-activation": {
+    "title": "Neurones et fonctions d'activation",
+    "content": "Un neurone somme les entrées pondérées puis applique une activation. Courantes : ReLU, sigmoïde (0–1), tanh (-1–1), linéaire. Le choix d'activation influence l'apprentissage et les motifs appris.",
+    "videoTeaser": "Pourquoi les activations comptent : ReLU, sigmoïde, tanh.",
+    "rewards": "Comparer les activations courantes|Choisir des activations pour couches cachées vs sortie|Comprendre le rôle de la non-linéarité"
+  },
+  "layers-architecture": {
+    "title": "Couches et architecture",
+    "content": "Les couches regroupent des neurones : entrée pour les caractéristiques, cachées pour les transformations, sortie pour les prédictions. Plus de profondeur permet des motifs plus complexes mais exige plus de données. Largeur et profondeur sont des choix clés.",
+    "videoTeaser": "Compromis profondeur / largeur et capacité du modèle.",
+    "rewards": "Décrire entrée, cachées et sortie|Raisonner sur profondeur et largeur|Esquisser une petite architecture"
+  },
+  "loss-functions": {
+    "title": "Fonctions de perte",
+    "content": "La perte mesure l'erreur des prédictions. MSE pour la régression, entropie croisée pour la classification. L'entraînement minimise la perte en ajustant les poids.",
+    "videoTeaser": "Relier prédictions, MSE et entropie croisée.",
+    "rewards": "Choisir une perte adaptée régression / classification|Interpréter la perte comme signal|Relier minimisation et mises à jour des poids"
+  },
+  "gradient-backprop": {
+    "title": "Descente de gradient et rétropropagation",
+    "content": "La descente de gradient met à jour les poids pour réduire la perte. La rétropropagation calcule le gradient de la perte pour chaque poids via la règle de chaîne. Le pas d'apprentissage fixe l'amplitude des mises à jour.",
+    "videoTeaser": "Intuition des gradients, chaîne et taille de pas.",
+    "rewards": "Expliquer la descente de gradient simplement|Décrire ce que calcule la rétropropagation|Ajuster grossièrement le pas d'apprentissage"
+  },
+  "optimizers": {
+    "title": "Optimiseurs : SGD, Adam",
+    "content": "Les optimiseurs décident comment appliquer les gradients. SGD utilise un pas fixe ou décroissant. Adam adapte le pas par paramètre (momentum, mise à l'échelle) et converge souvent plus vite. Ex. aussi RMSprop, AdaGrad.",
+    "videoTeaser": "SGD contre méthodes adaptatives comme Adam.",
+    "rewards": "Comparer SGD et Adam|Citer des cas favorables aux optimiseurs adaptatifs|Choisir un optimiseur pour petits essais"
+  },
+  "regularization": {
+    "title": "Surapprentissage et régularisation",
+    "content": "Le surapprentissage mémorise l'entraînement et échoue sur de nouvelles données. Régularisation : L2, dropout, early stopping. Les données de validation surveillent la généralisation.",
+    "videoTeaser": "Repérer le surapprentissage : dropout, L2, early stopping.",
+    "rewards": "Définir surapprentissage et généralisation|Lister trois techniques de régularisation|Guider l'entraînement avec la validation"
+  },
+  "cnns": {
+    "title": "Réseaux convolutifs (CNN)",
+    "content": "Les CNN traitent des données en grille (images). Les convolutions détectent motifs locaux ; le pooling réduit la taille. L'empilement construit des features du bas niveau au haut niveau.",
+    "videoTeaser": "Convoluations, filtres, pooling et hiérarchie visuelle.",
+    "rewards": "Expliquer convolutions et pooling simplement|Décrire la hiérarchie des features|Relier les CNN à la vision"
+  },
+  "rnns": {
+    "title": "Réseaux récurrents (RNN)",
+    "content": "Les RNN traitent des séquences via un état caché dans le temps. Utilisés pour texte, audio, séries. LSTM et GRU atténuent la disparition du gradient des RNN simples.",
+    "videoTeaser": "Séquences, état caché, LSTM / GRU.",
+    "rewards": "Décrire le déroulement temporel d'un RNN|Expliquer la disparition du gradient|Nommer deux variantes à portes"
+  },
+  "data-training": {
+    "title": "Données et bonnes pratiques d'entraînement",
+    "content": "Bonnes données et bonnes pratiques : splits train/val/test, normalisation, taille de batch, époques, suivi des métriques, débogage (gradients, surapprentissage).",
+    "videoTeaser": "Splits, batchs, époques et débogage des boucles d'entraînement.",
+    "rewards": "Mettre en place des splits propres|Surveiller les métriques|Utiliser une checklist si l'entraînement dérape"
+  }
+}

@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.9.1",
     "@vitejs/plugin-react": "^4.2.1",
     "deep-playground-prototype": "file:..",
     "react": "^18.2.0",

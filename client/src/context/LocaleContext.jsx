@@ -6,6 +6,7 @@ import fr from '../locales/fr.json';
 import es from '../locales/es.json';
 import ja from '../locales/ja.json';
 import { VALID_LOCALES, HTML_LANG } from '../locales/languages';
+import { buildChapterLookup } from '../locales/chapterPacks';
 
 const DICTS = { en, zh, ru, fr, es, ja };
 const STORAGE_KEY = 'nnp-locale';
@@ -74,9 +75,21 @@ export function LocaleProvider({ children }) {
     [mergedDict]
   );
 
+  const chapterLookup = useMemo(() => buildChapterLookup(locale), [locale]);
+
+  const chapterText = useCallback(
+    (slug, field, apiFallback) => {
+      const row = chapterLookup[slug];
+      const v = row && row[field];
+      if (v != null && String(v).trim() !== '') return v;
+      return apiFallback != null ? apiFallback : '';
+    },
+    [chapterLookup]
+  );
+
   const value = useMemo(
-    () => ({ locale, setLocale, t, locales: VALID_LOCALES }),
-    [locale, setLocale, t]
+    () => ({ locale, setLocale, t, chapterText, locales: VALID_LOCALES }),
+    [locale, setLocale, t, chapterText]
   );
 
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;

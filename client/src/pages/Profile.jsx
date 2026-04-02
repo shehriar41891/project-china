@@ -3,10 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLocale } from '../context/LocaleContext';
 import { api } from '../api/client';
+import PageBackBar from '../components/PageBackBar';
 import styles from './Profile.module.css';
 
 export default function Profile() {
-  const { t } = useLocale();
+  const { t, chapterText } = useLocale();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
@@ -39,6 +40,7 @@ export default function Profile() {
   if (loading || err) {
     return (
       <div className={styles.main}>
+        <PageBackBar />
         <div className={styles.card}>{err ? t(err) : t('profile.loading')}</div>
       </div>
     );
@@ -51,6 +53,7 @@ export default function Profile() {
 
   return (
     <div className={styles.main}>
+      <PageBackBar />
       <header className={styles.header}>
         <div className={styles.avatar}>{data.user?.name ? data.user.name.charAt(0).toUpperCase() : '?'}</div>
         <div className={styles.headerBody}>
@@ -87,7 +90,9 @@ export default function Profile() {
               {chapters.map((c) => (
                 <tr key={c.id}>
                   <td>
-                    <Link to={`/learn/${c.slug}`} className={styles.moduleLink}>{c.title || t('profile.chapterN').replace('{n}', String(c.id))}</Link>
+                    <Link to={`/learn/${c.slug}`} className={styles.moduleLink}>
+                      {c.slug ? chapterText(c.slug, 'title', c.title) : c.title || t('profile.chapterN').replace('{n}', String(c.id))}
+                    </Link>
                   </td>
                   <td>{c.completed_at ? t('profile.statusDone') : t('profile.statusInProgress')}</td>
                   <td>{c.quiz_best || '—'}</td>

@@ -27,7 +27,11 @@
   },
   "common": {
     "loading": "Chargement…",
-    "errorGeneric": "Une erreur s'est produite."
+    "errorGeneric": "Une erreur s'est produite.",
+    "backNav": "Navigation",
+    "back": "← Retour",
+    "home": "Accueil",
+    "allModules": "Tous les modules"
   },
   "home": {
     "heroKicker": "Plateforme interactive d'apprentissage IA",
@@ -92,7 +96,8 @@
     "tutorHelpText": "Demandez au tuteur IA sur un concept, un quiz ou l'entraînement.",
     "openTutor": "Ouvrir le tuteur IA",
     "fabTutor": "Ouvrir le tuteur IA",
-    "heroAlt": "Apprendre l'IA visuellement"
+    "heroAlt": "Apprendre l'IA visuellement",
+    "searchHint": "Trouvez des modules par titre de leçon dans Apprendre."
   },
   "learn": {
     "kicker": "Catalogue d'apprentissage",
@@ -139,7 +144,9 @@
     "nModules": "{n} modules",
     "previous": "Précédent",
     "next": "Suivant",
-    "pageOf": "Page {page} / {total}"
+    "pageOf": "Page {page} / {total}",
+    "videoPreviewTitle": "Vidéo de la leçon",
+    "watchPreview": "Aperçu"
   },
   "profile": {
     "loadError": "Impossible de charger le profil.",
@@ -255,7 +262,20 @@
     "noTutorReply": "Pas de réponse.",
     "glossary": "Termes du glossaire liés",
     "video": "Vidéo",
-    "doc": "Doc"
+    "doc": "Doc",
+    "introHeading": "Aperçu du chapitre",
+    "introSub": "Durée, objectifs et courte vidéo avant la leçon complète.",
+    "courseAboutTitle": "À propos du parcours complet",
+    "chaptersBoxTitle": "Chapitres",
+    "courseChaptersCount": "{n} chapitres dans ce parcours",
+    "courseTimeLabel": "Parcours complet (tous les chapitres)",
+    "courseHours": "Environ {h} h ({m} minutes au total)",
+    "chapterTimeLabel": "Ce chapitre",
+    "chapterMins": "Environ {n} minutes",
+    "rewardsTitle": "Après ce chapitre vous saurez",
+    "previewTitle": "Aperçu du contenu",
+    "enterLesson": "Continuer vers la leçon complète",
+    "openOnYoutube": "Ouvrir sur YouTube"
   },
   "auth": {
     "backHome": "← Retour à l'accueil",

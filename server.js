@@ -103,20 +103,29 @@ const chapterCount = db.prepare('SELECT COUNT(*) as c FROM chapters').get().c;
 if (chapterCount === 0) {
   const chapters = [
     { title: 'Introduction to Neural Networks', slug: 'intro-neural-nets', order: 1, content: 'Neural networks are computing systems inspired by biological brains. They consist of layers of nodes (neurons) that process inputs and produce outputs. Each connection has a weight that is adjusted during training. This chapter covers the basic structure: input layer, hidden layers, and output layer, and how data flows forward through the network.', videos: '["https://www.youtube.com/watch?v=aircAruvnKk"]', docs: '["https://en.wikipedia.org/wiki/Artificial_neural_network"]' },
-    { title: 'Neurons and Activation Functions', slug: 'neurons-activation', order: 2, content: 'A single neuron receives inputs, multiplies them by weights, sums the result, and applies an activation function. Common activations: ReLU (max(0,x)), Sigmoid (squashes to 0–1), Tanh (squashes to -1–1), and Linear. The choice of activation affects learning and the kinds of patterns the network can learn.', videos: '["https://www.youtube.com/watch?v=KkwX7FkLfug"]', docs: '["https://en.wikipedia.org/wiki/Activation_function"]' },
+    { title: 'Neurons and Activation Functions', slug: 'neurons-activation', order: 2, content: 'A single neuron receives inputs, multiplies them by weights, sums the result, and applies an activation function. Common activations: ReLU (max(0,x)), Sigmoid (squashes to 0–1), Tanh (squashes to -1–1), and Linear. The choice of activation affects learning and the kinds of patterns the network can learn.', videos: '["https://www.youtube.com/watch?v=68BZ5f7P94E"]', docs: '["https://en.wikipedia.org/wiki/Activation_function"]' },
     { title: 'Layers and Network Architecture', slug: 'layers-architecture', order: 3, content: 'Layers are groups of neurons. The input layer holds your features; hidden layers transform them; the output layer produces predictions. Deeper networks can learn more complex patterns but need more data and care to train. Width (neurons per layer) and depth (number of layers) are key design choices.', videos: '["https://www.youtube.com/watch?v=IHZwWFHWa-w"]', docs: '["https://www.deeplearningbook.org/contents/mlp.html"]' },
     { title: 'Loss Functions', slug: 'loss-functions', order: 4, content: 'A loss function measures how wrong the network\'s predictions are. For regression, Mean Squared Error (MSE) is common. For classification, Cross-Entropy is standard. The goal of training is to minimize the loss on the training data by adjusting weights.', videos: '["https://www.youtube.com/watch?v=eqEc66RFY0I"]', docs: '["https://en.wikipedia.org/wiki/Loss_function"]' },
     { title: 'Gradient Descent and Backpropagation', slug: 'gradient-backprop', order: 5, content: 'Gradient descent updates weights in the direction that reduces the loss. Backpropagation is the algorithm that computes the gradient of the loss with respect to every weight using the chain rule. Learning rate controls how big each update step is.', videos: '["https://www.youtube.com/watch?v=IHZwWFHWa-w"]', docs: '["https://en.wikipedia.org/wiki/Backpropagation"]' },
-    { title: 'Optimizers: SGD, Adam', slug: 'optimizers', order: 6, content: 'Optimizers decide how to update weights from gradients. Stochastic Gradient Descent (SGD) uses a fixed or decaying learning rate. Adam adapts the learning rate per parameter using momentum and scaling, and often converges faster. Other options include RMSprop and AdaGrad.', videos: '["https://www.youtube.com/watch?v=mdKjPmcSO_Y"]', docs: '["https://ruder.io/optimizing-gradient-descent/"]' },
+    { title: 'Optimizers: SGD, Adam', slug: 'optimizers', order: 6, content: 'Optimizers decide how to update weights from gradients. Stochastic Gradient Descent (SGD) uses a fixed or decaying learning rate. Adam adapts the learning rate per parameter using momentum and scaling, and often converges faster. Other options include RMSprop and AdaGrad.', videos: '["https://www.youtube.com/watch?v=3kjxzq7cXOk"]', docs: '["https://ruder.io/optimizing-gradient-descent/"]' },
     { title: 'Overfitting and Regularization', slug: 'regularization', order: 7, content: 'Overfitting means the model memorizes training data and fails on new data. Regularization reduces overfitting: L2 (weight decay), Dropout (randomly disabling neurons), and early stopping. Validation data is used to monitor generalization.', videos: '["https://www.youtube.com/watch?v=EuBBz3bI-aA"]', docs: '["https://en.wikipedia.org/wiki/Regularization_(mathematics)"]' },
     { title: 'Convolutional Neural Networks (CNNs)', slug: 'cnns', order: 8, content: 'CNNs are designed for grid-like data (images). Convolutional layers apply filters to detect local patterns (edges, textures). Pooling layers reduce spatial size. Stacking these layers builds up from low-level to high-level features, leading to state-of-the-art image recognition.', videos: '["https://www.youtube.com/watch?v=YRhxdVk_sIs"]', docs: '["https://cs231n.github.io/convolutional-networks/"]' },
     { title: 'Recurrent Networks and RNNs', slug: 'rnns', order: 9, content: 'RNNs process sequences by maintaining a hidden state that carries information across time steps. They are used for text, speech, and time series. Long Short-Term Memory (LSTM) and Gated Recurrent Units (GRU) address the vanishing gradient problem in basic RNNs.', videos: '["https://www.youtube.com/watch?v=UNmqTiOnRfg"]', docs: '["https://en.wikipedia.org/wiki/Recurrent_neural_network"]' },
-    { title: 'Data and Training Practice', slug: 'data-training', order: 10, content: 'Good data and training practice are essential. Topics: train/validation/test split, normalization and preprocessing, batch size and epochs, monitoring loss and metrics, and debugging (e.g., checking gradients and overfitting).', videos: '["https://www.youtube.com/watch?v=u4alGiomX4w"]', docs: '["https://www.deeplearningbook.org/contents/optimization.html"]' }
+    { title: 'Data and Training Practice', slug: 'data-training', order: 10, content: 'Good data and training practice are essential. Topics: train/validation/test split, normalization and preprocessing, batch size and epochs, monitoring loss and metrics, and debugging (e.g., checking gradients and overfitting).', videos: '["https://www.youtube.com/watch?v=fSytzGwwBVw"]', docs: '["https://www.deeplearningbook.org/contents/optimization.html"]' }
   ];
   const ins = db.prepare('INSERT INTO chapters (title, slug, sort_order, content_text, video_links, doc_links) VALUES (?, ?, ?, ?, ?, ?)');
   chapters.forEach(c => ins.run(c.title, c.slug, c.order, c.content, c.videos || '[]', c.docs || '[]'));
   console.log('Seeded 10 chapters');
 }
+
+// Replace YouTube URLs that became private/unlisted (chapters 2, 6, 10 by slug)
+const CHAPTER_VIDEO_FIXES = [
+  { slug: 'neurons-activation', videos: '["https://www.youtube.com/watch?v=68BZ5f7P94E"]' },
+  { slug: 'optimizers', videos: '["https://www.youtube.com/watch?v=3kjxzq7cXOk"]' },
+  { slug: 'data-training', videos: '["https://www.youtube.com/watch?v=fSytzGwwBVw"]' }
+];
+const fixChapterVideos = db.prepare('UPDATE chapters SET video_links = ? WHERE slug = ?');
+CHAPTER_VIDEO_FIXES.forEach(({ slug, videos }) => fixChapterVideos.run(videos, slug));
 
 const getStore = db.prepare('SELECT value FROM store WHERE key = ?');
 const setStore = db.prepare(`INSERT INTO store (key, value, updated_at) VALUES (?, ?, datetime('now')) ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = datetime('now')`);
@@ -250,18 +259,23 @@ async function mistralChat(messages, options = {}) {
 
 // ----- Chapters -----
 app.get('/api/chapters', requireAuth, (req, res) => {
-  const chapters = db.prepare('SELECT id, title, slug, sort_order FROM chapters ORDER BY sort_order').all();
+  const chapters = db.prepare('SELECT id, title, slug, sort_order, video_links FROM chapters ORDER BY sort_order').all();
   const progress = db.prepare('SELECT chapter_id, completed_at, quiz_best_correct, quiz_best_total FROM chapter_progress WHERE user_id = ?').all(req.session.userId);
   const progressMap = {};
   progress.forEach(p => { progressMap[p.chapter_id] = p; });
-  const list = chapters.map(c => ({
-    id: c.id,
-    title: c.title,
-    slug: c.slug,
-    sort_order: c.sort_order,
-    completed_at: progressMap[c.id] ? progressMap[c.id].completed_at : null,
-    quiz_best: progressMap[c.id] ? (progressMap[c.id].quiz_best_total > 0 ? progressMap[c.id].quiz_best_correct + '/' + progressMap[c.id].quiz_best_total : null) : null
-  }));
+  const list = chapters.map(c => {
+    let video_links = [];
+    try { video_links = JSON.parse(c.video_links || '[]'); } catch (_) {}
+    return {
+      id: c.id,
+      title: c.title,
+      slug: c.slug,
+      sort_order: c.sort_order,
+      video_links,
+      completed_at: progressMap[c.id] ? progressMap[c.id].completed_at : null,
+      quiz_best: progressMap[c.id] ? (progressMap[c.id].quiz_best_total > 0 ? progressMap[c.id].quiz_best_correct + '/' + progressMap[c.id].quiz_best_total : null) : null
+    };
+  });
   res.json({ chapters: list });
 });
 
@@ -446,7 +460,7 @@ app.get('/api/quiz/retake-context', requireAuth, (req, res) => {
 // ----- Profile: stats + LLM recommendations -----
 app.get('/api/profile', requireAuth, async (req, res) => {
   const userId = req.session.userId;
-  const chapters = db.prepare('SELECT id, title, sort_order FROM chapters ORDER BY sort_order').all();
+  const chapters = db.prepare('SELECT id, title, slug, sort_order FROM chapters ORDER BY sort_order').all();
   const prog = db.prepare('SELECT chapter_id, completed_at, quiz_best_correct, quiz_best_total FROM chapter_progress WHERE user_id = ?').all(userId);
   const progressMap = {};
   prog.forEach(p => { progressMap[p.chapter_id] = p; });
@@ -468,6 +482,7 @@ app.get('/api/profile', requireAuth, async (req, res) => {
     return {
       id: c.id,
       title: c.title,
+      slug: c.slug,
       sort_order: c.sort_order,
       completed_at: p ? p.completed_at : null,
       quiz_best: total > 0 ? correct + '/' + total : null,

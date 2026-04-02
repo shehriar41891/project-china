@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useLocale } from '../context/LocaleContext';
 import { api } from '../api/client';
+import PageBackBar from '../components/PageBackBar';
 import styles from './Tutor.module.css';
 
 export default function Tutor() {
@@ -55,6 +56,7 @@ export default function Tutor() {
 
   return (
     <div className={styles.page}>
+      <PageBackBar />
       <header className={styles.hero}>
         <div className={styles.heroText}>
           <p className={styles.eyebrow}>{t('tutorPage.eyebrow')}</p>
