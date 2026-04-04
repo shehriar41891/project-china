@@ -95,6 +95,9 @@ db.exec(`
   );
 `);
 try { db.exec('ALTER TABLE quiz_attempts ADD COLUMN chapter_id INTEGER'); } catch (e) {}
+try { db.exec('ALTER TABLE chapter_progress ADD COLUMN progress_pct INTEGER DEFAULT 0'); } catch (e) {}
+try { db.exec('ALTER TABLE chapter_progress ADD COLUMN materials_confirmed INTEGER DEFAULT 0'); } catch (e) {}
+try { db.exec('ALTER TABLE chapter_progress ADD COLUMN quiz_confirmed INTEGER DEFAULT 0'); } catch (e) {}
 console.log('SQLite DB:', DB_PATH);
 console.log('Session store (file):', SESSION_DIR);
 
@@ -260,20 +263,28 @@ async function mistralChat(messages, options = {}) {
 // ----- Chapters -----
 app.get('/api/chapters', requireAuth, (req, res) => {
   const chapters = db.prepare('SELECT id, title, slug, sort_order, video_links FROM chapters ORDER BY sort_order').all();
-  const progress = db.prepare('SELECT chapter_id, completed_at, quiz_best_correct, quiz_best_total FROM chapter_progress WHERE user_id = ?').all(req.session.userId);
+  const progress = db.prepare('SELECT chapter_id, completed_at, quiz_best_correct, quiz_best_total, progress_pct, materials_confirmed, quiz_confirmed FROM chapter_progress WHERE user_id = ?').all(req.session.userId);
   const progressMap = {};
   progress.forEach(p => { progressMap[p.chapter_id] = p; });
   const list = chapters.map(c => {
     let video_links = [];
     try { video_links = JSON.parse(c.video_links || '[]'); } catch (_) {}
+    const pr = progressMap[c.id];
+    const progress_pct = pr ? computeChapterProgressPct(pr) : 0;
+    const materials_confirmed = pr ? !!pr.materials_confirmed : false;
+    const quiz_done = pr ? pr.quiz_best_total > 0 : false;
     return {
       id: c.id,
       title: c.title,
       slug: c.slug,
       sort_order: c.sort_order,
       video_links,
-      completed_at: progressMap[c.id] ? progressMap[c.id].completed_at : null,
-      quiz_best: progressMap[c.id] ? (progressMap[c.id].quiz_best_total > 0 ? progressMap[c.id].quiz_best_correct + '/' + progressMap[c.id].quiz_best_total : null) : null
+      completed_at: pr ? pr.completed_at : null,
+      progress_pct,
+      materials_confirmed,
+      quiz_confirmed: pr ? !!pr.quiz_confirmed : false,
+      quiz_done,
+      quiz_best: pr ? (pr.quiz_best_total > 0 ? pr.quiz_best_correct + '/' + pr.quiz_best_total : null) : null
     };
   });
   res.json({ chapters: list });
@@ -303,6 +314,89 @@ app.post('/api/chapters/:id/start', requireAuth, (req, res) => {
   if (!ch) return res.status(404).json({ error: 'Chapter not found' });
   db.prepare('INSERT OR IGNORE INTO chapter_progress (user_id, chapter_id) VALUES (?, ?)').run(req.session.userId, id);
   res.json({ ok: true });
+});
+
+function getChapterProgressRow(userId, chapterId) {
+  return db.prepare('SELECT completed_at, quiz_best_correct, quiz_best_total, progress_pct, materials_confirmed, quiz_confirmed FROM chapter_progress WHERE user_id = ? AND chapter_id = ?').get(userId, chapterId);
+}
+
+/** 50% = materials confirmed, 50% = chapter quiz completed (quiz_best_total > 0). */
+function computeChapterProgressPct(row) {
+  if (!row) return 0;
+  const m = row.materials_confirmed ? 50 : 0;
+  const q = row.quiz_best_total > 0 ? 50 : 0;
+  return Math.min(100, m + q);
+}
+
+function persistChapterProgressPct(userId, chapterId) {
+  const row = getChapterProgressRow(userId, chapterId);
+  if (!row) return 0;
+  const pct = computeChapterProgressPct(row);
+  db.prepare('UPDATE chapter_progress SET progress_pct = ? WHERE user_id = ? AND chapter_id = ?').run(pct, userId, chapterId);
+  return pct;
+}
+
+function migrateAllChapterProgressPct() {
+  try {
+    const rows = db.prepare('SELECT user_id, chapter_id FROM chapter_progress').all();
+    rows.forEach((r) => {
+      try {
+        persistChapterProgressPct(r.user_id, r.chapter_id);
+      } catch (_) {}
+    });
+  } catch (_) {}
+}
+migrateAllChapterProgressPct();
+
+/** Confirm learning materials reviewed (50% of chapter progress when quiz is still pending). */
+app.post('/api/chapters/:id/confirm-materials', requireAuth, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const ch = db.prepare('SELECT id FROM chapters WHERE id = ?').get(id);
+  if (!ch) return res.status(404).json({ error: 'Chapter not found' });
+  db.prepare('INSERT OR IGNORE INTO chapter_progress (user_id, chapter_id, progress_pct) VALUES (?, ?, 0)').run(req.session.userId, id);
+  const row = getChapterProgressRow(req.session.userId, id);
+  if (row.materials_confirmed) {
+    return res.json({ ok: true, progress_pct: computeChapterProgressPct(row), already: true });
+  }
+  db.prepare('UPDATE chapter_progress SET materials_confirmed = 1 WHERE user_id = ? AND chapter_id = ?').run(req.session.userId, id);
+  const pct = persistChapterProgressPct(req.session.userId, id);
+  res.json({ ok: true, progress_pct: pct });
+});
+
+/** Optional: mark that you acknowledged the quiz score (progress is driven by quiz_best_*). */
+app.post('/api/chapters/:id/confirm-quiz', requireAuth, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const ch = db.prepare('SELECT id FROM chapters WHERE id = ?').get(id);
+  if (!ch) return res.status(404).json({ error: 'Chapter not found' });
+  db.prepare('INSERT OR IGNORE INTO chapter_progress (user_id, chapter_id, progress_pct) VALUES (?, ?, 0)').run(req.session.userId, id);
+  const row = getChapterProgressRow(req.session.userId, id);
+  if (!row || !row.quiz_best_total) {
+    return res.status(400).json({ error: 'Complete the chapter quiz first' });
+  }
+  if (row.quiz_confirmed) {
+    return res.json({ ok: true, progress_pct: computeChapterProgressPct(row), already: true });
+  }
+  db.prepare('UPDATE chapter_progress SET quiz_confirmed = 1 WHERE user_id = ? AND chapter_id = ?').run(req.session.userId, id);
+  const pct = persistChapterProgressPct(req.session.userId, id);
+  res.json({ ok: true, progress_pct: pct });
+});
+
+/** Mark chapter finished only when materials + chapter quiz are both done (100% progress). */
+app.post('/api/chapters/:id/complete-chapter', requireAuth, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const ch = db.prepare('SELECT id FROM chapters WHERE id = ?').get(id);
+  if (!ch) return res.status(404).json({ error: 'Chapter not found' });
+  db.prepare('INSERT OR IGNORE INTO chapter_progress (user_id, chapter_id, progress_pct) VALUES (?, ?, 0)').run(req.session.userId, id);
+  const row = getChapterProgressRow(req.session.userId, id);
+  if (row && row.completed_at) {
+    return res.json({ ok: true, progress_pct: 100, already: true, completed_at: row.completed_at });
+  }
+  const pct = computeChapterProgressPct(row);
+  if (pct < 100) {
+    return res.status(400).json({ error: 'completeMaterialsAndQuizFirst', progress_pct: pct });
+  }
+  db.prepare("UPDATE chapter_progress SET completed_at = datetime('now'), progress_pct = 100 WHERE user_id = ? AND chapter_id = ?").run(req.session.userId, id);
+  res.json({ ok: true, progress_pct: 100, completed_at: new Date().toISOString() });
 });
 
 // ----- Quiz: start attempt -----
@@ -439,12 +533,15 @@ app.post('/api/quiz/complete', requireAuth, async (req, res) => {
   const att = db.prepare('SELECT chapter_id, correct_count, total_questions FROM quiz_attempts WHERE id = ?').get(attemptId);
   if (att && att.chapter_id) {
     const cur = db.prepare('SELECT quiz_best_correct, quiz_best_total FROM chapter_progress WHERE user_id = ? AND chapter_id = ?').get(req.session.userId, att.chapter_id);
-    const newCorrect = att.correct_count || 0, newTotal = att.total_questions || 0;
+    const newCorrect = att.correct_count || 0;
+    const newTotal = att.total_questions || 0;
     const isBetter = !cur || (newTotal > 0 && (!cur.quiz_best_total || (newCorrect / newTotal) >= (cur.quiz_best_correct / cur.quiz_best_total)));
-    if (isBetter) {
-      db.prepare("INSERT INTO chapter_progress (user_id, chapter_id, completed_at, quiz_best_correct, quiz_best_total) VALUES (?, ?, datetime('now'), ?, ?) ON CONFLICT(user_id, chapter_id) DO UPDATE SET completed_at = datetime('now'), quiz_best_correct = excluded.quiz_best_correct, quiz_best_total = excluded.quiz_best_total").run(req.session.userId, att.chapter_id, newCorrect, newTotal);
-    } else {
-      db.prepare("INSERT INTO chapter_progress (user_id, chapter_id, completed_at) VALUES (?, ?, datetime('now')) ON CONFLICT(user_id, chapter_id) DO UPDATE SET completed_at = datetime('now')").run(req.session.userId, att.chapter_id);
+    if (isBetter && newTotal > 0) {
+      db.prepare(`INSERT INTO chapter_progress (user_id, chapter_id, quiz_best_correct, quiz_best_total) VALUES (?, ?, ?, ?)
+        ON CONFLICT(user_id, chapter_id) DO UPDATE SET quiz_best_correct = excluded.quiz_best_correct, quiz_best_total = excluded.quiz_best_total`).run(
+        req.session.userId, att.chapter_id, newCorrect, newTotal
+      );
+      persistChapterProgressPct(req.session.userId, att.chapter_id);
     }
   }
   const final = db.prepare('SELECT total_questions, correct_count FROM quiz_attempts WHERE id = ?').get(attemptId);
@@ -473,7 +570,7 @@ app.get('/api/quiz/retake-context', requireAuth, (req, res) => {
 app.get('/api/profile', requireAuth, async (req, res) => {
   const userId = req.session.userId;
   const chapters = db.prepare('SELECT id, title, slug, sort_order FROM chapters ORDER BY sort_order').all();
-  const prog = db.prepare('SELECT chapter_id, completed_at, quiz_best_correct, quiz_best_total FROM chapter_progress WHERE user_id = ?').all(userId);
+  const prog = db.prepare('SELECT chapter_id, completed_at, quiz_best_correct, quiz_best_total, progress_pct, materials_confirmed, quiz_confirmed FROM chapter_progress WHERE user_id = ?').all(userId);
   const progressMap = {};
   prog.forEach(p => { progressMap[p.chapter_id] = p; });
   // Last completed attempt per chapter (for retake context)
@@ -491,12 +588,19 @@ app.get('/api/profile', requireAuth, async (req, res) => {
     const total = p ? (p.quiz_best_total || 0) : 0;
     const correct = p ? (p.quiz_best_correct || 0) : 0;
     const needsRetake = total > 0 && correct < total;
+    const progress_pct = p ? computeChapterProgressPct(p) : 0;
+    const materials_confirmed = p ? !!p.materials_confirmed : false;
+    const quiz_done = total > 0;
     return {
       id: c.id,
       title: c.title,
       slug: c.slug,
       sort_order: c.sort_order,
       completed_at: p ? p.completed_at : null,
+      progress_pct,
+      materials_confirmed,
+      quiz_confirmed: p ? !!p.quiz_confirmed : false,
+      quiz_done,
       quiz_best: total > 0 ? correct + '/' + total : null,
       quiz_best_correct: correct,
       quiz_best_total: total,
@@ -504,6 +608,10 @@ app.get('/api/profile', requireAuth, async (req, res) => {
       retake_context: retakeContextByChapter[c.id] || null
     };
   });
+  const nCh = chapterProgress.length || 1;
+  const overall_progress_pct = Math.round(
+    chapterProgress.reduce((sum, x) => sum + (x.progress_pct || 0), 0) / nCh
+  );
   const attempts = db.prepare('SELECT id, started_at, completed_at, total_questions, correct_count, chapter_id FROM quiz_attempts WHERE user_id = ? ORDER BY id DESC').all(userId);
   const answers = db.prepare(`
     SELECT a.attempt_id, a.topic, a.is_correct FROM quiz_answers a
@@ -532,6 +640,7 @@ app.get('/api/profile', requireAuth, async (req, res) => {
   res.json({
     user: { id: req.session.userId, email: req.session.userEmail, name: req.session.userName },
     chapterProgress,
+    overall_progress_pct,
     attempts,
     byTopic,
     recommendations
@@ -547,23 +656,69 @@ const TUTOR_INTENTS = {
   general: 'Help with neural networks, deep learning, and this learning platform. Be brief and friendly.'
 };
 
+function chatFallbackReply(message, chapterLine) {
+  const q = String(message || '').trim().slice(0, 400);
+  const ctx = chapterLine ? '\n\n(Lesson context was included but AI is offline.)' : '';
+  if (!MISTRAL_API_KEY) {
+    return (
+      'Demo mode: MISTRAL_API_KEY is not set on the server, so live AI replies are disabled.\n\n' +
+      `You asked: "${q}"${ctx}\n\n` +
+      'Add a Mistral API key to your .env file and restart the server to enable the tutor. ' +
+      'Until then, use the lesson text, quizzes, and Network Builder to study.'
+    );
+  }
+  return (
+    'The AI service could not complete a reply right now. Please try again in a moment.\n\n' +
+    `Your question: "${q}"${ctx}`
+  );
+}
+
 app.post('/api/chat', async (req, res) => {
-  const { message, history = [], intent } = req.body || {};
-  if (!message || typeof message !== 'string') return res.status(400).json({ error: 'Message required' });
-  if (!MISTRAL_API_KEY) return res.status(503).json({ error: 'Chat not configured' });
-  const intentKey = typeof intent === 'string' && TUTOR_INTENTS[intent] ? intent : 'general';
-  const intentLine = TUTOR_INTENTS[intentKey];
-  const messages = [
-    { role: 'system', content: `You are a scoped tutor for the Neural Network Playground (browser-based NN learning). Stay on-topic: concepts, training intuition, builder/playground help, study tips. Do not fabricate features the app may not have. Current mode: ${intentKey}. ${intentLine}` },
-    ...history.slice(-10).map(m => ({ role: m.role, content: m.content })),
-    { role: 'user', content: message.trim().slice(0, 2000) }
-  ];
   try {
-    const reply = await mistralChat(messages, { max_tokens: 512 });
-    res.json({ reply: reply || 'I couldn\'t generate a response. Try rephrasing.' });
+    const { message, history = [], intent, chapterSlug, chapterTitle } = req.body || {};
+    if (!message || typeof message !== 'string') {
+      return res.json({ reply: 'Send a question in the message box so the tutor can respond.' });
+    }
+    const trimmed = message.trim().slice(0, 2000);
+    if (!trimmed) {
+      return res.json({ reply: 'Please type a question first, then send.' });
+    }
+    const intentKey = typeof intent === 'string' && TUTOR_INTENTS[intent] ? intent : 'general';
+    const intentLine = TUTOR_INTENTS[intentKey];
+    let chapterLine = '';
+    if (chapterSlug || chapterTitle) {
+      const ch = chapterSlug
+        ? db.prepare('SELECT title, content_text FROM chapters WHERE slug = ?').get(chapterSlug)
+        : null;
+      const title = (ch && ch.title) || (typeof chapterTitle === 'string' ? chapterTitle : '') || '';
+      const snippet = ch && ch.content_text ? String(ch.content_text).slice(0, 2500) : '';
+      chapterLine = title
+        ? `\nThe learner selected this lesson: "${title}". Tailor explanations to this module.${snippet ? ' Relevant material (for grounding, do not quote verbatim):\n' + snippet : ''}`
+        : '';
+    }
+    const historyMessages = (Array.isArray(history) ? history : []).slice(-10).map((m) => ({
+      role: m && m.role === 'assistant' ? 'assistant' : 'user',
+      content: typeof m?.content === 'string' ? m.content : String(m?.content ?? '')
+    }));
+    const messages = [
+      { role: 'system', content: `You are a scoped tutor for the Neural Network Playground (browser-based NN learning). Stay on-topic: concepts, training intuition, builder/playground help, study tips. Do not fabricate features the app may not have. Current mode: ${intentKey}. ${intentLine}${chapterLine}` },
+      ...historyMessages,
+      { role: 'user', content: trimmed }
+    ];
+    if (!MISTRAL_API_KEY) {
+      return res.json({ reply: chatFallbackReply(trimmed, chapterLine) });
+    }
+    try {
+      const reply = await mistralChat(messages, { max_tokens: 512 });
+      return res.json({ reply: reply || 'I couldn\'t generate a response. Try rephrasing.' });
+    } catch (e) {
+      console.error('Chat error:', e.message);
+      return res.json({ reply: chatFallbackReply(trimmed, chapterLine) });
+    }
   } catch (e) {
-    console.error('Chat error:', e.message);
-    res.status(500).json({ error: 'Chat failed', reply: 'Sorry, I couldn\'t process that. Please try again.' });
+    console.error('Chat route error:', e);
+    const q = String(req.body?.message || '').trim().slice(0, 400);
+    return res.json({ reply: chatFallbackReply(q, '') });
   }
 });
 

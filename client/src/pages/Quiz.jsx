@@ -181,13 +181,28 @@ export default function Quiz() {
               </button>
             </li>
             {sortedChapters.map((c) => (
-              <li key={c.id} className={activeChapterId != null && c.id === activeChapterId ? chapterStyles.activeLesson : ''}>
+              <li
+                key={c.id}
+                className={[
+                  activeChapterId != null && c.id === activeChapterId ? chapterStyles.activeLesson : '',
+                  c.completed_at ? chapterStyles.lessonListItemDone : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
                 <button
                   type="button"
                   className={styles.chapterPick}
                   onClick={() => navigate(`/quiz?chapterId=${c.id}`)}
                 >
-                  {c.sort_order}. {chapterText(c.slug, 'title', c.title)}
+                  <span className={styles.chapterPickInner}>
+                    <span>{c.sort_order}. {chapterText(c.slug, 'title', c.title)}</span>
+                    {c.completed_at ? (
+                      <span className={chapterStyles.lessonListCheck} aria-label={t('chapter.lessonCompleted')}>
+                        ✓
+                      </span>
+                    ) : null}
+                  </span>
                 </button>
                 <Link className={styles.openLessonLink} to={`/learn/${c.slug}`}>
                   {t('quiz.openLesson')}

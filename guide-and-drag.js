@@ -5,11 +5,11 @@
     learningRate: '<strong>Learning rate</strong> controls how big each training step is. Too high and the network may overshoot; too low and it learns slowly. Try 0.01 to start.',
     activation: '<strong>Activation function</strong> transforms the weighted sum at each neuron so the network can learn non-linear patterns. ReLU is a good default; try others to see how the output changes.',
     regularization: '<strong>Regularization</strong> (L1 or L2) discourages large weights and helps prevent overfitting. Use "None" at first, then try L2 if the test loss goes up while training loss goes down.',
-    data: '<strong>Data</strong>: pick a dataset (e.g. Circle, Spiral). The network will try to separate or fit the points. You can also drag activation blocks from the left and drop them on "Drop activation here" to change the activation function.'
+    data: '<strong>Data</strong>: pick a dataset (e.g. Circle, Spiral). The network will try to separate or fit the points. Use the Network Builder or activation dropdowns for architecture—this page focuses on training the visualization.'
   };
 
   var tourSteps = [
-    { title: 'Welcome', text: 'This builder lets you create and train a small neural network. You can use the dropdowns or drag blocks from the left panel onto the drop zones.' },
+    { title: 'Welcome', text: 'Train a small neural network on 2D toy data. Use the play controls to run training and watch the decision boundary update.' },
     { title: 'Data', text: 'Choose a dataset (e.g. Circle or Spiral). The colored points are what the network will learn to classify or fit.' },
     { title: 'Network', text: 'The diagram in the middle shows your network: input features, hidden layers (with + / − to add or remove), and output. Line thickness shows connection weights.' },
     { title: 'Training', text: 'Click Play to train. Watch the loss values and the output plot. Try different activations (ReLU, Tanh, etc.) and learning rates to see how they affect learning.' },

@@ -65,10 +65,19 @@ export default function Home() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [heroSearch, setHeroSearch] = useState('');
+  const [heroSearchFocused, setHeroSearchFocused] = useState(false);
+  const [catalogChapters, setCatalogChapters] = useState([]);
 
   useEffect(() => {
     if (!user) return;
     api('/api/profile').then(setProfile).catch(() => {});
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    api('/api/chapters')
+      .then((d) => setCatalogChapters(d.chapters || []))
+      .catch(() => setCatalogChapters([]));
   }, [user]);
 
   const weakTopics = useMemo(() => {
@@ -89,6 +98,25 @@ export default function Home() {
     if (!profile || !profile.chapterProgress) return null;
     return profile.chapterProgress.find((c) => !c.completed_at) || null;
   }, [profile]);
+
+  const heroSearchMatches = useMemo(() => {
+    if (!user || !catalogChapters.length) return [];
+    const q = heroSearch.trim().toLowerCase();
+    if (!q) return [];
+    return catalogChapters
+      .filter((c) => {
+        const raw = (c.title || '').toLowerCase();
+        const loc = chapterText(c.slug, 'title', c.title).toLowerCase();
+        const slug = (c.slug || '').toLowerCase();
+        return raw.includes(q) || loc.includes(q) || slug.includes(q);
+      })
+      .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+      .slice(0, 10);
+  }, [user, catalogChapters, heroSearch, chapterText, locale]);
+
+  const showHeroChapterDropdown = Boolean(
+    user && heroSearch.trim().length >= 1 && heroSearchFocused
+  );
 
   const quickAccess = useMemo(
     () => [
@@ -124,8 +152,6 @@ export default function Home() {
     [t, locale]
   );
 
-  const loopSteps = useMemo(() => [t('home.step1'), t('home.step2'), t('home.step3'), t('home.step4'), t('home.step5')], [t, locale]);
-
   const submitHeroSearch = (e) => {
     e.preventDefault();
     const q = heroSearch.trim();
@@ -146,22 +172,56 @@ export default function Home() {
             <p className={styles.heroKicker}>{t('home.heroKicker')}</p>
             <h1 className={styles.heroHeadline}>{t('home.heroTitle')}</h1>
             <p className={styles.heroText}>{t('home.heroText')}</p>
-            <form className={styles.heroSearch} onSubmit={submitHeroSearch} role="search" aria-label={t('layout.searchAria')}>
-              <div className={styles.heroSearchRow}>
-                <input
-                  type="search"
-                  name="q"
-                  value={heroSearch}
-                  onChange={(e) => setHeroSearch(e.target.value)}
-                  placeholder={t('layout.searchPlaceholder')}
-                  className={styles.heroSearchInput}
-                  aria-label={t('layout.searchAria')}
-                  autoComplete="off"
-                />
-                <button type="submit" className={styles.heroSearchBtn}>{t('layout.searchButton')}</button>
-              </div>
+            <div className={styles.heroSearchWrap}>
+              <form className={styles.heroSearch} onSubmit={submitHeroSearch} role="search" aria-label={t('layout.searchAria')}>
+                <div className={styles.heroSearchRow}>
+                  <input
+                    type="search"
+                    name="q"
+                    value={heroSearch}
+                    onChange={(e) => setHeroSearch(e.target.value)}
+                    onFocus={() => setHeroSearchFocused(true)}
+                    onBlur={() => window.setTimeout(() => setHeroSearchFocused(false), 200)}
+                    placeholder={t('layout.searchPlaceholder')}
+                    className={styles.heroSearchInput}
+                    aria-label={t('layout.searchAria')}
+                    autoComplete="off"
+                    aria-expanded={showHeroChapterDropdown}
+                    aria-controls="home-chapter-suggest"
+                  />
+                  <button type="submit" className={styles.heroSearchBtn}>{t('layout.searchButton')}</button>
+                </div>
+                {showHeroChapterDropdown ? (
+                  <div id="home-chapter-suggest" className={styles.heroSearchDropdown} role="listbox">
+                    <div className={styles.heroSearchDropdownLabel}>{t('layout.searchChapters')}</div>
+                    {heroSearchMatches.length === 0 ? (
+                      <div className={styles.heroSearchDropdownEmpty} role="option">
+                        {t('layout.searchNoResults')}
+                      </div>
+                    ) : (
+                      heroSearchMatches.map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          role="option"
+                          className={styles.heroSearchDropdownItem}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            navigate(`/learn/${c.slug}`);
+                            setHeroSearch('');
+                            setHeroSearchFocused(false);
+                          }}
+                        >
+                          <span className={styles.heroSearchDropdownTitle}>{chapterText(c.slug, 'title', c.title)}</span>
+                          <span className={styles.heroSearchDropdownMeta}>{c.slug}</span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                ) : null}
+              </form>
               <p className={styles.heroSearchHint}>{t('home.searchHint')}</p>
-            </form>
+            </div>
             <div className={styles.heroActions}>
               <Link to="/learn" className={styles.heroBtnPrimary}>{t('home.startLearning')}</Link>
               <Link to="/editor" className={styles.heroBtnSecondary}>{t('home.openBuilder')}</Link>
@@ -208,31 +268,19 @@ export default function Home() {
           </div>
         </section>
 
-        <section className={styles.loopSection}>
-          <div className={styles.sectionHead}>
-            <h2>{t('home.howTitle')}</h2>
-            <p>{t('home.howSub')}</p>
-          </div>
-          <div className={styles.loopSteps}>
-            {loopSteps.map((step, index) => (
-              <article key={step} className={styles.loopStep}>
-                <span>{index + 1}</span>
-                <p>{step}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
         <section className={styles.surfaceSection}>
           <div className={styles.sectionHead}>
             <h2>{t('home.modulesTitle')}</h2>
             <p>{t('home.modulesSub')}</p>
           </div>
           <div className={styles.moduleGrid}>
-            {moduleCards.map((row) => {
+            {moduleCards.map((row, idx) => {
+              const sorted = [...catalogChapters].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+              const ch = sorted[idx];
               const img = IMAGES[row.imageKey];
-              return (
-                <article key={row.id} className={styles.moduleCard}>
+              const title = ch ? chapterText(ch.slug, 'title', ch.title) : t(`home.${row.id}`);
+              const cardInner = (
+                <>
                   <div className={styles.cardMediaSlot}>
                     <ImgWithFallback
                       primary={img.primary}
@@ -245,8 +293,18 @@ export default function Home() {
                       decoding="async"
                     />
                   </div>
-                  <h3>{t(`home.${row.id}`)}</h3>
+                  <h3>{title}</h3>
                   <p>{t('home.moduleCardDesc')}</p>
+                  {ch ? <span className={styles.moduleCardCta}>{t('home.modulesCta')} →</span> : null}
+                </>
+              );
+              return ch ? (
+                <Link key={row.id} to={`/learn/${ch.slug}`} className={styles.moduleCardLink}>
+                  {cardInner}
+                </Link>
+              ) : (
+                <article key={row.id} className={styles.moduleCard}>
+                  {cardInner}
                 </article>
               );
             })}

@@ -141,13 +141,107 @@
   text-decoration: none;
 }
 
+.navProfileBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  text-decoration: none;
+  border: 2px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: linear-gradient(145deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #fff));
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.navProfileBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  text-decoration: none;
+  color: #fff;
+}
+.navProfileIcon {
+  line-height: 1;
+}
+
+.navSearchWrap {
+  position: relative;
+  flex: 1;
+  min-width: 280px;
+  max-width: 560px;
+  z-index: 250;
+}
 .navSearch {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  flex: 1;
-  min-width: 280px;
-  max-width: 560px;
+  width: 100%;
+}
+.searchDropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+  max-height: min(320px, 50vh);
+  overflow-y: auto;
+  padding: 0.35rem 0;
+  animation: searchDrop 0.15s ease;
+}
+@keyframes searchDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.searchDropdownLabel {
+  padding: 0.35rem 0.75rem 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+.searchDropdownEmpty {
+  padding: 0.65rem 0.75rem;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+.searchDropdownItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  font-size: 0.88rem;
+}
+.searchDropdownItem:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.searchDropdownTitle {
+  font-weight: 700;
+}
+.searchDropdownMeta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: ui-monospace, monospace;
 }
 .navSearchInput {
   width: 100%;
@@ -273,12 +367,15 @@
     align-items: center;
     justify-content: center;
   }
-  .navSearch {
+  .navSearchWrap {
     order: 4;
     max-width: 100%;
     min-width: 100%;
     width: 100%;
     flex: none;
+  }
+  .navSearch {
+    width: 100%;
   }
   .navRight {
     display: none;

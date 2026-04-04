@@ -41,6 +41,51 @@
   line-height: 1.5;
 }
 
+.heroText {
+  flex: 1;
+  min-width: 0;
+}
+
+.moduleHint {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  max-width: 56ch;
+}
+
+.moduleField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+  max-width: min(100%, 420px);
+}
+
+.moduleLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.moduleSelect {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.moduleSelect:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 .heroLinks {
   display: flex;
   gap: 0.5rem;

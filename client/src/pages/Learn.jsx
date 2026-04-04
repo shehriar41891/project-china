@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLocale } from '../context/LocaleContext';
 import { api } from '../api/client';
 import { youtubeIdFromUrl, youtubeThumbUrl } from '../utils/youtube';
+import { learnCardStatus, averageChapterProgress } from '../utils/chapterProgress';
 import PageBackBar from '../components/PageBackBar';
 import styles from './Learn.module.css';
 
@@ -118,8 +119,10 @@ export default function Learn() {
 
   const completedCount = chapters.filter((c) => c.completed_at).length;
   const totalCount = chapters.length || 10;
-  const progressPct = Math.round((completedCount / Math.max(totalCount, 1)) * 100);
-  const inProgressCount = chapters.filter((c) => !c.completed_at && c.quiz_best).length;
+  const overallProgressPct = averageChapterProgress(chapters);
+  const inProgressCount = chapters.filter(
+    (c) => !c.completed_at && ((c.progress_pct || 0) > 0 || c.quiz_best)
+  ).length;
 
   function getDifficulty(chapter) {
     if (chapter.sort_order <= 3) return t('learn.levelBeginner');
@@ -155,14 +158,9 @@ export default function Learn() {
           const ytId = youtubeIdFromUrl(vUrl);
           const thumb = ytId ? youtubeThumbUrl(ytId) : null;
           const teaser = chapterText(c.slug, 'videoTeaser', '');
-          const statusText = c.completed_at
-            ? t('learn.statusCompleted')
-            : c.quiz_best
-              ? t('learn.statusInProgress')
-              : t('learn.statusNotStarted');
-          const totalQuiz = c.quiz_best ? Number((c.quiz_best.split('/')[1] || '0')) : 6;
-          const correctQuiz = c.quiz_best ? Number((c.quiz_best.split('/')[0] || '0')) : 0;
-          const lessonProgress = c.completed_at ? 100 : Math.round((correctQuiz / Math.max(totalQuiz, 1)) * 100);
+          const statusText = learnCardStatus(c, t);
+          const lessonProgress =
+            c.completed_at ? 100 : Math.min(100, typeof c.progress_pct === 'number' ? c.progress_pct : 0);
           return (
             <li key={c.id}>
               <article className={styles.chapterItem}>
@@ -196,7 +194,7 @@ export default function Learn() {
                   </div>
                   <div className={styles.cardActions}>
                     <Link to={`/learn/${c.slug}`} className={styles.cta}>
-                      {c.completed_at || c.quiz_best ? t('learn.continue') : t('learn.start')}
+                      {c.completed_at || (c.progress_pct || 0) > 0 ? t('learn.continue') : t('learn.start')}
                     </Link>
                     <span className={styles.timeBadge}>{catLabel(getCategory(c))}</span>
                   </div>
@@ -244,10 +242,19 @@ export default function Learn() {
           <div className={styles.progressCard}>
             <p className={styles.progressLabel}>{t('learn.yourProgress')}</p>
             <p className={styles.progressValue}>
-              {completedCount}/{totalCount} {t('learn.chapters')}
+              {t('learn.courseAverage').replace('{pct}', String(overallProgressPct))}
             </p>
-            <div className={styles.progressBar} role="progressbar" aria-valuenow={completedCount} aria-valuemin={0} aria-valuemax={totalCount}>
-              <span style={{ width: `${progressPct}%` }} />
+            <p className={styles.progressSub}>
+              {t('learn.finalizedMeta').replace('{done}', String(completedCount)).replace('{total}', String(totalCount))}
+            </p>
+            <div
+              className={styles.progressBar}
+              role="progressbar"
+              aria-valuenow={overallProgressPct}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
+              <span style={{ width: `${overallProgressPct}%` }} />
             </div>
           </div>
 

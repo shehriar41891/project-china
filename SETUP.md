@@ -26,6 +26,13 @@ npm run server
 
 Then open **http://localhost:3000**
 
+### TensorFlow Playground page (`/playground.html`) — dark theme
+
+The server serves static files from **`playground/dist/`**. The classic playground CSS is built as **`dist/bundle.css`** = Material Design Lite + `styles.css` + **`playground-custom.css`** (see `npm run build-css` in `package.json`).
+
+- Always run **`npm run prep`** (or at least **`npm run build-css`**) after pulling or editing `playground-custom.css`, so `dist/bundle.css` includes the dark theme.
+- If the playground still looks **white and default**, your `dist/bundle.css` is stale: run `npm run prep` from the **`playground`** folder and hard-refresh the browser (Ctrl+F5).
+
 - **Home** is the default page (Sign in / Sign up in navbar when not logged in).
 - **Sign up** → create account (stored in SQLite).
 - **Sign in** → session cookie set; navbar shows Profile, Quiz, Network Builder, Logout.

@@ -118,16 +118,48 @@
   border-radius: 10px;
   margin-bottom: 0.5rem;
 }
-.lessonList li a {
-  display: block;
+.lessonListItemDone {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border)) !important;
+}
+.lessonListItemDone:not(.activeLesson) {
+  background: color-mix(in srgb, var(--accent) 6%, var(--bg-card));
+}
+.lessonListLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   padding: 0.55rem 0.7rem;
   color: var(--text);
   text-decoration: none;
   font-size: 0.9rem;
 }
+.lessonListText {
+  min-width: 0;
+  flex: 1;
+  line-height: 1.35;
+}
+.lessonListCheck {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  background: linear-gradient(145deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #0f766e));
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
 .activeLesson {
   border-color: var(--accent) !important;
   background: var(--accent-soft);
+}
+.activeLesson .lessonListCheck {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 .termWrap {
   display: flex;
@@ -304,6 +336,224 @@
 }
 .enterLessonBtn:hover {
   opacity: 0.94;
+}
+
+.completionSection {
+  margin-top: 1.5rem;
+  padding: 1.1rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--accent) 5%, var(--bg-card));
+}
+.completionSection h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+.completionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+.completionBtn {
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.88rem;
+}
+.completionBtn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.completionBtn:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+.markCompleteBtn {
+  width: 100%;
+  max-width: 360px;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.markCompleteBtn:hover:not(:disabled) {
+  opacity: 0.93;
+}
+.markCompleteBtn:disabled {
+  opacity: 0.75;
+  cursor: default;
+}
+
+.completionSync {
+  margin: 0 0 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.completionHint {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.completionErr {
+  margin: 0.5rem 0 0;
+  font-size: 0.84rem;
+  color: #f87171;
+}
+
+.tutorFab {
+  position: fixed;
+  right: 1.1rem;
+  bottom: 1.1rem;
+  z-index: 200;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--text);
+}
+.tutorFab:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.tutorFabIcon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.tutorOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+.tutorModal {
+  width: min(100%, 420px);
+  max-height: min(86vh, 560px);
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25);
+}
+.tutorModalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.tutorModalHead h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.tutorClose {
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+.tutorModalSub {
+  margin: 0;
+  padding: 0.5rem 1rem 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.tutorThread {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 1rem;
+  min-height: 180px;
+}
+.tutorEmpty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.tutorRowUser,
+.tutorRowAi {
+  margin-bottom: 0.65rem;
+}
+.tutorRole {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+}
+.tutorBubble {
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+.tutorRowUser .tutorBubble {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+}
+.tutorThinking {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+.tutorComposer {
+  display: flex;
+  gap: 0.45rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+.tutorComposer input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+.tutorComposer button {
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+.tutorComposer button:disabled {
+  opacity: 0.5;
 }
 
 @media (max-width: 1100px) {

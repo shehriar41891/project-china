@@ -2,9 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLocale } from '../context/LocaleContext';
-import { api } from '../api/client';
+import { api, postChat } from '../api/client';
 import { youtubeIdFromUrl } from '../utils/youtube';
 import PageBackBar from '../components/PageBackBar';
+import { formatBoldSegments } from '../utils/chatFormat';
 import styles from './Chapter.module.css';
 
 function estChapterMins(sortOrder) {
@@ -31,9 +32,12 @@ export default function Chapter() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
   const [taskDone, setTaskDone] = useState(false);
-  const [chatInput, setChatInput] = useState('');
-  const [chatReply, setChatReply] = useState('');
   const [lessonStarted, setLessonStarted] = useState(false);
+  const [tutorOpen, setTutorOpen] = useState(false);
+  const [tutorMessages, setTutorMessages] = useState([]);
+  const [tutorInput, setTutorInput] = useState('');
+  const [tutorLoading, setTutorLoading] = useState(false);
+  const [completeErr, setCompleteErr] = useState('');
 
   useEffect(() => {
     if (authLoading) return;
@@ -104,16 +108,76 @@ export default function Chapter() {
   const prev = currentIndex > 0 ? chapters[currentIndex - 1] : null;
   const next = currentIndex >= 0 && currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
   const objective = `${t('chapter.objectiveText')} ${localizedTitle}`;
-  const quizProgress = Math.round((chapter.sort_order / 10) * 100);
+  const chapterMeta = chapters.find((c) => c.id === chapter.id);
+  const lessonProgressPct = Math.min(100, chapterMeta?.progress_pct ?? 0);
   const keyTerms = keyTermsFromText(localizedContent);
 
-  async function askTutor() {
-    if (!chatInput.trim()) return;
+  async function refreshChapters() {
     try {
-      const res = await api('/api/chat', { method: 'POST', body: { message: chatInput } });
-      setChatReply(res.reply || t('chapter.noTutorReply'));
-    } catch (_) {
-      setChatReply(t('chapter.tutorNoReply'));
+      const data = await api('/api/chapters');
+      setChapters(data.chapters || []);
+    } catch (_) {}
+  }
+
+  async function sendTutor() {
+    const prompt = tutorInput.trim();
+    if (!prompt || tutorLoading || !chapter) return;
+    setTutorLoading(true);
+    setTutorInput('');
+    const userMsg = { role: 'user', content: prompt };
+    const history = tutorMessages.map((m) => ({ role: m.role, content: m.content }));
+    setTutorMessages((prev) => [...prev, userMsg]);
+    try {
+      const reply = await postChat({
+        message: prompt,
+        history,
+        chapterSlug: chapter.slug,
+        chapterTitle: chapter.title,
+      });
+      setTutorMessages((prev) => [...prev, { role: 'assistant', content: reply || t('chapter.noTutorReply') }]);
+    } catch (e) {
+      const msg = e && e.message ? String(e.message) : '';
+      let content =
+        msg === '__CHAT_NETWORK__'
+          ? t('chapter.tutorNetwork')
+          : msg === '__CHAT_HTML__'
+            ? t('chapter.tutorProxy')
+            : t('chapter.tutorNoReply');
+      if (msg && msg !== '__CHAT_NETWORK__' && msg !== '__CHAT_HTML__') {
+        content = `${t('tutorPage.errorDetail')}\n\n${msg}`;
+      }
+      setTutorMessages((prev) => [...prev, { role: 'assistant', content, isError: true }]);
+    } finally {
+      setTutorLoading(false);
+    }
+  }
+
+  async function confirmMaterials() {
+    try {
+      await api(`/api/chapters/${chapter.id}/confirm-materials`, { method: 'POST', body: {} });
+      await refreshChapters();
+    } catch (_) {}
+  }
+
+  async function confirmQuizProgress() {
+    try {
+      await api(`/api/chapters/${chapter.id}/confirm-quiz`, { method: 'POST', body: {} });
+      await refreshChapters();
+    } catch (_) {}
+  }
+
+  async function completeChapter() {
+    setCompleteErr('');
+    try {
+      await api(`/api/chapters/${chapter.id}/complete-chapter`, { method: 'POST', body: {} });
+      await refreshChapters();
+    } catch (e) {
+      const msg = e && e.message ? String(e.message) : '';
+      if (msg === 'completeMaterialsAndQuizFirst') {
+        setCompleteErr(t('chapter.completeBlocked'));
+      } else {
+        setCompleteErr(t('chapter.completeError'));
+      }
     }
   }
 
@@ -126,9 +190,24 @@ export default function Chapter() {
             <h3>{t('chapter.lessonList')}</h3>
             <ul className={styles.lessonList}>
               {chapters.map((c) => (
-                <li key={c.id} className={c.id === chapter.id ? styles.activeLesson : ''}>
-                  <Link to={`/learn/${c.slug}`}>
-                    {c.sort_order}. {chapterText(c.slug, 'title', c.title)}
+                <li
+                  key={c.id}
+                  className={[
+                    c.id === chapter.id ? styles.activeLesson : '',
+                    c.completed_at ? styles.lessonListItemDone : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
+                  <Link to={`/learn/${c.slug}`} className={styles.lessonListLink}>
+                    <span className={styles.lessonListText}>
+                      {c.sort_order}. {chapterText(c.slug, 'title', c.title)}
+                    </span>
+                    {c.completed_at ? (
+                      <span className={styles.lessonListCheck} aria-label={t('chapter.lessonCompleted')}>
+                        ✓
+                      </span>
+                    ) : null}
                   </Link>
                 </li>
               ))}
@@ -190,9 +269,24 @@ export default function Chapter() {
         <h3>{t('chapter.lessonList')}</h3>
         <ul className={styles.lessonList}>
           {chapters.map((c) => (
-            <li key={c.id} className={c.id === chapter.id ? styles.activeLesson : ''}>
-              <Link to={`/learn/${c.slug}`}>
-                {c.sort_order}. {chapterText(c.slug, 'title', c.title)}
+            <li
+              key={c.id}
+              className={[
+                c.id === chapter.id ? styles.activeLesson : '',
+                c.completed_at ? styles.lessonListItemDone : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            >
+              <Link to={`/learn/${c.slug}`} className={styles.lessonListLink}>
+                <span className={styles.lessonListText}>
+                  {c.sort_order}. {chapterText(c.slug, 'title', c.title)}
+                </span>
+                {c.completed_at ? (
+                  <span className={styles.lessonListCheck} aria-label={t('chapter.lessonCompleted')}>
+                    ✓
+                  </span>
+                ) : null}
               </Link>
             </li>
           ))}
@@ -260,6 +354,42 @@ export default function Chapter() {
             </p>
           </div>
 
+          <div className={styles.completionSection}>
+            <h3>{t('chapter.completionTitle')}</h3>
+            <p className={styles.tryItDesc}>{t('chapter.completionHint')}</p>
+            <div className={styles.completionRow}>
+              <button
+                type="button"
+                className={styles.completionBtn}
+                onClick={confirmMaterials}
+                disabled={!!chapterMeta?.materials_confirmed}
+              >
+                {chapterMeta?.materials_confirmed ? t('chapter.materialsDone') : t('chapter.confirmMaterials')}
+              </button>
+              <button
+                type="button"
+                className={styles.completionBtn}
+                onClick={confirmQuizProgress}
+                disabled={!chapterMeta?.quiz_best || !!chapterMeta?.quiz_confirmed}
+              >
+                {chapterMeta?.quiz_confirmed ? t('chapter.quizTracked') : t('chapter.confirmQuiz')}
+              </button>
+            </div>
+            <p className={styles.completionSync}>{t('chapter.completionSync')}</p>
+            <button
+              type="button"
+              className={styles.markCompleteBtn}
+              onClick={completeChapter}
+              disabled={!!chapterMeta?.completed_at || lessonProgressPct < 100}
+            >
+              {chapterMeta?.completed_at ? t('chapter.chapterComplete') : t('chapter.markComplete')}
+            </button>
+            {lessonProgressPct < 100 && !chapterMeta?.completed_at ? (
+              <p className={styles.completionHint}>{t('chapter.markCompleteHint')}</p>
+            ) : null}
+            {completeErr ? <p className={styles.completionErr}>{completeErr}</p> : null}
+          </div>
+
           <div className={styles.bottomNav}>
             {prev ? (
               <Link to={`/learn/${prev.slug}`} className={styles.btnBack}>
@@ -300,23 +430,9 @@ export default function Chapter() {
         <div className={styles.card}>
           <h3>{t('chapter.progressTitle')}</h3>
           <div className={styles.lessonProgress}>
-            <span style={{ width: `${quizProgress}%` }} />
+            <span style={{ width: `${lessonProgressPct}%` }} />
           </div>
-          <p className={styles.tryItDesc}>{t('chapter.progressThrough').replace('{n}', String(quizProgress))}</p>
-        </div>
-
-        <div className={styles.card}>
-          <h3>{t('chapter.askTutor')}</h3>
-          <textarea
-            className={styles.askBox}
-            value={chatInput}
-            onChange={(e) => setChatInput(e.target.value)}
-            placeholder={t('chapter.askPlaceholder')}
-          />
-          <button type="button" className={styles.askBtn} onClick={askTutor}>
-            {t('chapter.ask')}
-          </button>
-          {chatReply ? <p className={styles.tutorReply}>{chatReply}</p> : null}
+          <p className={styles.tryItDesc}>{t('chapter.progressPct').replace('{n}', String(lessonProgressPct))}</p>
         </div>
 
         <div className={styles.card}>
@@ -345,6 +461,64 @@ export default function Chapter() {
         </div>
       </aside>
       </div>
+
+      <button
+        type="button"
+        className={styles.tutorFab}
+        onClick={() => setTutorOpen(true)}
+        aria-label={t('chapter.askTutor')}
+      >
+        <span className={styles.tutorFabIcon} aria-hidden="true">💬</span>
+        <span>{t('chapter.askTutor')}</span>
+      </button>
+
+      {tutorOpen ? (
+        <div className={styles.tutorOverlay} role="presentation" onClick={() => setTutorOpen(false)}>
+          <div
+            className={styles.tutorModal}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('chapter.askTutor')}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.tutorModalHead}>
+              <h3>{t('chapter.askTutor')}</h3>
+              <button type="button" className={styles.tutorClose} onClick={() => setTutorOpen(false)} aria-label={t('chapter.closeModal')}>
+                ×
+              </button>
+            </div>
+            <p className={styles.tutorModalSub}>{t('chapter.tutorModalSub')}</p>
+            <div className={styles.tutorThread}>
+              {tutorMessages.length === 0 ? (
+                <p className={styles.tutorEmpty}>{t('chapter.tutorEmpty')}</p>
+              ) : (
+                tutorMessages.map((m, i) => (
+                  <div key={i} className={m.role === 'user' ? styles.tutorRowUser : styles.tutorRowAi}>
+                    <span className={styles.tutorRole}>{m.role === 'user' ? t('tutorPage.you') : t('tutorPage.tutor')}</span>
+                    <div className={styles.tutorBubble}>{formatBoldSegments(m.content)}</div>
+                  </div>
+                ))
+              )}
+              {tutorLoading ? <p className={styles.tutorThinking}>{t('tutorPage.thinking')}</p> : null}
+            </div>
+            <form
+              className={styles.tutorComposer}
+              onSubmit={(e) => {
+                e.preventDefault();
+                sendTutor();
+              }}
+            >
+              <input
+                value={tutorInput}
+                onChange={(e) => setTutorInput(e.target.value)}
+                placeholder={t('chapter.askPlaceholder')}
+                disabled={tutorLoading}
+              />
+              <button type="submit" disabled={!tutorInput.trim() || tutorLoading}>{t('chapter.ask')}</button>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

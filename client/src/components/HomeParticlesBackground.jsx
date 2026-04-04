@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, memo } from 'react';
 import Particles, { initParticlesEngine } from '@tsparticles/react';
 import { loadSlim } from '@tsparticles/slim';
 import styles from './HomeParticlesBackground.module.css';
@@ -20,7 +20,7 @@ function usePrefersReducedMotion() {
   return reduce;
 }
 
-export default function HomeParticlesBackground() {
+function HomeParticlesBackground() {
   const reduceMotion = usePrefersReducedMotion();
   const [init, setInit] = useState(false);
 
@@ -99,3 +99,6 @@ export default function HomeParticlesBackground() {
     </div>
   );
 }
+
+/** Isolated from parent (e.g. hero search typing) so tsparticles isn’t reset every keystroke */
+export default memo(HomeParticlesBackground);

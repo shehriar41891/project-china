@@ -82,15 +82,72 @@
   margin: 0 0 1.25rem;
   line-height: 1.5;
 }
-.heroSearch {
+.heroSearchWrap {
+  position: relative;
+  z-index: 4;
   margin: 0 0 1.35rem;
   max-width: 32rem;
 }
+.heroSearch {
+  margin: 0;
+  max-width: none;
+}
 @media (max-width: 768px) {
-  .heroSearch {
+  .heroSearchWrap {
     margin-left: auto;
     margin-right: auto;
   }
+}
+.heroSearchDropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.96);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  max-height: min(280px, 42vh);
+  overflow-y: auto;
+  padding: 0.35rem 0;
+}
+.heroSearchDropdownLabel {
+  padding: 0.35rem 0.75rem 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(224, 242, 254, 0.55);
+}
+.heroSearchDropdownEmpty {
+  padding: 0.65rem 0.75rem;
+  font-size: 0.86rem;
+  color: rgba(224, 242, 254, 0.55);
+}
+.heroSearchDropdownItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.12rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: #f0f9ff;
+  font-size: 0.88rem;
+}
+.heroSearchDropdownItem:hover {
+  background: rgba(59, 130, 246, 0.2);
+}
+.heroSearchDropdownTitle {
+  font-weight: 700;
+}
+.heroSearchDropdownMeta {
+  font-size: 0.72rem;
+  color: rgba(224, 242, 254, 0.45);
+  font-family: ui-monospace, monospace;
 }
 .heroSearchRow {
   display: flex;
@@ -357,6 +414,29 @@
   font-size: 0.85rem;
   color: var(--text-muted);
   flex: 1;
+}
+.moduleCardLink {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  padding: 1rem;
+  min-height: 0;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+.moduleCardLink:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+.moduleCardCta {
+  margin-top: 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent);
 }
 .popularGrid {
   display: grid;

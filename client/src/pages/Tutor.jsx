@@ -1,16 +1,16 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useLocale } from '../context/LocaleContext';
-import { api } from '../api/client';
+import { api, postChat } from '../api/client';
 import PageBackBar from '../components/PageBackBar';
+import { formatBoldSegments } from '../utils/chatFormat';
 import styles from './Tutor.module.css';
 
 export default function Tutor() {
-  const { t, locale } = useLocale();
-  const quickPrompts = useMemo(
-    () => [t('tutorPage.prompt1'), t('tutorPage.prompt2'), t('tutorPage.prompt3'), t('tutorPage.prompt4')],
-    [t, locale]
-  );
+  const { t, locale, chapterText } = useLocale();
+
+  const [chapters, setChapters] = useState([]);
+  const [chapterSlug, setChapterSlug] = useState('');
 
   const [messages, setMessages] = useState([
     {
@@ -18,6 +18,15 @@ export default function Tutor() {
       content: t('tutorPage.welcome'),
     },
   ]);
+
+  useEffect(() => {
+    api('/api/chapters')
+      .then((res) => {
+        const list = res.chapters || [];
+        setChapters(list);
+      })
+      .catch(() => setChapters([]));
+  }, []);
 
   useEffect(() => {
     setMessages([{ role: 'assistant', content: t('tutorPage.welcome') }]);
@@ -31,19 +40,55 @@ export default function Tutor() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
+  const selectedChapter = useMemo(
+    () => chapters.find((c) => c.slug === chapterSlug) || null,
+    [chapters, chapterSlug]
+  );
+
+  const quickPrompts = useMemo(() => {
+    const modTitle =
+      selectedChapter != null
+        ? chapterText(selectedChapter.slug, 'title', selectedChapter.title)
+        : '';
+    if (!chapterSlug || !modTitle) {
+      return [t('tutorPage.prompt1'), t('tutorPage.prompt2'), t('tutorPage.prompt3'), t('tutorPage.prompt4')];
+    }
+    const inject = (key) => t(key).replace(/\{module\}/g, modTitle);
+    return [
+      inject('tutorPage.promptModule1'),
+      inject('tutorPage.promptModule2'),
+      inject('tutorPage.promptModule3'),
+      inject('tutorPage.promptModule4'),
+    ];
+  }, [chapterSlug, selectedChapter, chapterText, t, locale]);
+
   async function send(text) {
     const prompt = (text || input).trim();
     if (!prompt || loading) return;
     setLoading(true);
     setInput('');
     const userMsg = { role: 'user', content: prompt };
+    // Prior turns only — `messages` does not yet include this user message (same pattern as TutorChat).
+    const history = messages.map((m) => ({ role: m.role, content: m.content }));
     setMessages((prev) => [...prev, userMsg]);
     try {
-      const history = [...messages, userMsg].map((m) => ({ role: m.role, content: m.content }));
-      const data = await api('/api/chat', { method: 'POST', body: { message: prompt, history } });
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply || t('tutorPage.noResponse') }]);
-    } catch (_) {
-      setMessages((prev) => [...prev, { role: 'assistant', content: t('tutorPage.unavailable'), isError: true }]);
+      const body = {
+        message: prompt,
+        history,
+        chapterSlug: chapterSlug || undefined,
+        chapterTitle: selectedChapter
+          ? chapterText(selectedChapter.slug, 'title', selectedChapter.title)
+          : undefined,
+      };
+      const reply = await postChat(body);
+      setMessages((prev) => [...prev, { role: 'assistant', content: reply || t('tutorPage.noResponse') }]);
+    } catch (e) {
+      const msg = e && e.message ? String(e.message) : '';
+      let content = t('tutorPage.unavailable');
+      if (msg === '__CHAT_NETWORK__') content = t('tutorPage.chatNetwork');
+      else if (msg === '__CHAT_HTML__') content = t('tutorPage.chatProxy');
+      else if (msg) content = `${t('tutorPage.errorDetail')}\n\n${msg}`;
+      setMessages((prev) => [...prev, { role: 'assistant', content, isError: true }]);
     } finally {
       setLoading(false);
     }
@@ -62,6 +107,23 @@ export default function Tutor() {
           <p className={styles.eyebrow}>{t('tutorPage.eyebrow')}</p>
           <h1>{t('tutorPage.title')}</h1>
           <p className={styles.lead}>{t('tutorPage.lead')}</p>
+          <p className={styles.moduleHint}>{t('tutorPage.chooseModule')}</p>
+          <label className={styles.moduleField}>
+            <span className={styles.moduleLabel}>{t('tutorPage.moduleSelectLabel')}</span>
+            <select
+              className={styles.moduleSelect}
+              value={chapterSlug}
+              onChange={(e) => setChapterSlug(e.target.value)}
+              aria-label={t('tutorPage.moduleSelectLabel')}
+            >
+              <option value="">{t('tutorPage.moduleSelectPlaceholder')}</option>
+              {[...chapters].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((c) => (
+                <option key={c.id} value={c.slug}>
+                  {chapterText(c.slug, 'title', c.title)}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
         <div className={styles.heroLinks}>
           <Link to="/learn" className={styles.heroLink}>{t('tutorPage.learningPath')}</Link>
@@ -73,8 +135,8 @@ export default function Tutor() {
         <aside className={styles.sidebar} aria-label={t('tutorPage.promptsAria')}>
           <h2 className={styles.sidebarTitle}>{t('tutorPage.quickPrompts')}</h2>
           <ul className={styles.promptList}>
-            {quickPrompts.map((p) => (
-              <li key={p}>
+            {quickPrompts.map((p, idx) => (
+              <li key={`${chapterSlug || 'all'}-${idx}`}>
                 <button type="button" className={styles.promptBtn} onClick={() => send(p)} disabled={loading}>
                   {p}
                 </button>
@@ -91,7 +153,9 @@ export default function Tutor() {
                 className={`${styles.row} ${m.role === 'user' ? styles.rowUser : styles.rowAssistant}`}
               >
                 <span className={styles.badge}>{m.role === 'user' ? t('tutorPage.you') : t('tutorPage.tutor')}</span>
-                <div className={`${styles.bubble} ${m.isError ? styles.bubbleErr : ''}`}>{m.content}</div>
+                <div className={`${styles.bubble} ${m.isError ? styles.bubbleErr : ''}`}>
+                  {m.role === 'assistant' ? formatBoldSegments(m.content) : m.content}
+                </div>
               </div>
             ))}
             {loading ? (

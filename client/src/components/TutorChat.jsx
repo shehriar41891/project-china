@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLocale } from '../context/LocaleContext';
-import { api } from '../api/client';
+import { postChat } from '../api/client';
 import styles from './TutorChat.module.css';
 
 /** Scoped AI tutor: explain / hint / navigation / glossary — backend enforces tone via intent. */
@@ -27,16 +27,15 @@ export default function TutorChat() {
     setInput('');
     try {
       const history = messages.map((m) => ({ role: m.role, content: m.content }));
-      const data = await api('/api/chat', {
-        method: 'POST',
-        body: { message: trimmed, history, intent },
-      });
-      setMessages((prev) => [...prev, userMsg, { role: 'assistant', content: data.reply || '' }]);
+      const reply = await postChat({ message: trimmed, history, intent });
+      setMessages((prev) => [...prev, userMsg, { role: 'assistant', content: reply || '' }]);
     } catch (e) {
-      const msg =
-        e.message && (e.message.includes('503') || e.message.includes('not configured'))
-          ? t('tutor.notConfigured')
-          : t('tutor.error');
+      const raw = e && e.message ? String(e.message) : '';
+      let msg = t('tutor.error');
+      if (raw === '__CHAT_NETWORK__') msg = t('tutorPage.chatNetwork');
+      else if (raw === '__CHAT_HTML__') msg = t('tutorPage.chatProxy');
+      else if (raw.includes('503') || raw.includes('not configured')) msg = t('tutor.notConfigured');
+      else if (raw) msg = `${t('tutorPage.errorDetail')}\n\n${raw}`;
       setMessages((prev) => [...prev, userMsg, { role: 'assistant', content: msg, isError: true }]);
     } finally {
       setLoading(false);

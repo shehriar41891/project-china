@@ -5,21 +5,33 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=1024">
   <meta name="keywords" content="neural networks,machine learning,javascript">
-  <title>Neural Network Builder</title>
+  <title>TensorFlow Playground — NN Lab</title>
+  <!-- bundle.css = MDL + styles.css + playground-custom.css (see npm run build-css) -->
   <link rel="stylesheet" href="bundle.css" type="text/css">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=Material+Icons" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=Material+Icons&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" type="text/css">
+  <!-- Last-resort dark UI if bundle was built without playground-custom.css -->
+  <style id="playground-theme-fallback">
+    html body.playground-page { background: #070b14 !important; color: #e2e8f0 !important; }
+    html body.playground-page #top-controls { background: rgba(7, 11, 20, 0.95) !important; border-bottom: 1px solid rgba(94, 234, 212, 0.25) !important; box-shadow: none !important; }
+    html body.playground-page #top-controls .container.l--page > .control { display: none !important; }
+    html body.playground-page #main-part .column { background: rgba(17, 24, 39, 0.92) !important; color: #e2e8f0 !important; border: 1px solid rgba(94, 234, 212, 0.22) !important; border-radius: 16px !important; }
+    html body.playground-page .playground-intro { background: rgba(15, 23, 42, 0.95) !important; border-bottom: 1px solid rgba(94, 234, 212, 0.2) !important; }
+    html body.playground-page .playground-howto { background: rgba(15, 23, 42, 0.85) !important; }
+    html body.playground-page footer { background: #070b14 !important; border-top: 1px solid rgba(94, 234, 212, 0.2) !important; }
+  </style>
   <script src="lib.js"></script>
 </head>
-<body>
-  <!-- Drag & drop palette -->
-  <div class="drag-palette" id="drag-palette">
-    <h5>Drag to apply</h5>
-    <div class="drag-item" data-drag-type="activation" data-value="relu" draggable="true">ReLU</div>
-    <div class="drag-item" data-drag-type="activation" data-value="tanh" draggable="true">Tanh</div>
-    <div class="drag-item" data-drag-type="activation" data-value="sigmoid" draggable="true">Sigmoid</div>
-    <div class="drag-item" data-drag-type="activation" data-value="linear" draggable="true">Linear</div>
-    <div class="drag-item" data-drag-type="layer" data-value="add" draggable="true">+ Add layer</div>
-  </div>
+<body class="playground-page">
+  <main class="playground-app">
+  <section class="playground-intro" aria-label="Introduction">
+    <div class="playground-intro-inner">
+      <h1>Neural Network Playground</h1>
+      <p>
+        This classic 2-D visualization helps you build intuition for how networks separate data.
+        Set your network shape, activation, and training options in the <strong>Network Builder</strong> first, then use the controls below to run and inspect training.
+      </p>
+    </div>
+  </section>
 
   <a class="github-link" href="https://github.com/tensorflow/playground" title="Source on GitHub" target="_blank">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60.5 60.5" width="60" height="60">
@@ -245,6 +257,28 @@
     <button class="mdl-button mdl-js-button mdl-button--fab"><i class="material-icons">keyboard_arrow_down</i></button>
   </div>
 
+  <section class="playground-howto" aria-labelledby="playground-howto-title">
+    <div class="playground-howto-inner">
+      <h2 id="playground-howto-title">How to use this page</h2>
+      <p>
+        Configure layers and activations in the <strong>Network Builder</strong>, then use this lab: pick a dataset, adjust noise and batch size, and press <strong>play</strong> to watch the decision boundary evolve.
+      </p>
+      <h3>Playback</h3>
+      <ul>
+        <li><strong>Reset</strong> clears the run; <strong>Play / Pause</strong> trains or stops; <strong>Step</strong> advances one epoch at a time.</li>
+        <li>Watch training and test loss in the output column—aim for both to decrease without the training loss diving far below test loss (overfitting).</li>
+      </ul>
+      <h3>Reading the visualization</h3>
+      <ul>
+        <li>Colors show how the network classifies regions of the plane; the heatmap and neuron thumbnails explain which features matter.</li>
+        <li>Toggle test data and discretize output to compare raw scores with hard class labels.</li>
+      </ul>
+      <p class="tip">
+        Tip: If you need to change learning rate, regularization, or problem type (classification vs regression), do it in the Network Builder so your settings stay consistent across the course workflow.
+      </p>
+    </div>
+  </section>
+
   <footer>
     <div class="l--body">
       <a href="editor.html">← Network Builder</a>
@@ -254,6 +288,7 @@
       </div>
     </div>
   </footer>
+  </main>
   <script src="bundle.js"></script>
   <script src="guide-and-drag.js"></script>
   <script src="analytics.js"></script>
