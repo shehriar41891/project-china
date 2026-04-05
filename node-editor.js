@@ -411,6 +411,34 @@
 
   window.addEventListener('resize', redrawEdges);
 
+  function addHiddenLayerNode() {
+    var layerNids = Object.keys(nodes).filter(function(id) {
+      return nodes[id] && nodes[id].type === 'layer';
+    });
+    var n = layerNids.length;
+    var x = 120 + n * 48;
+    var y = 90 + n * 36;
+    createCanvasNode('layer', 'Hidden Layer', null, x, y);
+  }
+
+  function removeLastHiddenLayerNode() {
+    var layerNids = Object.keys(nodes).filter(function(id) {
+      return nodes[id] && nodes[id].type === 'layer';
+    });
+    if (!layerNids.length) return;
+    layerNids.sort(function(a, b) {
+      var na = parseInt(String(a).replace(/\D/g, ''), 10) || 0;
+      var nb = parseInt(String(b).replace(/\D/g, ''), 10) || 0;
+      return na - nb;
+    });
+    removeNode(layerNids[layerNids.length - 1]);
+  }
+
+  var btnAddHidden = document.getElementById('btn-add-hidden');
+  var btnRemoveHidden = document.getElementById('btn-remove-hidden');
+  if (btnAddHidden) btnAddHidden.addEventListener('click', addHiddenLayerNode);
+  if (btnRemoveHidden) btnRemoveHidden.addEventListener('click', removeLastHiddenLayerNode);
+
   // Restore saved graph when returning to the editor
   restoreGraph();
 

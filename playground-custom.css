@@ -87,21 +87,6 @@ body.playground-page .playground-intro strong {
   font-weight: 700 !important;
 }
 
-/* GitHub corner — tuck into header row visually */
-body.playground-page .github-link {
-  position: fixed !important;
-  top: 0.5rem !important;
-  right: 0.5rem !important;
-  z-index: 50 !important;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4)) !important;
-  opacity: 0.9 !important;
-  transform: scale(0.92);
-}
-
-body.playground-page .github-link:hover {
-  opacity: 1 !important;
-}
-
 /* ---- Remove legacy drag palette (also stripped from HTML) ---- */
 body.playground-page .drag-palette,
 body.playground-page #drag-palette {
@@ -249,10 +234,11 @@ body.playground-page #main-part .hidden-layers.column {
 }
 
 body.playground-page #main-part .output.column {
-  width: 275px !important;
-  min-width: 252px !important;
-  max-width: 290px !important;
-  flex: 0 0 275px !important;
+  width: min(320px, 100%) !important;
+  min-width: 260px !important;
+  max-width: 360px !important;
+  flex: 0 1 300px !important;
+  overflow: visible !important;
 }
 
 @media (max-width: 1100px) {
@@ -320,9 +306,15 @@ body.playground-page #network .plus-minus-neurons {
   display: none !important;
 }
 
-/* Hidden-layers column header: +/- layer count + “N hidden layers” — hide (same reason) */
+/* Show add/remove hidden layer controls (+ / −) */
 body.playground-page .column.hidden-layers > h4 {
-  display: none !important;
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.35rem !important;
+}
+body.playground-page .column.hidden-layers .ui-numHiddenLayers button {
+  color: var(--pg-text) !important;
 }
 
 /* Bracket stack (hidden layers) must paint above backgrounds and not clip */
@@ -337,6 +329,48 @@ body.playground-page .column.hidden-layers {
 body.playground-page #main-part .output-stats,
 body.playground-page #main-part .metrics {
   color: var(--pg-text) !important;
+}
+
+/* Loss numbers must stay readable on dark UI (base styles use near-black #333) */
+body.playground-page #loss-test,
+body.playground-page #loss-train {
+  color: #f8fafc !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  line-height: 1.3 !important;
+}
+body.playground-page .output .output-stats .value {
+  color: #f8fafc !important;
+  font-weight: 600 !important;
+}
+body.playground-page .metrics .train {
+  color: #cbd5e1 !important;
+}
+body.playground-page .metrics .output-stats span:first-child {
+  color: #e2e8f0 !important;
+}
+body.playground-page #main-part .metrics {
+  position: relative !important;
+  height: auto !important;
+  min-height: 88px !important;
+  overflow: visible !important;
+  padding-bottom: 4px !important;
+}
+body.playground-page #main-part #linechart {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: 52% !important;
+  height: 72px !important;
+}
+body.playground-page #main-part .output-stats {
+  max-width: 48% !important;
+  padding-right: 4px !important;
+  box-sizing: border-box !important;
+}
+body.playground-page #main-part #heatmap {
+  overflow: visible !important;
+  max-width: 100% !important;
 }
 
 body.playground-page #main-part #heatmap,

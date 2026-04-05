@@ -2,21 +2,21 @@
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: 1.25rem min(1.25rem, 3vw) 2.5rem;
+  padding: 1.5rem min(1.25rem, 3vw) 2.75rem;
   box-sizing: border-box;
 }
 
 .shell {
   display: grid;
   grid-template-columns: min(280px, 32%) 1fr;
-  gap: 1.25rem;
+  gap: 1.5rem;
   align-items: start;
 }
 
 .sidebar {
   position: sticky;
   top: 5.5rem;
-  padding: 1.35rem;
+  padding: 1.5rem 1.35rem 1.6rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 16px;

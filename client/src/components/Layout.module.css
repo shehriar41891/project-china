@@ -94,9 +94,16 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.4rem;
+  gap: 0.35rem;
   flex-wrap: wrap;
   flex: 1;
+}
+
+.navRight .navProfileBtn {
+  order: 98;
+}
+.navRight .themeBtn {
+  order: 99;
 }
 .navRightOpen {
   display: flex;

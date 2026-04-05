@@ -147,6 +147,42 @@ body {
   margin-bottom: 22px;
 }
 .palette-group:last-child { margin-bottom: 0; }
+
+.palette-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--ed-border);
+}
+.btn-palette-action {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--ed-border2);
+  background: rgba(37, 99, 235, 0.2);
+  color: #e0f2fe;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s, border-color 0.2s;
+}
+.btn-palette-action:hover {
+  background: rgba(37, 99, 235, 0.4);
+  border-color: var(--ed-accent-bright);
+}
+.btn-palette-action--muted {
+  background: transparent;
+  color: var(--ed-muted);
+  border-color: var(--ed-border);
+}
+.btn-palette-action--muted:hover {
+  color: #fecaca;
+  border-color: rgba(248, 113, 113, 0.5);
+}
+
 .palette-label {
   display: block;
   font-size: 10px;

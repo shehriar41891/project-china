@@ -7,13 +7,16 @@ import HomeParticlesBackground from '../components/HomeParticlesBackground';
 import styles from './Home.module.css';
 
 const IMAGES = {
+  /** AI / deep learning — abstract neural aesthetic (not generic stock buildings) */
   hero: {
-    primary: 'https://illustrations.popsy.co/blue/artificial-intelligence.svg',
-    fallback: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
+    primary:
+      'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=88&fit=crop&auto=format',
+    fallback:
+      'https://images.unsplash.com/photo-1620121692029-d088224ddc80?w=1200&q=88&fit=crop&auto=format',
   },
   builder: {
     primary: 'https://illustrations.popsy.co/blue/coding.svg',
-    fallback: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&q=80',
+    fallback: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=600&q=80',
   },
   learn: {
     primary: 'https://illustrations.popsy.co/blue/developer-activity.svg',
@@ -28,9 +31,9 @@ const IMAGES = {
     primary: 'https://illustrations.popsy.co/blue/online-learning.svg',
     fallback: 'https://images.unsplash.com/photo-1434030216411-0b793f4ed417?w=600&q=80',
   },
-  /** Quick Access “Take a Quiz” — checkpoint / exam vibe (distinct from generic “quiz” module art) */
+  /** Quick Access “Take a Quiz” — same-origin art so the card always shows an image */
   quizCard: {
-    primary: 'https://images.unsplash.com/photo-1434030216411-0b793f4ed417?w=640&q=80',
+    primary: '/quiz-card-art.svg',
     fallback: 'https://illustrations.popsy.co/blue/online-learning.svg',
   },
   tutor: {
@@ -230,9 +233,6 @@ export default function Home() {
           <div className={styles.heroMedia}>
             <div className={styles.heroIllusWrap}>
               <ImgWithFallback primary={IMAGES.hero.primary} fallback={IMAGES.hero.fallback} alt={t('home.heroAlt')} width={500} height={400} loading="eager" />
-              <span className={styles.heroFloat1} aria-hidden="true" />
-              <span className={styles.heroFloat2} aria-hidden="true" />
-              <span className={styles.heroFloat3} aria-hidden="true" />
             </div>
           </div>
         </section>

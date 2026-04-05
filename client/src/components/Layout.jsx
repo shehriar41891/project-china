@@ -156,17 +156,6 @@ export default function Layout() {
             <>
               <Link to="/learn" onClick={() => setMobileOpen(false)} className={styles.navLink}>{t('nav.learn')}</Link>
               <Link to="/tutor" onClick={() => setMobileOpen(false)} className={styles.navLink}>{t('nav.tutorLink')}</Link>
-              <Link
-                to="/profile"
-                onClick={() => setMobileOpen(false)}
-                className={styles.navProfileBtn}
-                aria-label={t('nav.profile')}
-                title={t('nav.profile')}
-              >
-                <span className={styles.navProfileIcon} aria-hidden>
-                  {(user.name || user.email || '?').charAt(0).toUpperCase()}
-                </span>
-              </Link>
               <div className={styles.menuWrap}>
                 <button type="button" className={styles.menuBtn} onClick={() => setMenuOpen((v) => !v)} aria-expanded={menuOpen}>
                   {t('nav.menu')} ▾
@@ -187,6 +176,19 @@ export default function Layout() {
           {!user ? <Link to="/about" onClick={() => setMobileOpen(false)} className={styles.navLink}>{t('nav.about')}</Link> : null}
           <Link to="/editor" onClick={() => setMobileOpen(false)} className={styles.navLinkMuted}>{t('nav.builder')}</Link>
           <LanguageMenu />
+          {user ? (
+            <Link
+              to="/profile"
+              onClick={() => setMobileOpen(false)}
+              className={styles.navProfileBtn}
+              aria-label={t('nav.profile')}
+              title={t('nav.profile')}
+            >
+              <span className={styles.navProfileIcon} aria-hidden>
+                {(user.name || user.email || '?').charAt(0).toUpperCase()}
+              </span>
+            </Link>
+          ) : null}
           <button type="button" className={styles.themeBtn} onClick={toggle} aria-label={t('nav.toggleTheme')}>
             {theme === 'light' ? '🌙' : '☀'}
           </button>
