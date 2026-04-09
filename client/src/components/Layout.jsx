@@ -164,16 +164,12 @@ export default function Layout() {
                   <div className={styles.menu}>
                     <Link to="/quiz" onClick={() => { setMenuOpen(false); setMobileOpen(false); }}>{t('nav.quiz')}</Link>
                     <Link to="/editor" onClick={() => { setMenuOpen(false); setMobileOpen(false); }}>{t('nav.builder')}</Link>
-                    <Link to="/about" onClick={() => { setMenuOpen(false); setMobileOpen(false); }}>{t('nav.about')}</Link>
                     <button type="button" onClick={handleLogout}>{t('nav.logout')}</button>
                   </div>
                 )}
               </div>
             </>
-          ) : (
-            <Link to="/login" onClick={() => setMobileOpen(false)} className={styles.navLinkCta}>{t('nav.signIn')}</Link>
-          )}
-          {!user ? <Link to="/about" onClick={() => setMobileOpen(false)} className={styles.navLink}>{t('nav.about')}</Link> : null}
+          ) : null}
           <Link to="/editor" onClick={() => setMobileOpen(false)} className={styles.navLinkMuted}>{t('nav.builder')}</Link>
           <LanguageMenu />
           {user ? (
@@ -188,7 +184,15 @@ export default function Layout() {
                 {(user.name || user.email || '?').charAt(0).toUpperCase()}
               </span>
             </Link>
-          ) : null}
+          ) : (
+            <Link
+              to="/login"
+              onClick={() => setMobileOpen(false)}
+              className={`${styles.navLinkCta} ${styles.navSignInEnd}`}
+            >
+              {t('nav.signIn')}
+            </Link>
+          )}
           <button type="button" className={styles.themeBtn} onClick={toggle} aria-label={t('nav.toggleTheme')}>
             {theme === 'light' ? '🌙' : '☀'}
           </button>
@@ -200,9 +204,7 @@ export default function Layout() {
       <footer className={styles.foot}>
         <div className={styles.footLinks}>
           <Link to="/how-it-works">{t('nav.howItWorks')}</Link>
-          <Link to="/about">{t('nav.about')}</Link>
           <Link to="/editor">{t('nav.builder')}</Link>
-          <a href="https://github.com/tensorflow/playground" target="_blank" rel="noopener">GitHub</a>
         </div>
         <p className={styles.footNote}>{t('footer.tagline')}</p>
       </footer>

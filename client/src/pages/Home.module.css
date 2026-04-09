@@ -393,6 +393,18 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 0.9rem;
 }
+/* Module thumbnails: fill the slot so photos read clearly (SVGs were easy to “lose” on the gradient) */
+.moduleGrid .cardMediaSlot {
+  padding: 0;
+}
+.moduleGrid .cardMediaImg {
+  width: 100%;
+  height: 152px;
+  max-height: none;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 12px;
+}
 .moduleCard {
   display: flex;
   flex-direction: column;
@@ -439,6 +451,17 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.8rem;
+}
+.popularGrid .cardMediaSlot {
+  padding: 0;
+}
+.popularGrid .cardMediaImg {
+  width: 100%;
+  height: 152px;
+  max-height: none;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 12px;
 }
 .popularCard {
   display: flex;

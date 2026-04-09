@@ -38,11 +38,43 @@ const IMAGES = {
   },
   tutor: {
     primary: 'https://illustrations.popsy.co/blue/artificial-intelligence.svg',
-    fallback: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&q=80',
+    fallback: 'https://illustrations.popsy.co/blue/developer-activity.svg',
   },
   learningPath: {
     primary: 'https://illustrations.popsy.co/blue/rocket-launch.svg',
     fallback: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80',
+  },
+  /** Learn-path module row 1 — intro (not the hero AI shot; avoids clash with optimizers card) */
+  moduleIntroNn: {
+    primary: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=640&q=88&fit=crop&auto=format',
+    fallback: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=640&q=88&fit=crop&auto=format',
+  },
+  /** Row 3 — layers & architecture: strong photo (replaces faint SVG) */
+  moduleLayersArch: {
+    primary: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=640&q=88&fit=crop&auto=format',
+    fallback: 'https://images.unsplash.com/photo-1558490479-6195778c448c?w=640&q=88&fit=crop&auto=format',
+  },
+  /** Row 6 — optimizers: charts/metrics only (no AI head imagery) */
+  moduleOptimizers: {
+    primary: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=640&q=88&fit=crop&auto=format',
+    fallback: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=640&q=88&fit=crop&auto=format',
+  },
+  /** Popular course cards — visuals aligned with each chapter theme */
+  courseNeural101: {
+    primary: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=640&q=88&fit=crop&auto=format',
+    fallback: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=640&q=88&fit=crop&auto=format',
+  },
+  courseOptimizers: {
+    primary: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=640&q=88&fit=crop&auto=format',
+    fallback: 'https://illustrations.popsy.co/blue/data-report.svg',
+  },
+  courseCnns: {
+    primary: 'https://images.unsplash.com/photo-1507146426986-efeeb2e5bdb2?w=640&q=88&fit=crop&auto=format',
+    fallback: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=640&q=88&fit=crop&auto=format',
+  },
+  courseTrainingDebug: {
+    primary: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=640&q=88&fit=crop&auto=format',
+    fallback: 'https://illustrations.popsy.co/blue/coding.svg',
   },
 };
 
@@ -135,25 +167,55 @@ export default function Home() {
 
   const moduleCards = useMemo(
     () => [
-      { id: 'm1', imageKey: 'hero' },
+      { id: 'm1', imageKey: 'moduleIntroNn' },
       { id: 'm2', imageKey: 'playground' },
-      { id: 'm3', imageKey: 'quiz' },
+      { id: 'm3', imageKey: 'moduleLayersArch' },
       { id: 'm4', imageKey: 'learningPath' },
       { id: 'm5', imageKey: 'builder' },
-      { id: 'm6', imageKey: 'tutor' },
+      { id: 'm6', imageKey: 'moduleOptimizers' },
     ],
     []
   );
 
-  const popularCourses = useMemo(
-    () => [
-      { title: t('home.course1'), meta: `${t('home.levelBeginner')} • 12.4k ${t('home.studentsK')}`, to: '/learn', imageKey: 'learn' },
-      { title: t('home.course2'), meta: `${t('home.levelIntermediate')} • 8.9k ${t('home.studentsK')}`, to: '/learn', imageKey: 'playground' },
-      { title: t('home.course3'), meta: `${t('home.levelIntermediate')} • 10.2k ${t('home.studentsK')}`, to: '/learn', imageKey: 'hero' },
-      { title: t('home.course4'), meta: `${t('home.levelAdvanced')} • 6.3k ${t('home.studentsK')}`, to: '/learn', imageKey: 'builder' },
-    ],
-    [t, locale]
-  );
+  const chapterBySlug = useMemo(() => {
+    const m = {};
+    catalogChapters.forEach((c) => {
+      if (c.slug) m[c.slug] = c;
+    });
+    return m;
+  }, [catalogChapters]);
+
+  const popularCourses = useMemo(() => {
+    const defs = [
+      {
+        slug: 'intro-neural-nets',
+        meta: `${t('home.levelBeginner')} • 12.4k ${t('home.studentsK')}`,
+        imageKey: 'courseNeural101',
+      },
+      {
+        slug: 'optimizers',
+        meta: `${t('home.levelIntermediate')} • 8.9k ${t('home.studentsK')}`,
+        imageKey: 'courseOptimizers',
+      },
+      {
+        slug: 'cnns',
+        meta: `${t('home.levelIntermediate')} • 10.2k ${t('home.studentsK')}`,
+        imageKey: 'courseCnns',
+      },
+      {
+        slug: 'data-training',
+        meta: `${t('home.levelAdvanced')} • 6.3k ${t('home.studentsK')}`,
+        imageKey: 'courseTrainingDebug',
+      },
+    ];
+    return defs.map((d, i) => {
+      const ch = chapterBySlug[d.slug];
+      return {
+        ...d,
+        title: ch ? chapterText(ch.slug, 'title', ch.title) : t(`home.course${i + 1}`),
+      };
+    });
+  }, [t, locale, chapterBySlug, chapterText]);
 
   const submitHeroSearch = (e) => {
     e.preventDefault();
@@ -319,8 +381,10 @@ export default function Home() {
           <div className={styles.popularGrid}>
             {popularCourses.map((c) => {
               const img = IMAGES[c.imageKey];
+              const chapterPath = `/learn/${c.slug}`;
+              const courseTo = user ? chapterPath : `/login?next=${encodeURIComponent(chapterPath)}`;
               return (
-                <article key={c.title} className={styles.popularCard}>
+                <article key={c.slug} className={styles.popularCard}>
                   <div className={styles.cardMediaSlot}>
                     <ImgWithFallback
                       primary={img.primary}
@@ -335,7 +399,7 @@ export default function Home() {
                   </div>
                   <h3>{c.title}</h3>
                   <p>{c.meta}</p>
-                  <Link to={c.to}>{t('home.viewCourse')}</Link>
+                  <Link to={courseTo}>{t('home.viewCourse')}</Link>
                 </article>
               );
             })}

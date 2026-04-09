@@ -99,7 +99,8 @@
   flex: 1;
 }
 
-.navRight .navProfileBtn {
+.navRight .navProfileBtn,
+.navRight .navSignInEnd {
   order: 98;
 }
 .navRight .themeBtn {

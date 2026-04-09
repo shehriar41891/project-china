@@ -8,7 +8,6 @@ import Learn from './pages/Learn';
 import Chapter from './pages/Chapter';
 import Quiz from './pages/Quiz';
 import Profile from './pages/Profile';
-import About from './pages/About';
 import Tutor from './pages/Tutor';
 import HowItWorks from './pages/HowItWorks';
 
@@ -25,7 +24,6 @@ export default function App() {
         <Route index element={<Home />} />
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
-        <Route path="about" element={<About />} />
         <Route path="how-it-works" element={<HowItWorks />} />
         <Route path="learn" element={<RequireAuth><Learn /></RequireAuth>} />
         <Route path="learn/chapter/:id" element={<RequireAuth><Chapter /></RequireAuth>} />
