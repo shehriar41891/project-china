@@ -359,6 +359,50 @@ body {
   border-color: var(--ed-accent-bright);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
 }
+
+.neuron-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(5, 10, 20, 0.65);
+  border: 1px solid var(--ed-border);
+}
+.neuron-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid var(--ed-border2);
+  background: rgba(37, 99, 235, 0.35);
+  color: #e0f2fe;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.neuron-btn:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.55);
+  border-color: var(--ed-accent-bright);
+}
+.neuron-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.neuron-count {
+  min-width: 2rem;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ed-text);
+  letter-spacing: 0.02em;
+}
 .canvas-node .node-ports {
   display: flex;
   justify-content: space-between;

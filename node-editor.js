@@ -13,6 +13,13 @@
 
   function id() { return 'n' + (++nodeIdCounter); }
 
+  /** Matches playground.ts neuron limits (1–8 per hidden layer). */
+  function clampNeuronCount(raw) {
+    var n = parseInt(String(raw), 10);
+    if (isNaN(n)) return 4;
+    return Math.max(1, Math.min(8, n));
+  }
+
   function getCanvasRect() {
     return canvas.getBoundingClientRect();
   }
@@ -40,9 +47,12 @@
         '<button type="button" class="node-delete" aria-label="Remove">×</button>' +
         '<div class="node-title">Hidden Layer</div>' +
         '<div class="node-body">' +
-          '<label class="node-field"><span>Neurons</span><select class="node-select layer-neurons">' +
-            '<option value="2">2</option><option value="4">4</option><option value="6">6</option><option value="8">8</option>' +
-          '</select></label>' +
+          '<label class="node-field"><span>Neurons (per layer)</span>' +
+          '<div class="neuron-stepper" data-min="1" data-max="8">' +
+            '<button type="button" class="neuron-btn neuron-minus" aria-label="Fewer neurons">−</button>' +
+            '<span class="neuron-count" aria-live="polite">4</span>' +
+            '<button type="button" class="neuron-btn neuron-plus" aria-label="More neurons">+</button>' +
+          '</div></label>' +
           '<label class="node-field"><span>Activation</span><select class="node-select layer-activation">' +
             '<option value="relu">ReLU</option><option value="tanh">Tanh</option><option value="sigmoid">Sigmoid</option><option value="linear">Linear</option>' +
           '</select></label>' +
@@ -77,10 +87,53 @@
     });
 
     portListeners(el);
+    if (type === 'layer') {
+      bindNeuronStepper(el);
+      var actSel = el.querySelector('.node-select.layer-activation');
+      if (actSel) {
+        actSel.addEventListener('change', function() {
+          if (!restoring) saveGraph();
+        });
+      }
+    }
     dragNode(el, nid);
     updatePlaceholder();
     if (!restoring) saveGraph();
     return nid;
+  }
+
+  function bindNeuronStepper(layerEl) {
+    var wrap = layerEl.querySelector('.neuron-stepper');
+    var countEl = layerEl.querySelector('.neuron-count');
+    var minus = layerEl.querySelector('.neuron-btn.neuron-minus');
+    var plus = layerEl.querySelector('.neuron-btn.neuron-plus');
+    if (!wrap || !countEl || !minus || !plus) return;
+    var min = parseInt(wrap.getAttribute('data-min') || '1', 10);
+    var max = parseInt(wrap.getAttribute('data-max') || '8', 10);
+    function syncUi(n) {
+      var v = clampNeuronCount(n);
+      countEl.textContent = String(v);
+      minus.disabled = v <= min;
+      plus.disabled = v >= max;
+    }
+    function getN() {
+      return clampNeuronCount(countEl.textContent);
+    }
+    function setN(n) {
+      syncUi(n);
+      if (!restoring) saveGraph();
+    }
+    minus.addEventListener('click', function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      setN(getN() - 1);
+    });
+    plus.addEventListener('click', function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      setN(getN() + 1);
+    });
+    syncUi(getN());
   }
 
   function getNodeState(nid) {
@@ -94,9 +147,9 @@
       var ds = el.querySelector('.node-select.dataset-select');
       state.dataset = ds ? ds.value : 'circle';
     } else if (n.type === 'layer') {
-      var neur = el.querySelector('.node-select.layer-neurons');
+      var cnt = el.querySelector('.neuron-count');
       var act = el.querySelector('.node-select.layer-activation');
-      state.neurons = neur ? neur.value : '2';
+      state.neurons = cnt ? String(clampNeuronCount(cnt.textContent)) : '4';
       state.activation = act ? act.value : 'relu';
     } else if (n.type === 'output') {
       var outAct = el.querySelector('.node-select.output-activation');
@@ -139,9 +192,21 @@
         var ds = n.el.querySelector('.node-select.dataset-select');
         if (ds) ds.value = state.dataset;
       } else if (state.type === 'layer') {
-        var neur = n.el.querySelector('.node-select.layer-neurons');
+        var cnt = n.el.querySelector('.neuron-count');
         var act = n.el.querySelector('.node-select.layer-activation');
-        if (neur) neur.value = state.neurons || '2';
+        if (cnt) {
+          var nv = clampNeuronCount(state.neurons != null ? state.neurons : '4');
+          cnt.textContent = String(nv);
+          var wrap = n.el.querySelector('.neuron-stepper');
+          var minus = n.el.querySelector('.neuron-btn.neuron-minus');
+          var plus = n.el.querySelector('.neuron-btn.neuron-plus');
+          if (wrap && minus && plus) {
+            var lo = parseInt(wrap.getAttribute('data-min') || '1', 10);
+            var hi = parseInt(wrap.getAttribute('data-max') || '8', 10);
+            minus.disabled = nv <= lo;
+            plus.disabled = nv >= hi;
+          }
+        }
         if (act) act.value = state.activation || 'relu';
       } else if (state.type === 'output' && state.outputActivation) {
         var outAct = n.el.querySelector('.node-select.output-activation');
@@ -282,7 +347,7 @@
     var dragging = false;
     var dx = 0, dy = 0;
     el.addEventListener('mousedown', function(e) {
-      if (e.target.closest('.port') || e.target.closest('.node-delete') || e.target.closest('select')) return;
+      if (e.target.closest('.port') || e.target.closest('.node-delete') || e.target.closest('select') || e.target.closest('.neuron-stepper')) return;
       dragging = true;
       var r = el.getBoundingClientRect();
       dx = e.clientX - r.left;
@@ -393,9 +458,9 @@
       var n = nodes[nid];
       if (!n) return;
       if (n.type === 'layer') {
-        var neurSel = n.el.querySelector('.node-select.layer-neurons');
+        var neurCnt = n.el.querySelector('.neuron-count');
         var actSel = n.el.querySelector('.node-select.layer-activation');
-        layers.push(neurSel ? parseInt(neurSel.value, 10) : 2);
+        layers.push(neurCnt ? clampNeuronCount(neurCnt.textContent) : 4);
         if (actSel) activation = actSel.value;
       }
     });
@@ -447,7 +512,7 @@
     {
       title: 'Step 1: Add nodes',
       subtitle: 'Three types. Drag onto the canvas.',
-      body: '<ol><li><strong>Dataset</strong> — choose data (Circle, XOR, Gaussian, Spiral).</li><li><strong>Hidden Layer</strong> — one or more, with neurons (2–8) and activation.</li><li><strong>Output Layer</strong> — the end, with output activation.</li></ol>'
+      body: '<ol><li><strong>Dataset</strong> — choose data (Circle, XOR, Gaussian, Spiral).</li><li><strong>Hidden Layer</strong> — one or more; use <strong>− / +</strong> to set neurons per layer (1–8, same as the Playground) and pick an activation.</li><li><strong>Output Layer</strong> — the end, with output activation.</li></ol>'
     },
     {
       title: 'Step 2: Connect them',
@@ -457,7 +522,7 @@
     {
       title: 'Step 3: Configure',
       subtitle: 'Set options on each node.',
-      body: '<p><strong>Dataset</strong>: pick Circle, XOR, Gaussian, or Spiral.</p><p><strong>Hidden Layer</strong>: neurons (2–8) and activation (ReLU, Tanh, etc.).</p><p><strong>Output Layer</strong>: output activation (Sigmoid or Linear).</p>'
+      body: '<p><strong>Dataset</strong>: pick Circle, XOR, Gaussian, or Spiral.</p><p><strong>Hidden Layer</strong>: tap <strong>− / +</strong> to change neuron count (1–8 per layer) and choose activation (ReLU, Tanh, etc.).</p><p><strong>Output Layer</strong>: output activation (Sigmoid or Linear).</p>'
     },
     {
       title: 'Step 4: Run training',

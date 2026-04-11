@@ -10,6 +10,7 @@ import Quiz from './pages/Quiz';
 import Profile from './pages/Profile';
 import Tutor from './pages/Tutor';
 import HowItWorks from './pages/HowItWorks';
+import About from './pages/About';
 
 function RequireAuth({ children }) {
   const token = document.cookie.includes('connect.sid');
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
         <Route path="how-it-works" element={<HowItWorks />} />
+        <Route path="about" element={<About />} />
         <Route path="learn" element={<RequireAuth><Learn /></RequireAuth>} />
         <Route path="learn/chapter/:id" element={<RequireAuth><Chapter /></RequireAuth>} />
         <Route path="learn/:slug" element={<RequireAuth><Chapter /></RequireAuth>} />

@@ -12,7 +12,7 @@
   <header class="editor-header">
     <a href="/" class="back-link">← Home</a>
     <h1>Network Builder</h1>
-    <p class="subtitle">Connect Dataset → Hidden Layer(s) → Output Layer. Your graph is saved when you leave.</p>
+    <p class="subtitle">Connect Dataset → Hidden Layer(s) → Output Layer. Use − / + on each hidden layer to set neurons (1–8). Your graph is saved when you leave.</p>
     <div class="header-actions">
       <button type="button" class="btn-guide" id="btn-guide" title="How to use">?</button>
       <button type="button" class="btn btn-secondary" id="btn-clear">Clear</button>
@@ -25,7 +25,7 @@
   <div class="editor-layout">
     <aside class="node-palette">
       <h3>Nodes</h3>
-      <p class="palette-hint">Drag onto canvas. Connect: Dataset → Hidden → Output</p>
+      <p class="palette-hint">Drag onto canvas. Each hidden layer: <strong>− / +</strong> neurons (1–8). Connect: Dataset → Hidden → Output</p>
       <div class="palette-group">
         <span class="palette-label">Data</span>
         <div class="palette-node palette-node--dataset" data-node-type="dataset" data-label="Dataset" draggable="true">

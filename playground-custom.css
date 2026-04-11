@@ -301,9 +301,35 @@ body.playground-page #network {
   z-index: 5 !important;
 }
 
-/* Per-layer +/- neuron controls drawn on top of the graph — hide (set depth in Network Builder) */
-body.playground-page #network .plus-minus-neurons {
-  display: none !important;
+/* Per-layer +/- neuron controls above each hidden layer (add/remove neurons 1–8 per layer) */
+body.playground-page #main-part .features.column .plus-minus-neurons {
+  display: block !important;
+  z-index: 30 !important;
+  pointer-events: auto !important;
+  color: var(--pg-text) !important;
+}
+
+body.playground-page #main-part .features.column .plus-minus-neurons .mdl-button {
+  color: var(--pg-text) !important;
+  background: rgba(15, 23, 42, 0.92) !important;
+  border: 1px solid rgba(148, 163, 184, 0.4) !important;
+  border-radius: 8px !important;
+}
+
+body.playground-page #main-part .features.column .plus-minus-neurons .mdl-button:hover {
+  background: rgba(45, 212, 191, 0.2) !important;
+  border-color: var(--pg-accent) !important;
+}
+
+body.playground-page #main-part .features.column .plus-minus-neurons .material-icons {
+  font-size: 18px !important;
+  line-height: 24px !important;
+}
+
+body.playground-page #main-part .features.column .plus-minus-neurons > div:last-child {
+  color: var(--pg-muted) !important;
+  font-weight: 600 !important;
+  margin-top: 2px !important;
 }
 
 /* Show add/remove hidden layer controls (+ / −) */
