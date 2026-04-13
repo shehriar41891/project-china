@@ -29,6 +29,17 @@ export default function About() {
         <p className={styles.kicker}>{t('aboutPage.kicker')}</p>
         <h1 className={styles.title}>{t('aboutPage.title')}</h1>
         <p className={styles.lead}>{t('aboutPage.lead')}</p>
+        <figure className={styles.diagramBox}>
+          <img
+            src="/about-learning-loop.svg"
+            width={720}
+            height={280}
+            alt=""
+            loading="eager"
+            decoding="async"
+          />
+          <figcaption className={styles.diagramCaption}>{t('aboutPage.diagramCaption')}</figcaption>
+        </figure>
       </header>
 
       <section className={styles.section} aria-labelledby="about-what">

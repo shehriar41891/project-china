@@ -144,7 +144,8 @@
     "audienceP2": "You do not need prior ML employment; basic comfort with math notation and persistence through a technical course helps. If you are completely new to programming, pair this site with a general coding intro—the focus here is neural networks and how they are trained.",
     "ctaTitle": "Start where you are",
     "ctaLead": "Open Learn to follow the catalog, try How it works for the full loop, or take a quiz to see where you stand.",
-    "exploreTitle": "Explore"
+    "exploreTitle": "Explore",
+    "diagramCaption": "From lessons and building to training, quizzes, and the AI tutor—then back to your profile for what to do next."
   },
   "learn": {
     "kicker": "Learning catalog",
@@ -254,10 +255,10 @@
     "prompt2": "What is the difference between loss and accuracy?",
     "prompt3": "How do I reduce overfitting?",
     "prompt4": "Mini quiz on activation functions.",
-    "promptModule1": "Summarize the main ideas in “{module}” in three short bullets.",
-    "promptModule2": "What should I practice right after “{module}” to remember it?",
-    "promptModule3": "What do learners often misunderstand in “{module}”—and how can I avoid that?",
-    "promptModule4": "Give one quick self-check question about “{module}” (don’t reveal the answer).",
+    "promptModule1": "Summarize the main ideas in \"{module}\" in three short bullets.",
+    "promptModule2": "What should I practice right after \"{module}\" to remember it?",
+    "promptModule3": "What do learners often misunderstand in \"{module}\"—and how can I avoid that?",
+    "promptModule4": "Give one quick self-check question about \"{module}\" (do not reveal the answer).",
     "chatAria": "Chat",
     "promptsAria": "Suggested prompts",
     "you": "You",

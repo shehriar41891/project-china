@@ -166,6 +166,20 @@ body.playground-page #top-controls .timeline-controls .ui-playButton.mdl-button-
   background: linear-gradient(145deg, #14b8a6, #0d9488) !important;
   border: none !important;
   box-shadow: 0 6px 20px rgba(13, 148, 136, 0.45) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+/* Base styles.css offsets play/pause icons with translate(-18px,-12px) — breaks centered fab */
+body.playground-page #top-controls #play-pause-button .material-icons {
+  transform: none !important;
+  color: #f0fdfa !important;
+  font-size: 26px !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  position: static !important;
 }
 
 body.playground-page #top-controls .timeline-controls .material-icons {
@@ -404,18 +418,6 @@ body.playground-page #main-part #linechart {
   border-radius: 10px !important;
 }
 
-/* ---- Scroll hint ---- */
-body.playground-page .more {
-  text-align: center !important;
-  padding: 0.25rem 0 0.5rem !important;
-}
-
-body.playground-page .more .mdl-button {
-  background: var(--pg-accent-dim) !important;
-  color: var(--pg-accent) !important;
-  border: 1px solid var(--pg-border) !important;
-}
-
 /* ---- How-to ---- */
 body.playground-page .playground-howto {
   background: rgba(15, 23, 42, 0.65) !important;
@@ -553,12 +555,6 @@ body.playground-page #main-part .basic-button {
 body.playground-page #main-part .basic-button:hover {
   background: rgba(45, 212, 191, 0.2) !important;
   color: var(--pg-text) !important;
-}
-
-body.playground-page .more button {
-  background: rgba(30, 41, 59, 0.9) !important;
-  border-color: rgba(94, 234, 212, 0.3) !important;
-  color: var(--pg-accent) !important;
 }
 
 body.playground-page #top-controls .timeline-controls {

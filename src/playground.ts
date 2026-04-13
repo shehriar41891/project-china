@@ -31,13 +31,17 @@ import * as d3 from 'd3';
 
 let mainWidth;
 
-// More scrolling
-d3.select(".more button").on("click", function() {
-  let position = 800;
-  d3.transition()
-    .duration(1000)
-    .tween("scroll", scrollTween(position));
-});
+// Scroll hint button removed from playground.html; keep handler only if present.
+(function bindMoreScroll() {
+  let moreBtn = d3.select(".more button");
+  if (moreBtn.empty()) return;
+  moreBtn.on("click", function() {
+    let position = 800;
+    d3.transition()
+      .duration(1000)
+      .tween("scroll", scrollTween(position));
+  });
+})();
 
 function scrollTween(offset) {
   return function() {

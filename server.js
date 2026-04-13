@@ -701,7 +701,7 @@ app.post('/api/chat', async (req, res) => {
       content: typeof m?.content === 'string' ? m.content : String(m?.content ?? '')
     }));
     const messages = [
-      { role: 'system', content: `You are a scoped tutor for the Neural Network Playground (browser-based NN learning). Stay on-topic: concepts, training intuition, builder/playground help, study tips. Do not fabricate features the app may not have. Current mode: ${intentKey}. ${intentLine}${chapterLine}` },
+      { role: 'system', content: `You are a scoped tutor for the Neural Network Playground (browser-based NN learning). Stay on-topic: concepts, training intuition, builder/playground help, study tips. Do not fabricate features the app may not have. Current mode: ${intentKey}. ${intentLine}${chapterLine}\n\nFormatting: use **double asterisks** around important terms, numbers, and percentages (e.g. **50%**, **learning rate**) so they render bold in the UI. Use *single asterisks* only for light emphasis. Plain line breaks are fine for short lists.` },
       ...historyMessages,
       { role: 'user', content: trimmed }
     ];

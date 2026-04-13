@@ -36,6 +36,11 @@ const IMAGES = {
     primary: '/quiz-card-art.svg',
     fallback: 'https://illustrations.popsy.co/blue/online-learning.svg',
   },
+  /** Talk to Tutor AI — same-origin so the thumbnail always loads */
+  tutorCard: {
+    primary: '/tutor-card-art.svg',
+    fallback: 'https://illustrations.popsy.co/blue/artificial-intelligence.svg',
+  },
   tutor: {
     primary: 'https://illustrations.popsy.co/blue/artificial-intelligence.svg',
     fallback: 'https://illustrations.popsy.co/blue/developer-activity.svg',
@@ -159,7 +164,7 @@ export default function Home() {
       { title: t('home.qa2Title'), desc: t('home.qa2Desc'), to: '/editor', imageKey: 'builder' },
       { title: t('home.qa3Title'), desc: t('home.qa3Desc'), to: '/playground', imageKey: 'playground' },
       { title: t('home.qa4Title'), desc: t('home.qa4Desc'), to: '/quiz', imageKey: 'quizCard' },
-      { title: t('home.qa5Title'), desc: t('home.qa5Desc'), to: '/tutor', imageKey: 'tutor' },
+      { title: t('home.qa5Title'), desc: t('home.qa5Desc'), to: '/tutor', imageKey: 'tutorCard' },
       { title: t('home.qa6Title'), desc: t('home.qa6Desc'), to: '/learn', imageKey: 'learningPath' },
     ],
     [t, locale]

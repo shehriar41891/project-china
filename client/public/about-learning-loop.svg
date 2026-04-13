@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none">
+  <defs>
+    <linearGradient id="abg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#2dd4bf"/>
+    </linearGradient>
+    <filter id="ash" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="720" height="280" rx="16" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+  <text x="360" y="36" text-anchor="middle" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="13" font-weight="700" letter-spacing="0.06em">YOUR LEARNING LOOP</text>
+  <g filter="url(#ash)">
+    <rect x="40" y="72" width="112" height="64" rx="12" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="96" y="100" text-anchor="middle" fill="#f1f5f9" font-family="system-ui,sans-serif" font-size="12" font-weight="700">Learn</text>
+    <text x="96" y="118" text-anchor="middle" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="9">Chapters</text>
+    <rect x="188" y="72" width="112" height="64" rx="12" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="244" y="100" text-anchor="middle" fill="#f1f5f9" font-family="system-ui,sans-serif" font-size="12" font-weight="700">Build</text>
+    <text x="244" y="118" text-anchor="middle" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="9">Network</text>
+    <rect x="336" y="72" width="112" height="64" rx="12" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="392" y="100" text-anchor="middle" fill="#f1f5f9" font-family="system-ui,sans-serif" font-size="12" font-weight="700">Train</text>
+    <text x="392" y="118" text-anchor="middle" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="9">Playground</text>
+    <rect x="484" y="72" width="112" height="64" rx="12" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="540" y="100" text-anchor="middle" fill="#f1f5f9" font-family="system-ui,sans-serif" font-size="12" font-weight="700">Check</text>
+    <text x="540" y="118" text-anchor="middle" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="9">Quiz</text>
+    <rect x="596" y="72" width="112" height="64" rx="12" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="652" y="100" text-anchor="middle" fill="#f1f5f9" font-family="system-ui,sans-serif" font-size="12" font-weight="700">Ask</text>
+    <text x="652" y="118" text-anchor="middle" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="9">Tutor AI</text>
+  </g>
+  <path d="M152 104h28" stroke="url(#abg)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M300 104h28" stroke="url(#abg)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M448 104h28" stroke="url(#abg)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M596 104h28" stroke="url(#abg)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M652 200 C652 228 520 248 360 248 C200 248 68 228 68 200" stroke="url(#abg)" stroke-width="2" fill="none" stroke-dasharray="8 6" stroke-linecap="round" opacity="0.9"/>
+  <text x="360" y="238" text-anchor="middle" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="10" font-weight="600">Profile and next steps</text>
+  <polygon points="68,200 62,208 74,208" fill="#a78bfa"/>
+</svg>

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLocale } from '../context/LocaleContext';
 import { postChat } from '../api/client';
+import { formatBoldSegments } from '../utils/chatFormat';
 import styles from './TutorChat.module.css';
 
 /** Scoped AI tutor: explain / hint / navigation / glossary — backend enforces tone via intent. */
@@ -98,7 +99,7 @@ export default function TutorChat() {
                 key={i}
                 className={`${styles.bubble} ${m.role === 'user' ? styles.user : styles.assistant} ${m.isError ? styles.err : ''}`}
               >
-                {m.content}
+                {m.role === 'assistant' ? formatBoldSegments(m.content) : m.content}
               </div>
             ))}
             {loading && <div className={styles.bubble + ' ' + styles.assistant}>…</div>}
