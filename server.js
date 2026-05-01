@@ -647,6 +647,101 @@ app.get('/api/profile', requireAuth, async (req, res) => {
   });
 });
 
+/**
+ * Mastery per chapter: 50/50 blend of latest quiz accuracy % and average of prior attempts %.
+ * Status: <50 Weak, 50–69 Developing, ≥70 Strong.
+ */
+function attemptAccuracyPct(row) {
+  const tq = row.total_questions;
+  if (!tq || tq <= 0) return null;
+  return (100 * (row.correct_count || 0)) / tq;
+}
+
+function masteryFromAttempts(attemptRowsNewestFirst) {
+  const list = (attemptRowsNewestFirst || []).filter((r) => r && r.total_questions > 0);
+  if (!list.length) {
+    return {
+      masteryScore: null,
+      status: 'Developing',
+      nextAction: 'review',
+      reasonCode: 'NO_DATA',
+      latestAccuracy: null,
+      previousAverageAccuracy: null
+    };
+  }
+  const latest = list[0];
+  const L = attemptAccuracyPct(latest);
+  const prev = list.slice(1);
+  let masteryScore;
+  let previousAverageAccuracy = null;
+  if (!prev.length) {
+    masteryScore = Math.round(L);
+  } else {
+    const sum = prev.reduce((s, r) => s + attemptAccuracyPct(r), 0);
+    previousAverageAccuracy = Math.round((sum / prev.length) * 10) / 10;
+    masteryScore = Math.round(0.5 * L + 0.5 * (sum / prev));
+  }
+  const latestAccuracy = Math.round(L * 10) / 10;
+  let status;
+  let nextAction;
+  let reasonCode;
+  if (masteryScore < 50) {
+    status = 'Weak';
+    nextAction = 'review';
+    reasonCode = prev.length ? 'WEAK_WITH_HISTORY' : 'WEAK_SINGLE';
+  } else if (masteryScore < 70) {
+    status = 'Developing';
+    nextAction = 'retake';
+    reasonCode = prev.length ? 'DEVELOPING_WITH_HISTORY' : 'DEVELOPING_SINGLE';
+  } else {
+    status = 'Strong';
+    nextAction = 'advance';
+    reasonCode = prev.length ? 'STRONG_WITH_HISTORY' : 'STRONG_SINGLE';
+  }
+  return {
+    masteryScore,
+    status,
+    nextAction,
+    reasonCode,
+    latestAccuracy,
+    previousAverageAccuracy
+  };
+}
+
+app.get('/api/mastery', requireAuth, (req, res) => {
+  const userId = req.session.userId;
+  const chapters = db.prepare('SELECT id, title, slug, sort_order FROM chapters ORDER BY sort_order').all();
+  const rows = db.prepare(`
+    SELECT chapter_id, correct_count, total_questions, id
+    FROM quiz_attempts
+    WHERE user_id = ? AND chapter_id IS NOT NULL AND completed_at IS NOT NULL AND total_questions > 0
+    ORDER BY chapter_id ASC, id DESC
+  `).all(userId);
+  const byChapter = {};
+  rows.forEach((r) => {
+    if (!byChapter[r.chapter_id]) byChapter[r.chapter_id] = [];
+    byChapter[r.chapter_id].push(r);
+  });
+  const out = chapters.map((c) => {
+    const attemptsForChapter = byChapter[c.id] || [];
+    const m = masteryFromAttempts(attemptsForChapter);
+    return {
+      chapterId: c.id,
+      title: c.title,
+      slug: c.slug,
+      sort_order: c.sort_order,
+      masteryScore: m.masteryScore,
+      status: m.status,
+      nextAction: m.nextAction,
+      reasonCode: m.reasonCode,
+      latestAccuracy: m.latestAccuracy,
+      previousAverageAccuracy: m.previousAverageAccuracy,
+      attemptCount: attemptsForChapter.length
+    };
+  });
+  res.json({ chapters: out });
+});
+
 // ----- Chat (LLM) — scoped tutor intents (reduces off-topic / quiz-spoil answers) -----
 const TUTOR_INTENTS = {
   explain: 'The user wants a simpler explanation. Use short sentences and plain language. No code unless asked.',

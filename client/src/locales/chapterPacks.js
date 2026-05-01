@@ -4,8 +4,9 @@ import ru from './chapters/ru.json';
 import fr from './chapters/fr.json';
 import es from './chapters/es.json';
 import ja from './chapters/ja.json';
+import ar from './chapters/ar.json';
 
-const PACKS = { en, zh, ru, fr, es, ja };
+const PACKS = { en, zh, ru, fr, es, ja, ar };
 
 /** Per-slug chapter copy: locale overrides English field-by-field. */
 export function buildChapterLookup(locale) {

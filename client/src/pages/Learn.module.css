@@ -165,7 +165,7 @@
   color: var(--text-muted);
 }
 .clearSearch {
-  margin-left: auto;
+  margin-inline-start: auto;
   border: 1px solid var(--border);
   background: var(--bg);
   color: var(--text);
@@ -195,7 +195,7 @@
 }
 .viewTab,
 .viewTabActive {
-  text-align: left;
+  text-align: start;
   border-radius: 10px;
   padding: 0.55rem 0.7rem;
   font-size: 0.84rem;

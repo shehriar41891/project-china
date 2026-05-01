@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <link rel="icon" type="image/png" href="favicon.png">
   <meta charset="utf-8">
@@ -12,42 +12,42 @@
   <header class="editor-header">
     <a href="/" class="back-link">← Home</a>
     <h1>Network Builder</h1>
-    <p class="subtitle">Connect Dataset → Hidden Layer(s) → Output Layer. Use − / + on each hidden layer to set neurons (1–8). Your graph is saved when you leave.</p>
+    <p class="subtitle">Connect Dataset → Hidden Layer(s) → Output Layer. Use − / + on each hidden layer to set neurons (1–8). Your graph is saved when you leave. <span class="kbd-hint">Keyboard: <kbd>Alt+L</kbd> add hidden layer, <kbd>Alt+Shift+L</kbd> remove last. Focus a node: arrow keys to move; <kbd>[</kbd> / <kbd>]</kbd> cycle activation on a hidden layer; <kbd>Delete</kbd> removes the node.</span></p>
     <div class="header-actions">
-      <button type="button" class="btn-guide" id="btn-guide" title="How to use">?</button>
-      <button type="button" class="btn btn-secondary" id="btn-clear">Clear</button>
-      <button type="button" class="btn btn-primary" id="btn-run">
-        <i class="material-icons" style="font-size:18px;vertical-align:middle;">play_arrow</i> Run training
+      <button type="button" class="btn-guide" id="btn-guide" title="How to use" aria-label="Open step-by-step guide">?</button>
+      <button type="button" class="btn btn-secondary" id="btn-clear" aria-label="Clear all nodes from the canvas">Clear</button>
+      <button type="button" class="btn btn-primary" id="btn-run" aria-label="Validate graph and open training in Playground">
+        <i class="material-icons" style="font-size:18px;vertical-align:middle;" aria-hidden="true">play_arrow</i> Run training
       </button>
     </div>
   </header>
 
   <div class="editor-layout">
-    <aside class="node-palette">
+    <aside class="node-palette" aria-label="Node palette">
       <h3>Nodes</h3>
       <p class="palette-hint">Drag onto canvas. Each hidden layer: <strong>− / +</strong> neurons (1–8). Connect: Dataset → Hidden → Output</p>
       <div class="palette-group">
         <span class="palette-label">Data</span>
-        <div class="palette-node palette-node--dataset" data-node-type="dataset" data-label="Dataset" draggable="true">
+        <div class="palette-node palette-node--dataset" data-node-type="dataset" data-label="Dataset" draggable="true" role="button" tabindex="0" aria-label="Dataset node. Drag onto the canvas or press Enter to add.">
           <span class="palette-node-icon" aria-hidden="true">D</span>
           Dataset
         </div>
       </div>
       <div class="palette-group">
         <span class="palette-label">Layers</span>
-        <div class="palette-node palette-node--hidden" data-node-type="layer" data-label="Hidden Layer" draggable="true">
+        <div class="palette-node palette-node--hidden" data-node-type="layer" data-label="Hidden Layer" draggable="true" role="button" tabindex="0" aria-label="Hidden layer node. Drag onto the canvas or press Enter to add.">
           <span class="palette-node-icon" aria-hidden="true">H</span>
           Hidden Layer
         </div>
-        <div class="palette-node palette-node--output" data-node-type="output" data-label="Output Layer" draggable="true">
+        <div class="palette-node palette-node--output" data-node-type="output" data-label="Output Layer" draggable="true" role="button" tabindex="0" aria-label="Output layer node. Drag onto the canvas or press Enter to add.">
           <span class="palette-node-icon" aria-hidden="true">Out</span>
           Output Layer
         </div>
         <div class="palette-actions">
-          <button type="button" class="btn-palette-action" id="btn-add-hidden" title="Add a hidden layer to the canvas">
+          <button type="button" class="btn-palette-action" id="btn-add-hidden" title="Add a hidden layer to the canvas" aria-keyshortcuts="Alt+L" aria-label="Add a hidden layer to the canvas. Shortcut: Alt+L.">
             + Add hidden layer
           </button>
-          <button type="button" class="btn-palette-action btn-palette-action--muted" id="btn-remove-hidden" title="Remove the last hidden layer">
+          <button type="button" class="btn-palette-action btn-palette-action--muted" id="btn-remove-hidden" title="Remove the last hidden layer" aria-keyshortcuts="Alt+Shift+L" aria-label="Remove the last hidden layer from the canvas. Shortcut: Alt+Shift+L.">
             − Remove last hidden
           </button>
         </div>
@@ -55,7 +55,8 @@
     </aside>
 
     <main class="node-canvas-wrap">
-      <div class="node-canvas" id="node-canvas">
+      <div id="editor-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+      <div class="node-canvas" id="node-canvas" role="application" aria-label="Neural network graph. Drag nodes from the palette or use keyboard shortcuts from the header hint.">
         <svg class="edge-layer" id="edge-layer"></svg>
         <div class="nodes-container" id="nodes-container"></div>
         <div class="canvas-placeholder" id="canvas-placeholder">Drop nodes here · Dataset → Hidden → Output Layer</div>

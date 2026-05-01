@@ -1,7 +1,7 @@
 .fab {
   position: fixed;
   bottom: 1.25rem;
-  right: 1.25rem;
+  inset-inline-end: 1.25rem;
   z-index: 1000;
   width: 56px;
   height: 56px;
@@ -23,9 +23,10 @@
 .panel {
   position: fixed;
   bottom: 5.5rem;
-  right: 1.25rem;
+  inset-inline-end: 1.25rem;
   z-index: 1001;
   width: min(400px, calc(100vw - 2rem));
+  width: min(400px, calc(100dvi - 2rem));
   max-height: min(520px, 70vh);
   display: flex;
   flex-direction: column;

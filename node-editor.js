@@ -11,6 +11,15 @@
   var placeholder = document.getElementById('canvas-placeholder');
   var runResult = document.getElementById('run-result');
 
+  function announce(msg) {
+    var live = document.getElementById('editor-announcer');
+    if (!live || !msg) return;
+    live.textContent = '';
+    setTimeout(function() {
+      live.textContent = msg;
+    }, 30);
+  }
+
   function id() { return 'n' + (++nodeIdCounter); }
 
   /** Matches playground.ts neuron limits (1–8 per hidden layer). */
@@ -18,6 +27,105 @@
     var n = parseInt(String(raw), 10);
     if (isNaN(n)) return 4;
     return Math.max(1, Math.min(8, n));
+  }
+
+  function syncCanvasNodeAria(el) {
+    var nid = el.dataset.nodeId;
+    var n = nodes[nid];
+    if (!n) return;
+    var type = n.type;
+    var summary = '';
+    if (type === 'dataset') {
+      var ds = el.querySelector('.dataset-select');
+      var dv = ds ? ds.value : 'circle';
+      summary = 'Dataset node. Selected data: ' + dv + '. Arrow keys move the node. Delete removes it.';
+    } else if (type === 'layer') {
+      var cnt = el.querySelector('.neuron-count');
+      var act = el.querySelector('.layer-activation');
+      var nc = cnt ? cnt.textContent : '4';
+      var av = act ? act.value : 'relu';
+      summary =
+        'Hidden layer. Neurons: ' +
+        nc +
+        '. Activation: ' +
+        av +
+        '. Press [ or ] to cycle activation. Arrow keys move. Delete removes.';
+    } else if (type === 'output') {
+      var oa = el.querySelector('.output-activation');
+      var ov = oa ? oa.value : 'sigmoid';
+      summary = 'Output layer. Activation: ' + ov + '. Arrow keys move. Delete removes.';
+    } else {
+      summary = 'Network node';
+    }
+    el.setAttribute('aria-label', summary);
+  }
+
+  function moveNodeByKeyboard(nid, dx, dy) {
+    var n = nodes[nid];
+    if (!n || !n.el) return;
+    var el = n.el;
+    var cr = getCanvasRect();
+    var left = (parseInt(el.style.left, 10) || 80) + dx;
+    var top = (parseInt(el.style.top, 10) || 80) + dy;
+    el.style.left = Math.max(0, Math.min((cr.width || 800) - 40, left)) + 'px';
+    el.style.top = Math.max(0, Math.min((cr.height || 600) - 40, top)) + 'px';
+    redrawEdges();
+    saveGraph();
+  }
+
+  function cycleLayerActivation(layerEl, forward) {
+    var sel = layerEl.querySelector('.layer-activation');
+    if (!sel || sel.tagName !== 'SELECT') return;
+    var i = sel.selectedIndex;
+    var nOpt = sel.options.length;
+    var next = forward ? (i + 1) % nOpt : (i - 1 + nOpt) % nOpt;
+    sel.selectedIndex = next;
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+    var label = sel.options[next] ? sel.options[next].textContent : sel.value;
+    announce('Activation: ' + label);
+  }
+
+  function onCanvasNodeKeydown(e, nid) {
+    var fromInteractive =
+      e.target &&
+      (e.target.closest('select') ||
+        e.target.closest('button') ||
+        e.target.closest('.neuron-stepper'));
+    if (fromInteractive && e.target !== e.currentTarget) return;
+
+    var n = nodes[nid];
+    if (!n) return;
+
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      moveNodeByKeyboard(nid, -12, 0);
+      return;
+    }
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      moveNodeByKeyboard(nid, 12, 0);
+      return;
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      moveNodeByKeyboard(nid, 0, -12);
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      moveNodeByKeyboard(nid, 0, 12);
+      return;
+    }
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      e.preventDefault();
+      removeNode(nid);
+      announce('Node removed');
+      return;
+    }
+    if (n.type === 'layer' && (e.key === '[' || e.key === ']')) {
+      e.preventDefault();
+      cycleLayerActivation(n.el, e.key === ']');
+    }
   }
 
   function getCanvasRect() {
@@ -34,40 +142,40 @@
 
     if (type === 'dataset') {
       el.innerHTML =
-        '<button type="button" class="node-delete" aria-label="Remove">×</button>' +
+        '<button type="button" class="node-delete" aria-label="Remove dataset node">×</button>' +
         '<div class="node-title">Dataset</div>' +
         '<div class="node-body">' +
-          '<label class="node-field"><span>Choose data</span><select class="node-select dataset-select">' +
+          '<label class="node-field"><span>Choose data</span><select class="node-select dataset-select" aria-label="Training dataset preset">' +
             '<option value="circle">Circle</option><option value="xor">XOR</option><option value="gauss">Gaussian</option><option value="spiral">Spiral</option>' +
           '</select></label>' +
         '</div>' +
-        '<div class="node-ports"><div class="inputs"></div><div class="outputs"><span class="port output" data-port="out"></span></div></div>';
+        '<div class="node-ports"><div class="inputs"></div><div class="outputs"><span class="port output" data-port="out" aria-label="Output port: drag to connect to another node"></span></div></div>';
     } else if (type === 'layer') {
       el.innerHTML =
-        '<button type="button" class="node-delete" aria-label="Remove">×</button>' +
+        '<button type="button" class="node-delete" aria-label="Remove hidden layer node">×</button>' +
         '<div class="node-title">Hidden Layer</div>' +
         '<div class="node-body">' +
           '<label class="node-field"><span>Neurons (per layer)</span>' +
           '<div class="neuron-stepper" data-min="1" data-max="8">' +
-            '<button type="button" class="neuron-btn neuron-minus" aria-label="Fewer neurons">−</button>' +
+            '<button type="button" class="neuron-btn neuron-minus" aria-label="Decrease neuron count">−</button>' +
             '<span class="neuron-count" aria-live="polite">4</span>' +
-            '<button type="button" class="neuron-btn neuron-plus" aria-label="More neurons">+</button>' +
+            '<button type="button" class="neuron-btn neuron-plus" aria-label="Increase neuron count">+</button>' +
           '</div></label>' +
-          '<label class="node-field"><span>Activation</span><select class="node-select layer-activation">' +
+          '<label class="node-field"><span>Activation</span><select class="node-select layer-activation" aria-label="Hidden layer activation function">' +
             '<option value="relu">ReLU</option><option value="tanh">Tanh</option><option value="sigmoid">Sigmoid</option><option value="linear">Linear</option>' +
           '</select></label>' +
         '</div>' +
-        '<div class="node-ports"><div class="inputs"><span class="port input" data-port="in"></span></div><div class="outputs"><span class="port output" data-port="out"></span></div></div>';
+        '<div class="node-ports"><div class="inputs"><span class="port input" data-port="in" aria-label="Input port: complete a connection here"></span></div><div class="outputs"><span class="port output" data-port="out" aria-label="Output port: drag to connect to another node"></span></div></div>';
     } else if (type === 'output') {
       el.innerHTML =
-        '<button type="button" class="node-delete" aria-label="Remove">×</button>' +
+        '<button type="button" class="node-delete" aria-label="Remove output layer node">×</button>' +
         '<div class="node-title">Output Layer</div>' +
         '<div class="node-body">' +
-          '<label class="node-field"><span>Output activation</span><select class="node-select output-activation">' +
+          '<label class="node-field"><span>Output activation</span><select class="node-select output-activation" aria-label="Output activation function">' +
             '<option value="sigmoid">Sigmoid</option><option value="linear">Linear</option>' +
           '</select></label>' +
         '</div>' +
-        '<div class="node-ports"><div class="inputs"><span class="port input" data-port="in"></span></div><div class="outputs"></div></div>';
+        '<div class="node-ports"><div class="inputs"><span class="port input" data-port="in" aria-label="Input port: complete a connection here"></span></div><div class="outputs"></div></div>';
     } else {
       el.innerHTML = '<div class="node-title">' + (label || type) + '</div><div class="node-ports"><div class="inputs"><span class="port input" data-port="in"></span></div><div class="outputs"><span class="port output" data-port="out"></span></div></div>';
     }
@@ -87,15 +195,40 @@
     });
 
     portListeners(el);
+    if (type === 'dataset') {
+      var dsSel = el.querySelector('.dataset-select');
+      if (dsSel) {
+        dsSel.addEventListener('change', function() {
+          syncCanvasNodeAria(el);
+          if (!restoring) saveGraph();
+        });
+      }
+    }
     if (type === 'layer') {
       bindNeuronStepper(el);
       var actSel = el.querySelector('.node-select.layer-activation');
       if (actSel) {
         actSel.addEventListener('change', function() {
+          syncCanvasNodeAria(el);
           if (!restoring) saveGraph();
         });
       }
     }
+    if (type === 'output') {
+      var outSel = el.querySelector('.output-activation');
+      if (outSel) {
+        outSel.addEventListener('change', function() {
+          syncCanvasNodeAria(el);
+          if (!restoring) saveGraph();
+        });
+      }
+    }
+    el.setAttribute('role', 'group');
+    el.setAttribute('tabindex', '0');
+    syncCanvasNodeAria(el);
+    el.addEventListener('keydown', function(e) {
+      onCanvasNodeKeydown(e, nid);
+    });
     dragNode(el, nid);
     updatePlaceholder();
     if (!restoring) saveGraph();
@@ -121,6 +254,7 @@
     }
     function setN(n) {
       syncUi(n);
+      syncCanvasNodeAria(layerEl);
       if (!restoring) saveGraph();
     }
     minus.addEventListener('click', function(e) {
@@ -134,6 +268,7 @@
       setN(getN() + 1);
     });
     syncUi(getN());
+    syncCanvasNodeAria(layerEl);
   }
 
   function getNodeState(nid) {
@@ -503,6 +638,47 @@
   var btnRemoveHidden = document.getElementById('btn-remove-hidden');
   if (btnAddHidden) btnAddHidden.addEventListener('click', addHiddenLayerNode);
   if (btnRemoveHidden) btnRemoveHidden.addEventListener('click', removeLastHiddenLayerNode);
+
+  function paletteAddAtDefault(type, label, value) {
+    var cr = getCanvasRect();
+    var x = Math.max(40, (cr.width || 400) / 2 - 60);
+    var y = Math.max(40, (cr.height || 300) / 2 - 40);
+    createCanvasNode(type, label || null, value || null, x, y);
+    announce(
+      type === 'dataset' ? 'Dataset node added to canvas' :
+      type === 'layer' ? 'Hidden layer added to canvas' :
+      'Output layer added to canvas'
+    );
+  }
+
+  document.querySelectorAll('.palette-node').forEach(function(paletteEl) {
+    paletteEl.addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      var type = paletteEl.dataset.nodeType;
+      var label = paletteEl.dataset.label || '';
+      var value = paletteEl.dataset.value || null;
+      paletteAddAtDefault(type, label, value);
+    });
+  });
+
+  document.addEventListener(
+    'keydown',
+    function(e) {
+      if (!e.altKey || e.code !== 'KeyL') return;
+      var tag = e.target && e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'OPTION') return;
+      e.preventDefault();
+      if (e.shiftKey) {
+        removeLastHiddenLayerNode();
+        announce('Removed last hidden layer');
+      } else {
+        addHiddenLayerNode();
+        announce('Added hidden layer');
+      }
+    },
+    true
+  );
 
   // Restore saved graph when returning to the editor
   restoreGraph();

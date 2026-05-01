@@ -12,6 +12,7 @@ export default function Profile() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const [mastery, setMastery] = useState(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
   const [recOpen, setRecOpen] = useState(false);
@@ -22,11 +23,49 @@ export default function Profile() {
       navigate('/login', { replace: true });
       return;
     }
-    api('/api/profile')
-      .then(setData)
+    Promise.all([api('/api/profile'), api('/api/mastery').catch(() => null)])
+      .then(([profileJson, masteryJson]) => {
+        setData(profileJson);
+        setMastery(masteryJson && masteryJson.chapters ? masteryJson : null);
+      })
       .catch(() => setErr('profile.loadError'))
       .finally(() => setLoading(false));
   }, [user, authLoading, navigate]);
+
+  const masteryReasonText = useMemo(() => {
+    if (!mastery || !mastery.chapters) return () => '';
+    return (row) => {
+      const code = row.reasonCode || 'NO_DATA';
+      const path = `profile.masteryReason${code}`;
+      let s = t(path);
+      if (s === path) s = t('profile.masteryReasonNO_DATA');
+      const masteryStr = row.masteryScore != null ? String(row.masteryScore) : '';
+      const latestStr = row.latestAccuracy != null ? String(row.latestAccuracy) : '';
+      const prevStr = row.previousAverageAccuracy != null ? String(row.previousAverageAccuracy) : '';
+      return s
+        .replace(/\{mastery\}/g, masteryStr)
+        .replace(/\{latest\}/g, latestStr)
+        .replace(/\{prev\}/g, prevStr);
+    };
+  }, [mastery, t]);
+
+  const statusClass = (status) => {
+    if (status === 'Weak') return styles.statusWeak;
+    if (status === 'Strong') return styles.statusStrong;
+    return styles.statusDeveloping;
+  };
+
+  const actionLabel = (action) => {
+    if (action === 'review') return t('profile.actionReview');
+    if (action === 'advance') return t('profile.actionAdvance');
+    return t('profile.actionRetake');
+  };
+
+  const statusLabel = (status) => {
+    if (status === 'Weak') return t('profile.statusWeak');
+    if (status === 'Strong') return t('profile.statusStrong');
+    return t('profile.statusDeveloping');
+  };
 
   const weakLine = useMemo(() => {
     if (!data || !data.byTopic) return '';
@@ -128,6 +167,45 @@ export default function Profile() {
               </div>
             </div>
           </section>
+
+          {mastery && mastery.chapters && mastery.chapters.length ? (
+            <section className={styles.panel} aria-labelledby="mastery-heading">
+              <h2 id="mastery-heading" className={styles.panelTitle}>{t('profile.panelMastery')}</h2>
+              <p className={styles.masteryLead}>{t('profile.masteryLead')}</p>
+              <div className={styles.tableWrap}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>{t('profile.colModule')}</th>
+                      <th>{t('profile.colMasteryScore')}</th>
+                      <th>{t('profile.colMasteryStatus')}</th>
+                      <th>{t('profile.colNextAction')}</th>
+                      <th>{t('profile.colReason')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mastery.chapters.map((row) => (
+                      <tr key={row.chapterId}>
+                        <td>
+                          <Link to={`/learn/${row.slug}`} className={styles.moduleLink}>
+                            {row.slug ? chapterText(row.slug, 'title', row.title) : row.title}
+                          </Link>
+                        </td>
+                        <td>{row.masteryScore != null ? `${row.masteryScore}%` : t('profile.masteryScoreNA')}</td>
+                        <td>
+                          <span className={`${styles.statusBadge} ${statusClass(row.status)}`}>
+                            {statusLabel(row.status)}
+                          </span>
+                        </td>
+                        <td>{actionLabel(row.nextAction)}</td>
+                        <td>{masteryReasonText(row)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          ) : null}
 
           <section className={styles.panel}>
             <h2 className={styles.panelTitle}>{t('profile.panelProgress')}</h2>

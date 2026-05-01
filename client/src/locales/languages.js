@@ -2,6 +2,7 @@
 export const LANGUAGE_OPTIONS = [
   { code: 'zh', label: '中文' },
   { code: 'en', label: 'English' },
+  { code: 'ar', label: 'العربية' },
   { code: 'ru', label: 'Русский' },
   { code: 'fr', label: 'Français' },
   { code: 'es', label: 'Español' },
@@ -12,6 +13,7 @@ export const LANGUAGE_OPTIONS = [
 export const HTML_LANG = {
   zh: 'zh-CN',
   en: 'en',
+  ar: 'ar',
   ru: 'ru',
   fr: 'fr',
   es: 'es',

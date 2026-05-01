@@ -1,6 +1,6 @@
 .skipLink {
   position: absolute;
-  left: -9999px;
+  inset-inline-start: -9999px;
   z-index: 9999;
   padding: 0.5rem 1rem;
   background: var(--accent);
@@ -9,7 +9,7 @@
   border-radius: 0 0 8px 0;
 }
 .skipLink:focus {
-  left: 1rem;
+  inset-inline-start: 1rem;
   top: 0.5rem;
   outline: 2px solid var(--text);
 }
@@ -38,6 +38,8 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
   padding: 0.85rem min(2rem, 4vw);
   background: color-mix(in srgb, var(--bg-card) 92%, transparent);
@@ -62,7 +64,8 @@
   font-weight: 800;
   color: var(--text);
   text-decoration: none;
-  min-width: 180px;
+  min-width: 0;
+  flex-shrink: 1;
 }
 .navBrand:hover {
   text-decoration: none;
@@ -178,8 +181,8 @@
 .navSearchWrap {
   position: relative;
   flex: 1;
-  min-width: 280px;
-  max-width: 560px;
+  min-width: 0;
+  max-width: min(560px, 100%);
   z-index: 250;
 }
 .navSearch {
@@ -190,8 +193,7 @@
 }
 .searchDropdown {
   position: absolute;
-  left: 0;
-  right: 0;
+  inset-inline: 0;
   top: calc(100% + 0.35rem);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -235,7 +237,7 @@
   border: 0;
   background: transparent;
   cursor: pointer;
-  text-align: left;
+  text-align: start;
   color: var(--text);
   font-size: 0.88rem;
 }
@@ -288,7 +290,7 @@
 }
 .menu {
   position: absolute;
-  right: 0;
+  inset-inline-end: 0;
   top: calc(100% + 0.35rem);
   min-width: 180px;
   border: 1px solid var(--border);
@@ -305,7 +307,7 @@
   border: 0;
   background: transparent;
   color: var(--text);
-  text-align: left;
+  text-align: start;
   padding: 0.45rem 0.5rem;
   border-radius: 8px;
   text-decoration: none;
@@ -378,7 +380,7 @@
   .navSearchWrap {
     order: 4;
     max-width: 100%;
-    min-width: 100%;
+    min-width: 0;
     width: 100%;
     flex: none;
   }

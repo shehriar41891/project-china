@@ -24,15 +24,25 @@ body.theme-light {
 *::after {
   box-sizing: border-box;
 }
+
+html {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: 'Space Grotesk', system-ui, sans-serif;
+  max-width: 100%;
+  overflow-x: clip;
+  font-family: 'Space Grotesk', 'Noto Sans Arabic', 'Segoe UI', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
 }
 #root {
   min-height: 100vh;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 a {
@@ -52,8 +62,3 @@ input, textarea {
   font-family: inherit;
 }
 
-@media (max-width: 768px) {
-  body {
-    overflow-x: clip;
-  }
-}

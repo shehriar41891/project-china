@@ -5,10 +5,11 @@ import ru from '../locales/ru.json';
 import fr from '../locales/fr.json';
 import es from '../locales/es.json';
 import ja from '../locales/ja.json';
+import ar from '../locales/ar.json';
 import { VALID_LOCALES, HTML_LANG } from '../locales/languages';
 import { buildChapterLookup } from '../locales/chapterPacks';
 
-const DICTS = { en, zh, ru, fr, es, ja };
+const DICTS = { en, zh, ru, fr, es, ja, ar };
 const STORAGE_KEY = 'nnp-locale';
 
 /** Deep-merge override into base so partial locale files inherit English for missing keys. */
@@ -57,6 +58,7 @@ export function LocaleProvider({ children }) {
 
   useEffect(() => {
     document.documentElement.lang = HTML_LANG[locale] || 'en';
+    document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
   }, [locale]);
 
   const mergedDict = useMemo(() => {

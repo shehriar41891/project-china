@@ -12,19 +12,21 @@
     "dev": "npm run prep && concurrently \"--kill-others=false\" \"node server.js\" \"npm run watch\"",
     "start": "npm run prep && node server.js",
     "start:prod": "node server.js",
-    "prep": "npm run build:client && copyfiles -f client/public/* dist && copyfiles editor.html playground.html analytics.js guide-and-drag.js editor.css node-editor.js playground-custom.css dist && concat node_modules/material-design-lite/material.min.js node_modules/seedrandom/seedrandom.min.js > dist/lib.js && npm run build-css",
+    "prep": "npm run build:client && npm run build-js && copyfiles -f client/public/* dist && copyfiles editor.html playground.html analytics.js guide-and-drag.js editor.css node-editor.js playground-custom.css dist && concat node_modules/material-design-lite/material.min.js node_modules/seedrandom/seedrandom.min.js > dist/lib.js && npm run build-css",
     "build-css": "concat node_modules/material-design-lite/material.min.css styles.css playground-custom.css > dist/bundle.css",
     "watch-css": "concat node_modules/material-design-lite/material.min.css styles.css playground-custom.css -o dist/bundle.css",
     "build-html": "copyfiles playground.html editor.html dist",
     "watch-html": "copyfiles playground.html editor.html dist",
-    "build-js": "browserify src/playground.ts -p [tsify] | uglifyjs -c > dist/bundle.js",
-    "watch-js": "watchify src/playground.ts -p [tsify] -v --debug -o dist/bundle.js",
+    "build-js": "browserify src/playground.ts -p [ tsify --project tsconfig.playground.json ] | uglifyjs -c > dist/bundle.js",
+    "watch-js": "watchify src/playground.ts -p [ tsify --project tsconfig.playground.json ] -v --debug -o dist/bundle.js",
     "build": "npm run prep && npm run build-js && npm run build-css && npm run build-html",
     "watch": "npm run prep && concurrently \"npm run watch-js\" \"npm run watch-css\" \"npm run watch-html\"",
     "serve": "npx serve dist/",
     "serve-watch": "concurrently \"npx serve dist/\" \"npm run watch\"",
     "server": "node server.js",
-    "dev:db": "concurrently \"npm run watch\" \"node server.js\""
+    "dev:db": "concurrently \"npm run watch\" \"node server.js\"",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "@types/d3": "^3.5.34",
@@ -36,6 +38,7 @@
     "serve": "^11.3.0",
     "tsify": "^4.0.0",
     "typescript": "^2.9",
+    "vitest": "^3.0.5",
     "uglify-js": "^2.8.29",
     "watchify": "^4.0.0"
   },
